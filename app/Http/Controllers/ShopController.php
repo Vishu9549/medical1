@@ -1,0 +1,230 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Shop;
+use App\Models\Inventory;
+use App\Models\Medicine;
+use App\Models\Order;
+use App\Models\Wallet;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class ShopController extends Controller
+{
+    private function getActiveShop()
+    {
+        if (Auth::check()) {
+            return Auth::user()->shop;
+        }
+        return null;
+    }
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'owner' => 'required|string',
+            'phone' => 'required|string',
+            'area' => 'required|string',
+            'address' => 'required|string',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric'
+        ]);
+
+        if (!Auth::check()) {
+            return redirect('/login')->with('error', 'Pehle account login karein.');
+        }
+
+        $shop = Shop::create([
+            'name' => $request->name,
+            'owner_name' => $request->owner,
+            'phone' => $request->phone,
+            'area' => $request->area,
+            'address' => $request->address,
+            'rating' => 5.0,
+            'reviews' => 0,
+            'distance_km' => round(rand(5, 45) / 10, 1),
+            'is_top' => false,
+            'delivery_enabled' => false,
+            'is_online' => true,
+            'status' => 'approved', // Automatically approve for demo purposes
+            'user_id' => Auth::id(),
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude
+        ]);
+
+        // Create wallet
+        Wallet::create([
+            'shop_id' => $shop->id,
+            'total_sales' => 0,
+            'due_commission' => 0,
+            'credit_limit' => 100,
+            'status' => 'active'
+        ]);
+
+        // Automatically update role to shop_owner if they were customer
+        $user = Auth::user();
+        if ($user->role === 'customer') {
+            $user->role = 'shop_owner';
+            $user->save();
+        }
+
+        return redirect('/shop/dashboard')->with('success', 'Store registered successfully!');
+    }
+
+    public function dashboard()
+    {
+        $shop = $this->getActiveShop();
+        if (!$shop) {
+            return redirect('/profile')->with('error', 'Pehle store register karein!');
+        }
+
+        $orders = Order::where('shop_id', $shop->id)->orderBy('id', 'desc')->get();
+        $ordersCount = $orders->count();
+        $revenue = $orders->sum('total_price');
+        
+        $inventory = Inventory::where('shop_id', $shop->id)->get();
+        $inventoryCount = $inventory->count();
+
+        $wallet = Wallet::where('shop_id', $shop->id)->first();
+
+        return view('shop.dashboard', compact('shop', 'ordersCount', 'revenue', 'inventoryCount', 'wallet'));
+    }
+
+    public function toggleOnline(Request $request)
+    {
+        $shop = $this->getActiveShop();
+        if (!$shop) return redirect('/profile');
+
+        $shop->is_online = !$shop->is_online;
+        $shop->save();
+
+        return redirect()->back()->with('success', 'Online status updated!');
+    }
+
+    public function toggleDelivery(Request $request)
+    {
+        $shop = $this->getActiveShop();
+        if (!$shop) return redirect('/profile');
+
+        $shop->delivery_enabled = !$shop->delivery_enabled;
+        $shop->save();
+
+        return redirect()->back()->with('success', 'Delivery status updated!');
+    }
+
+    public function quickSetupIndex(Request $request)
+    {
+        $shop = $this->getActiveShop();
+        if (!$shop) return redirect('/profile');
+
+        $category = $request->input('category', 'All');
+        $medQuery = Medicine::query();
+        if ($category !== 'All') {
+            $medQuery->where('category', $category);
+        }
+        $masterMedicines = $medQuery->get();
+        $shopInventory = Inventory::where('shop_id', $shop->id)->get();
+
+        return view('shop.quicksetup', compact('shop', 'masterMedicines', 'shopInventory', 'category'));
+    }
+
+    public function quickSetupSave(Request $request)
+    {
+        $shop = $this->getActiveShop();
+        if (!$shop) return redirect('/profile');
+
+        $qsSel = $request->input('qs_sel', []);
+
+        foreach ($qsSel as $medIdStr => $data) {
+            $medId = (int) str_replace('m', '', $medIdStr);
+            $has = isset($data['has']) && $data['has'] === 'true';
+            $price = (float) ($data['price'] ?? 0);
+
+            if ($has) {
+                Inventory::updateOrCreate(
+                    ['shop_id' => $shop->id, 'medicine_id' => $medId],
+                    ['price' => $price, 'quantity' => 50]
+                );
+            } else {
+                Inventory::where('shop_id', $shop->id)->where('medicine_id', $medId)->delete();
+            }
+        }
+
+        return redirect('/shop/inventory')->with('success', 'Quick setup stock saved successfully!');
+    }
+
+    public function inventoryIndex()
+    {
+        $shop = $this->getActiveShop();
+        if (!$shop) return redirect('/profile');
+
+        $inventory = Inventory::where('shop_id', $shop->id)->with('medicine')->get();
+
+        return view('shop.inventory', compact('shop', 'inventory'));
+    }
+
+    public function inventoryAdd(Request $request)
+    {
+        $shop = $this->getActiveShop();
+        if (!$shop) return redirect('/profile');
+
+        $request->validate([
+            'name' => 'required|string',
+            'price' => 'required|numeric',
+            'qty' => 'required|integer'
+        ]);
+
+        $master = Medicine::where('name', 'like', '%' . $request->name . '%')->first();
+
+        Inventory::create([
+            'shop_id' => $shop->id,
+            'medicine_id' => $master ? $master->id : null,
+            'name' => $master ? null : $request->name,
+            'price' => $request->price,
+            'quantity' => $request->qty
+        ]);
+
+        return redirect('/shop/inventory')->with('success', 'Medicine stock added manually!');
+    }
+
+    public function inventoryDelete(Request $request, $id)
+    {
+        $shop = $this->getActiveShop();
+        if (!$shop) return redirect('/profile');
+
+        // Confirm inventory item belongs to this shop for protection
+        Inventory::where('id', $id)->where('shop_id', $shop->id)->delete();
+
+        return redirect('/shop/inventory')->with('success', 'Medicine stock removed!');
+    }
+
+    public function ordersIndex()
+    {
+        $shop = $this->getActiveShop();
+        if (!$shop) return redirect('/profile');
+
+        $orders = Order::where('shop_id', $shop->id)->orderBy('id', 'desc')->get();
+
+        return view('shop.orders', compact('shop', 'orders'));
+    }
+
+    public function ordersUpdate(Request $request)
+    {
+        $shop = $this->getActiveShop();
+        if (!$shop) return redirect('/profile');
+
+        $request->validate([
+            'order_id' => 'required|integer',
+            'status' => 'required|string'
+        ]);
+
+        // Secure checking that order belongs to active shop owner
+        $order = Order::where('id', $request->order_id)->where('shop_id', $shop->id)->firstOrFail();
+        $order->status = $request->status;
+        $order->save();
+
+        return redirect()->back()->with('success', 'Order status updated to ' . $request->status);
+    }
+}

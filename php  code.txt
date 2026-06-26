@@ -1,0 +1,1064 @@
+<?php
+// Dawalo - Medicine Delivery App
+// Single file PHP - Upload to any PHP server and open in browser
+?>
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Dawalo 💊 - Muzaffarpur</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:#E8ECF5;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;font-family:'Segoe UI','Nunito',sans-serif;}
+#app{width:100%;max-width:430px;min-height:100vh;background:#F0F4FF;position:relative;overflow:hidden;display:flex;flex-direction:column;}
+.screen{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.scroll::-webkit-scrollbar{width:0;}
+
+/* Header */
+.hdr-gradient{background:linear-gradient(135deg,#1A3C8F,#2563EB,#3B82F6,#60A5FA);padding:16px 16px 70px;position:relative;overflow:hidden;}
+.hdr-circle{position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,0.08);}
+.hdr-circle2{position:absolute;bottom:10px;left:-50px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.06);}
+
+/* Cards */
+.card{background:#fff;border-radius:18px;box-shadow:0 2px 16px rgba(0,0,0,0.07);}
+.stat-grid{display:flex;gap:10px;padding:0 14px;margin-top:-50px;position:relative;z-index:10;}
+.stat-card{flex:1;background:#fff;border-radius:14px;padding:13px 8px;text-align:center;box-shadow:0 6px 24px rgba(37,99,235,0.12);border:1px solid #F0F4FF;}
+
+/* Buttons */
+.btn-blue{background:#1A3C8F;border:none;border-radius:12px;color:#fff;font-weight:800;cursor:pointer;font-family:inherit;}
+.btn-outline{background:#fff;border:1.5px solid #1A3C8F;border-radius:12px;color:#1A3C8F;font-weight:800;cursor:pointer;font-family:inherit;}
+.btn-green{background:linear-gradient(135deg,#059669,#10B981);border:none;border-radius:12px;color:#fff;font-weight:800;cursor:pointer;font-family:inherit;}
+.btn-danger{background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;color:#DC2626;font-weight:800;cursor:pointer;font-family:inherit;}
+
+/* Bottom Nav */
+.bottom-nav{background:#fff;border-top:1px solid #E5E7EB;display:flex;justify-content:space-around;padding:10px 0 14px;flex-shrink:0;box-shadow:0 -4px 20px rgba(0,0,0,0.08);}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 16px;}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:#1A3C8F;}
+
+/* Search */
+.search-box{background:#fff;border-radius:14px;display:flex;align-items:center;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.15);}
+.search-input{flex:1;border:none;outline:none;padding:13px 14px;font-size:14px;color:#1A1A1A;background:transparent;font-family:inherit;}
+.search-btn{background:#1A3C8F;border:none;padding:10px 16px;margin:4px;border-radius:10px;cursor:pointer;color:#fff;font-weight:700;font-size:14px;font-family:inherit;}
+
+/* Pills */
+.pill-row{display:flex;gap:8px;margin-top:12px;overflow-x:auto;padding-bottom:4px;}
+.pill-row::-webkit-scrollbar{height:0;}
+.pill{font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;white-space:nowrap;cursor:pointer;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.18);color:#fff;display:inline-block;}
+.pill.active{background:#fff;color:#1A3C8F;}
+
+/* Banner */
+.banner-wrap{padding:16px 14px 0;}
+.banner-card{position:relative;border-radius:20px;overflow:hidden;height:110px;transition:background 0.6s;}
+.banner-circle{position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.15);}
+.banner-emoji{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:56px;opacity:0.9;}
+.banner-text{position:absolute;left:18px;top:50%;transform:translateY(-50%);max-width:70%;}
+.banner-dots{position:absolute;bottom:10px;left:18px;display:flex;gap:6px;}
+
+/* Category */
+.cat-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;}
+.cat-row::-webkit-scrollbar{height:0;}
+.cat-item{display:flex;flex-direction:column;align-items:center;gap:6px;background:#fff;border-radius:16px;padding:13px 14px;min-width:68px;box-shadow:0 2px 12px rgba(0,0,0,0.06);cursor:pointer;}
+
+/* Shop card */
+.shop-card{background:#fff;border-radius:20px;padding:16px;cursor:pointer;box-shadow:0 2px 16px rgba(0,0,0,0.07);margin-bottom:12px;}
+
+/* Medicine list (search results) */
+.med-row{display:flex;border-bottom:1px solid #F3F4F6;padding:16px;background:#fff;}
+.med-img{width:110px;height:110px;border-radius:12px;background:#F8FAFF;border:1px solid #E5E7EB;display:flex;align-items:center;justify-content:center;font-size:52px;flex-shrink:0;position:relative;overflow:hidden;}
+.bestseller{position:absolute;top:6px;left:0;background:#FEF3C7;color:#D97706;font-size:9px;font-weight:800;padding:2px 7px;border-radius:0 6px 6px 0;}
+.add-btn{width:100%;padding:11px 0;background:#fff;border:1.5px solid #1A3C8F;border-radius:10px;color:#1A3C8F;font-weight:900;font-size:15px;cursor:pointer;font-family:inherit;letter-spacing:1px;}
+.qty-row{display:flex;align-items:center;border:1.5px solid #1A3C8F;border-radius:10px;overflow:hidden;}
+.qty-btn{flex:1;padding:11px 0;background:#fff;border:none;font-size:20px;font-weight:900;color:#1A3C8F;cursor:pointer;}
+.qty-num{flex:1;text-align:center;font-weight:900;font-size:16px;color:#1A3C8F;background:#EEF2FF;padding:11px 0;}
+
+/* Cart bar */
+.cart-bar{background:linear-gradient(135deg,#1A3C8F,#2563EB);border-radius:18px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 8px 28px rgba(37,99,235,0.45);margin:8px 14px;}
+
+/* Order modal */
+.overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.55);z-index:500;display:flex;flex-direction:column;justify-content:flex-end;}
+.sheet{background:#fff;border-radius:20px 20px 0 0;padding:22px 20px 40px;max-height:90%;overflow-y:auto;}
+.handle{width:40px;height:4px;background:#E5E7EB;border-radius:4px;margin:0 auto 18px;}
+
+/* Smart Cart */
+.cart-item-card{background:#fff;border-radius:16px;padding:12px;box-shadow:0 2px 12px rgba(0,0,0,0.07);margin-bottom:9px;display:flex;gap:11px;align-items:center;}
+
+/* Dashboard */
+.dash-tab{flex-shrink:0;padding:10px 10px;border:none;border-radius:14px;cursor:pointer;font-weight:800;font-size:11px;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:3px;}
+
+/* Admin */
+.admin-tab{flex-shrink:0;padding:8px 10px;border:none;border-radius:12px;cursor:pointer;font-weight:800;font-size:10px;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;}
+
+/* Quick setup */
+.qs-card{background:#fff;border-radius:14px;padding:11px 12px;box-shadow:0 2px 10px rgba(0,0,0,0.05);margin-bottom:9px;display:flex;gap:10px;align-items:center;}
+.qs-check{width:26px;height:26px;border-radius:7px;flex-shrink:0;border:2px solid #D1D5DB;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.qs-check.checked{background:#16A34A;border:none;color:#fff;font-weight:900;font-size:14px;}
+
+/* Form inputs */
+.form-input{width:100%;padding:12px 14px;border:1.5px solid #E5E7EB;border-radius:12px;font-size:14px;outline:none;color:#1A1A1A;font-family:inherit;background:#fff;transition:border 0.2s;}
+.form-input:focus{border-color:#1A3C8F;}
+.form-label{display:block;font-size:12px;font-weight:700;color:#666;margin-bottom:6px;}
+
+/* Toggle switch */
+.toggle-wrap{width:50px;height:28px;border-radius:99px;position:relative;cursor:pointer;transition:background 0.3s;flex-shrink:0;}
+.toggle-dot{width:22px;height:22px;background:#fff;border-radius:50%;position:absolute;top:3px;transition:left 0.3s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+
+/* Delivery bar */
+.due-bar-track{height:6px;background:#F3F4F6;border-radius:99px;overflow:hidden;margin-top:7px;}
+.due-bar-fill{height:100%;border-radius:99px;}
+
+/* Transitions */
+.screen{animation:fadeIn 0.15s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+/* Scrollbar hidden globally */
+::-webkit-scrollbar{width:0;height:0;}
+
+/* Status badges */
+.badge{font-size:10px;font-weight:800;padding:3px 10px;border-radius:8px;display:inline-block;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────
+const MEDICINES = ["Paracetamol","Azithromycin","Cetirizine","Omeprazole","Ibuprofen","Dolo 650","Metformin","Amoxicillin"];
+
+const ALL_SHOPS = [
+  {id:1,name:"Sharma Medical Store",area:"Mithanpura",rating:4.8,reviews:124,distanceKm:0.4,top:true,deliveryEnabled:true,
+   inventory:{"Paracetamol":25,"Dolo 650":30,"Cetirizine":20,"Omeprazole":45,"Ibuprofen":22}},
+  {id:2,name:"Gupta Pharma",area:"Brahmpura",rating:4.5,reviews:89,distanceKm:1.2,top:false,deliveryEnabled:false,
+   inventory:{"Azithromycin":90,"Paracetamol":18,"Metformin":35,"Amoxicillin":80}},
+  {id:3,name:"Singh Medical",area:"Juran Chapra",rating:4.7,reviews:203,distanceKm:2.1,top:false,deliveryEnabled:true,
+   inventory:{"Cetirizine":22,"Ibuprofen":20,"Dolo 650":28,"Omeprazole":40,"Paracetamol":15}},
+  {id:4,name:"Yadav Medical",area:"Ramna Road",rating:4.3,reviews:56,distanceKm:2.8,top:false,deliveryEnabled:true,
+   inventory:{"Metformin":30,"Amoxicillin":75,"Azithromycin":85}},
+];
+
+const BANNERS = [
+  {title:"Pehla Order Free Delivery! 🎉",sub:"Naye users ke liye special offer",bg:"#F97316",emoji:"🛵"},
+  {title:"24x7 Emergency Medicines 🚨",sub:"Raat ko bhi dawai milegi",bg:"#7C3AED",emoji:"🌙"},
+  {title:"Apni Dukan List Karein 🏪",sub:"Free mein register karo",bg:"#059669",emoji:"📈"},
+];
+
+const CATS = [
+  {icon:"🤒",label:"Bukhar",color:"#FEF3C7"},{icon:"💊",label:"Antibiotic",color:"#DBEAFE"},
+  {icon:"❤️",label:"Heart",color:"#FEE2E2"},{icon:"🧴",label:"Skin",color:"#F3E8FF"},
+  {icon:"🦷",label:"Dental",color:"#E0F2FE"},{icon:"👁️",label:"Eye",color:"#DCFCE7"},
+];
+
+const CATALOG = [
+  {id:"m1",name:"Paracetamol 500mg",cat:"Fever",emoji:"🌡️",mrp:32,price:25,disc:22,inv:"Paracetamol"},
+  {id:"m2",name:"Azithromycin 500mg",cat:"Antibiotic",emoji:"💊",mrp:120,price:95,disc:21,inv:"Azithromycin"},
+  {id:"m3",name:"Cetirizine 10mg",cat:"Allergy",emoji:"🤧",mrp:28,price:22,disc:21,inv:"Cetirizine"},
+  {id:"m4",name:"Omeprazole 20mg",cat:"Acidity",emoji:"🔵",mrp:45,price:36,disc:20,inv:"Omeprazole"},
+  {id:"m5",name:"Ibuprofen 400mg",cat:"Pain",emoji:"🩹",mrp:38,price:30,disc:21,inv:"Ibuprofen"},
+  {id:"m6",name:"Dolo 650mg",cat:"Fever",emoji:"🌡️",mrp:30,price:24,disc:20,inv:"Dolo 650"},
+  {id:"m7",name:"Metformin 500mg",cat:"Diabetes",emoji:"💉",mrp:55,price:42,disc:24,inv:"Metformin"},
+  {id:"m8",name:"Amoxicillin 250mg",cat:"Antibiotic",emoji:"💊",mrp:85,price:68,disc:20,inv:"Amoxicillin"},
+  {id:"m9",name:"Pantoprazole 40mg",cat:"Acidity",emoji:"🔵",mrp:60,price:48,disc:20,inv:null},
+  {id:"m10",name:"Vitamin C 500mg",cat:"Supplement",emoji:"🍊",mrp:40,price:32,disc:20,inv:null},
+  {id:"m11",name:"Atorvastatin 10mg",cat:"Heart",emoji:"❤️",mrp:95,price:76,disc:20,inv:null},
+  {id:"m12",name:"Metronidazole 400mg",cat:"Antibiotic",emoji:"💊",mrp:42,price:34,disc:19,inv:null},
+];
+
+// ─── STATE ───────────────────────────────────────────────────
+let S = {
+  screen: "home",
+  tab: "home",
+  search: "",
+  cartSearch: "",
+  bannerIdx: 0,
+  pulse: false,
+  homeCart: {},
+  modal: null,
+  selectedShop: null,
+  orderMode: null,
+  confirmedOrder: null,
+  registeredShop: null,
+  shopInventory: [],
+  shopOnline: true,
+  deliveryOn: false,
+  dashTab: "overview",
+  qsSel: {},
+  qsCat: "All",
+  showAddMed: false,
+  newMed: {name:"",price:"",qty:""},
+  shopOrders: [
+    {id:1001,medicine:"Paracetamol",mode:"pickup",total:50,status:"Delivered"},
+    {id:1002,medicine:"Dolo 650",mode:"delivery",total:38,status:"Pending"}
+  ],
+  shopFormData: {name:"",owner:"",phone:"",area:"",address:""},
+  adminPin: "",
+  adminPinErr: "",
+  adminTab: "overview",
+  adminStores: [
+    {id:1,name:"Sharma Medical Store",owner:"Rajesh Sharma",area:"Mithanpura",phone:"9876543210",status:"approved",orders:124,revenue:4280},
+    {id:2,name:"Gupta Pharma",owner:"Anil Gupta",area:"Brahmpura",phone:"9123456780",status:"approved",orders:89,revenue:3150},
+    {id:3,name:"Singh Medical",owner:"Vikram Singh",area:"Juran Chapra",phone:"9988776655",status:"approved",orders:203,revenue:6720},
+    {id:4,name:"Yadav Medical",owner:"Suresh Yadav",area:"Ramna Road",phone:"9090909090",status:"blocked",orders:12,revenue:410},
+    {id:5,name:"Verma Pharmacy",owner:"Pooja Verma",area:"Aghoria Bazar",phone:"9555512345",status:"pending",orders:0,revenue:0},
+  ],
+  commRate: 2,
+  commOn: true,
+  wallets: [
+    {id:1,name:"Sharma Medical Store",area:"Mithanpura",totalSales:4820,due:45,limit:100,status:"active"},
+    {id:2,name:"Gupta Pharma",area:"Brahmpura",totalSales:2100,due:138,limit:100,status:"restricted"},
+    {id:3,name:"Singh Medical",area:"Juran Chapra",totalSales:7300,due:0,limit:100,status:"active"},
+    {id:4,name:"Yadav Medical",area:"Ramna Road",totalSales:1600,due:32,limit:100,status:"active"},
+  ],
+  cartMatches: null,
+  masterMeds: [
+    {id:"mm1",name:"Paracetamol 500mg",cat:"Fever",mrp:32,price:25},
+    {id:"mm2",name:"Azithromycin 500mg",cat:"Antibiotic",mrp:120,price:95},
+    {id:"mm3",name:"Cetirizine 10mg",cat:"Allergy",mrp:28,price:22},
+    {id:"mm4",name:"Omeprazole 20mg",cat:"Acidity",mrp:45,price:36},
+    {id:"mm5",name:"Dolo 650mg",cat:"Fever",mrp:30,price:24},
+    {id:"mm6",name:"Amoxicillin 250mg",cat:"Antibiotic",mrp:85,price:68},
+  ],
+  newMasterMed: {name:"",cat:"",mrp:"",price:""},
+  showMasterForm: false,
+};
+
+// ─── HELPERS ─────────────────────────────────────────────────
+function calcDelivery(km){ return km > 10 ? null : Math.round(km * 8); }
+
+function set(updates){ Object.assign(S, updates); render(); }
+
+function cartCount(){ return Object.values(S.homeCart).reduce((a,b)=>a+b,0); }
+
+function computeMatches(){
+  const items = Object.keys(S.homeCart).map(id => CATALOG.find(m=>m.id===id)).filter(Boolean);
+  if(!items.length) return [];
+  return ALL_SHOPS.map(shop => {
+    const available=[], missing=[];
+    let tp=0;
+    items.forEach(item => {
+      if(item.inv && shop.inventory[item.inv]!==undefined){
+        available.push({...item, shopPrice:shop.inventory[item.inv]});
+        tp += shop.inventory[item.inv];
+      } else { missing.push(item); }
+    });
+    const dc = calcDelivery(shop.distanceKm)||0;
+    return {shop,available,missing,matchCount:available.length,totalPrice:tp,
+            totalWithDelivery:tp+dc,deliveryCharge:dc,totalItems:items.length};
+  }).sort((a,b)=>b.matchCount-a.matchCount||a.totalWithDelivery-b.totalWithDelivery);
+}
+
+function esc(s){ 
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── DOM HELPERS ──────────────────────────────────────────────
+function el(tag, attrs={}, ...children){
+  const e = document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs)){
+    if(k==="cls") e.className=v;
+    else if(k==="style" && typeof v==="object") Object.assign(e.style,v);
+    else if(k.startsWith("on")) e.addEventListener(k.slice(2).toLowerCase(),v);
+    else e.setAttribute(k,v);
+  }
+  children.flat().forEach(c=>{
+    if(c==null||c===false||c===undefined) return;
+    e.appendChild(typeof c==="string"||typeof c==="number" ? document.createTextNode(String(c)) : c);
+  });
+  return e;
+}
+function d(style,...children){ return el("div",{style},...children); }
+function b(style,text,onClick){ 
+  const btn=el("button",{style,onClick});
+  btn.innerHTML=text; 
+  return btn;
+}
+function span(style,text){ const s=el("span",{style}); s.innerHTML=text; return s; }
+
+// ─── SCREENS ─────────────────────────────────────────────────
+
+// HOME SCREEN
+function renderHome(){
+  const isSearching = S.search.trim().length > 0;
+  const cc = cartCount();
+  const wrap = d({display:"flex",flexDirection:"column",minHeight:"100vh"});
+
+  // === HEADER ===
+  const hdr = el("div",{cls:"hdr-gradient"});
+  hdr.appendChild(el("div",{cls:"hdr-circle"}));
+  hdr.appendChild(el("div",{cls:"hdr-circle2"}));
+
+  const topBar = d({display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"14px",position:"relative",zIndex:"1"});
+  const brand = d({});
+  const brandRow = d({display:"flex",alignItems:"center",gap:"6px",marginBottom:"2px"});
+  const bt = el("span",{style:{fontSize:"22px",fontWeight:"900",color:"#fff"}});
+  bt.innerHTML = "Dawa<span style='color:#60A5FA'>lo</span> 💊";
+  brandRow.appendChild(bt);
+  brand.appendChild(brandRow);
+  const locRow = d({display:"flex",alignItems:"center",gap:"4px"});
+  locRow.appendChild(el("span",{style:{fontSize:"13px",color:"rgba(255,255,255,0.9)",fontWeight:"600"}},"📍 Muzaffarpur"));
+  locRow.appendChild(el("span",{style:{fontSize:"13px",color:"rgba(255,255,255,0.6)"}}," , Bihar ▾"));
+  brand.appendChild(locRow);
+  topBar.appendChild(brand);
+  topBar.appendChild(d({background:"rgba(255,255,255,0.15)",borderRadius:"12px",width:"40px",height:"40px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"18px",cursor:"pointer"},"🔔"));
+  hdr.appendChild(topBar);
+
+  const heroDiv = d({marginBottom:"18px",position:"relative",zIndex:"1"});
+  const heroTitle = el("h1",{style:{color:"#fff",fontSize:"26px",fontWeight:"900",lineHeight:"1.2",margin:"0 0 6px"}});
+  heroTitle.innerHTML = "Dawai dhundo,<br><span style='color:#93C5FD'>5 km ke andar</span> 💊";
+  heroDiv.appendChild(heroTitle);
+  heroDiv.appendChild(el("p",{style:{color:"rgba(255,255,255,0.75)",fontSize:"13px",margin:"0"}},"Nearby medical shops ka live stock — order karo ghar se"));
+  hdr.appendChild(heroDiv);
+
+  // Search bar
+  const sb = el("div",{cls:"search-box",style:{position:"relative",zIndex:"1"}});
+  const si = el("input",{cls:"search-input",placeholder:"Medicine ka naam likhein...",type:"text"});
+  si.value = S.search;
+  si.oninput = e => { S.search = e.target.value; render(); };
+  sb.appendChild(si);
+  if(S.search){ sb.appendChild(b({background:"none",border:"none",color:"#aaa",fontSize:"20px",cursor:"pointer",padding:"0 8px"},"✕",()=>set({search:""}))); }
+  sb.appendChild(b({background:"#1A3C8F",border:"none",padding:"10px 18px",margin:"4px",borderRadius:"12px",cursor:"pointer",color:"#fff",fontWeight:"700",fontSize:"14px",fontFamily:"inherit"},"🔍 Search",()=>{}));
+  hdr.appendChild(sb);
+
+  // Pills
+  const pills = d({display:"flex",gap:"8px",marginTop:"12px",overflowX:"auto",paddingBottom:"4px",position:"relative",zIndex:"1"});
+  MEDICINES.forEach(m => {
+    const p = el("span",{cls:"pill"+(S.search===m?" active":""),style:{cursor:"pointer"}},m);
+    p.onclick = () => set({search:m});
+    pills.appendChild(p);
+  });
+  hdr.appendChild(pills);
+  wrap.appendChild(hdr);
+
+  // === SCROLL AREA ===
+  const scroll = el("div",{cls:"scroll",style:{flex:"1",paddingBottom:"8px"}});
+
+  // Stats
+  const stats = d({display:"flex",gap:"10px",padding:"0 14px",marginTop:"-50px",position:"relative",zIndex:"10",marginBottom:"10px"});
+  [{value:"47",label:"Medical Shops",color:"#1A3C8F",icon:"🏪"},
+   {value:"12",label:"Online Now",color:"#059669",icon:"🟢"},
+   {value:"5km",label:"Coverage",color:"#D97706",icon:"📍"}].forEach(sc => {
+    const c = el("div",{cls:"stat-card"});
+    c.appendChild(d({fontSize:"18px",marginBottom:"2px"},sc.icon));
+    c.appendChild(d({fontSize:"22px",fontWeight:"900",color:sc.color},sc.value));
+    c.appendChild(d({fontSize:"11px",color:"#888",fontWeight:"600",marginTop:"2px"},sc.label));
+    stats.appendChild(c);
+  });
+  scroll.appendChild(stats);
+
+  if(!isSearching){
+    // Banner carousel
+    const bWrap = el("div",{cls:"banner-wrap"});
+    const bCard = el("div",{cls:"banner-card",style:{background:BANNERS[S.bannerIdx].bg}});
+    bCard.appendChild(el("div",{cls:"banner-circle"}));
+    bCard.appendChild(d({position:"absolute",right:"16px",top:"50%",transform:"translateY(-50%)",fontSize:"56px",opacity:"0.9"},BANNERS[S.bannerIdx].emoji));
+    const bText = el("div",{cls:"banner-text"});
+    bText.appendChild(d({color:"#fff",fontWeight:"900",fontSize:"16px",lineHeight:"1.3",marginBottom:"4px"},BANNERS[S.bannerIdx].title));
+    bText.appendChild(d({color:"rgba(255,255,255,0.85)",fontSize:"12px",fontWeight:"600"},BANNERS[S.bannerIdx].sub));
+    bCard.appendChild(bText);
+    const dotsWrap = el("div",{cls:"banner-dots"});
+    BANNERS.forEach((_,i) => dotsWrap.appendChild(d({width:i===S.bannerIdx?"16px":"6px",height:"6px",borderRadius:"4px",background:i===S.bannerIdx?"#fff":"rgba(255,255,255,0.4)",transition:"all 0.3s"})));
+    bCard.appendChild(dotsWrap);
+    bWrap.appendChild(bCard);
+    scroll.appendChild(bWrap);
+
+    // Categories
+    const cWrap = d({padding:"16px 14px 8px"});
+    const cHead = d({display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"14px"});
+    cHead.appendChild(d({fontWeight:"800",fontSize:"16px",color:"#1A1A1A"},"Categories"));
+    cHead.appendChild(d({fontSize:"13px",color:"#2563EB",fontWeight:"700"},"See all"));
+    cWrap.appendChild(cHead);
+    const cRow = el("div",{cls:"cat-row"});
+    CATS.forEach(c => {
+      const ci = el("div",{cls:"cat-item"});
+      ci.appendChild(d({width:"40px",height:"40px",borderRadius:"12px",background:c.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"20px"},c.icon));
+      ci.appendChild(d({fontSize:"11px",fontWeight:"700",color:"#444"},c.label));
+      cRow.appendChild(ci);
+    });
+    cWrap.appendChild(cRow);
+    scroll.appendChild(cWrap);
+
+    // Smart Cart Banner
+    const scBanner = d({padding:"0 14px 8px"});
+    const scCard = d({background:"linear-gradient(135deg,#7C3AED,#A855F7)",borderRadius:"20px",padding:"16px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",boxShadow:"0 4px 20px rgba(124,58,237,0.3)",cursor:"pointer"});
+    const scLeft = d({});
+    scLeft.appendChild(d({color:"#fff",fontWeight:"800",fontSize:"15px",marginBottom:"4px"},"🛒 Smart Cart"));
+    scLeft.appendChild(d({color:"rgba(255,255,255,0.8)",fontSize:"12px"},"Multiple medicines — best pharmacy auto-match"));
+    scCard.appendChild(scLeft);
+    scCard.appendChild(d({color:"#fff",fontSize:"24px"},"→"));
+    scCard.onclick = () => set({screen:"smartcart"});
+    scBanner.appendChild(scCard);
+    scroll.appendChild(scBanner);
+
+    // Prescription Banner
+    const rxBanner = d({padding:"0 14px 14px"});
+    const rxCard = d({background:"linear-gradient(135deg,#1A3C8F,#3B82F6)",borderRadius:"20px",padding:"18px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",boxShadow:"0 4px 20px rgba(37,99,235,0.3)"});
+    rxCard.appendChild((() => { const t=d({}); t.appendChild(d({color:"#fff",fontWeight:"800",fontSize:"15px",marginBottom:"4px"},"📋 Prescription hai?")); t.appendChild(d({color:"rgba(255,255,255,0.8)",fontSize:"12px"},"Upload karo, shop dhundh denge")); return t; })());
+    rxCard.appendChild(b({background:"#fff",border:"none",borderRadius:"12px",padding:"10px 16px",color:"#1A3C8F",fontWeight:"800",fontSize:"13px",cursor:"pointer",fontFamily:"inherit"},"Upload ↑",()=>{}));
+    rxBanner.appendChild(rxCard);
+    scroll.appendChild(rxBanner);
+
+    // Nearby Pharmacies
+    const np = d({padding:"0 14px 20px"});
+    const npHead = d({display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"14px"});
+    const npLeft = d({display:"flex",alignItems:"center",gap:"8px"});
+    const dot = d({width:"10px",height:"10px",borderRadius:"50%",background:"#22C55E",boxShadow:S.pulse?"0 0 0 4px rgba(34,197,94,0.3)":"none",transition:"box-shadow 0.5s"});
+    npLeft.appendChild(dot);
+    npLeft.appendChild(d({fontWeight:"800",fontSize:"16px",color:"#1A1A1A"},"Open Nearby Pharmacies"));
+    npHead.appendChild(npLeft);
+    npHead.appendChild(d({fontSize:"13px",color:"#2563EB",fontWeight:"700"},"See all"));
+    np.appendChild(npHead);
+    ALL_SHOPS.forEach(shop => {
+      const card = el("div",{cls:"shop-card",style:{border:shop.top?"2px solid #DBEAFE":"2px solid transparent"}});
+      const row = d({display:"flex",gap:"14px",alignItems:"center"});
+      row.appendChild(d({width:"56px",height:"56px",borderRadius:"16px",background:"#EEF2FF",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"26px",flexShrink:"0"},"🏥"));
+      const info = d({flex:"1"});
+      const nameRow = d({display:"flex",alignItems:"center",gap:"6px",marginBottom:"2px"});
+      nameRow.appendChild(el("span",{style:{fontWeight:"800",fontSize:"14px",color:"#1A1A1A"}},shop.name));
+      if(shop.top) nameRow.appendChild(d({background:"#DBEAFE",color:"#1D4ED8",fontSize:"10px",fontWeight:"700",padding:"2px 8px",borderRadius:"6px"}},"⭐ Top"));
+      info.appendChild(nameRow);
+      info.appendChild(d({color:"#888",fontSize:"12px",marginBottom:"4px"},"📍 "+shop.area));
+      const meta = d({display:"flex",gap:"8px",alignItems:"center"});
+      meta.appendChild(el("span",{style:{fontSize:"12px",color:"#F59E0B",fontWeight:"700"}},"★ "+shop.rating));
+      meta.appendChild(el("span",{style:{fontSize:"11px",color:"#aaa"}},"("+shop.reviews+")"));
+      meta.appendChild(el("span",{style:{fontSize:"11px",color:"#888"}},"• "+shop.distanceKm+" km"));
+      info.appendChild(meta);
+      row.appendChild(info);
+      row.appendChild(b({background:"#1A3C8F",border:"none",borderRadius:"12px",padding:"10px 14px",color:"#fff",fontWeight:"700",fontSize:"12px",cursor:"pointer",fontFamily:"inherit"},"Order",()=>set({search:Object.keys(shop.inventory)[0]})));
+      card.appendChild(row);
+      np.appendChild(card);
+    });
+    scroll.appendChild(np);
+  }
+
+  // ── SEARCH RESULTS ──
+  if(isSearching){
+    const mm = CATALOG.filter(m=>m.name.toLowerCase().includes(S.search.toLowerCase())||m.cat.toLowerCase().includes(S.search.toLowerCase()));
+    const resBg = d({background:"#fff"});
+    const resHdr = d({padding:"10px 16px",borderBottom:"1px solid #F3F4F6",fontSize:"13px",color:"#555",fontWeight:"600"});
+    resHdr.innerHTML = mm.length>0 ? `${mm.length} results for "<strong style="color:#1A3C8F">${esc(S.search)}</strong>"` : `No results for "<strong>${esc(S.search)}</strong>"`;
+    resBg.appendChild(resHdr);
+
+    mm.forEach((med,idx) => {
+      const qty = S.homeCart[med.id]||0;
+      const row = el("div",{cls:"med-row",style:{background:qty>0?"#FAFBFF":"#fff"}});
+      const imgBox = el("div",{cls:"med-img"});
+      imgBox.appendChild(d({},med.emoji));
+      if(idx<2) imgBox.appendChild(el("div",{cls:"bestseller"},"Bestseller ✦"));
+      row.appendChild(imgBox);
+      const details = d({flex:"1",paddingLeft:"14px",display:"flex",flexDirection:"column",justifyContent:"space-between"});
+      const top = d({});
+      top.appendChild(d({fontWeight:"800",fontSize:"15px",color:"#1A1A1A",lineHeight:"1.3",marginBottom:"3px"},med.name));
+      top.appendChild(d({fontSize:"12px",color:"#888",marginBottom:"8px"},med.cat+" • 10 tablets"));
+      top.appendChild(d({fontSize:"12px",color:"#7C3AED",fontWeight:"700",marginBottom:"8px"},"⚡ Get in 45 mins"));
+      const priceRow = d({display:"flex",alignItems:"center",gap:"8px",marginBottom:"6px"});
+      priceRow.appendChild(el("span",{style:{fontSize:"20px",fontWeight:"900",color:"#1A1A1A"}},"₹"+med.price));
+      const mrpEl = el("span",{style:{fontSize:"13px",color:"#aaa",textDecoration:"line-through"}},"₹"+med.mrp);
+      priceRow.appendChild(mrpEl);
+      priceRow.appendChild(el("span",{style:{fontSize:"12px",color:"#E05D2E",fontWeight:"800"}},med.disc+"% off"));
+      top.appendChild(priceRow);
+      details.appendChild(top);
+      if(qty===0){
+        details.appendChild(b({width:"100%",padding:"11px 0",background:"#fff",border:"1.5px solid #1A3C8F",borderRadius:"10px",color:"#1A3C8F",fontWeight:"900",fontSize:"15px",cursor:"pointer",fontFamily:"inherit",letterSpacing:"1px"},"ADD",()=>{S.homeCart={...S.homeCart,[med.id]:1};render();}));
+      } else {
+        const qrow = d({display:"flex",alignItems:"center",border:"1.5px solid #1A3C8F",borderRadius:"10px",overflow:"hidden"});
+        qrow.appendChild(b({flex:"1",padding:"11px 0",background:"#fff",border:"none",fontSize:"20px",fontWeight:"900",color:"#1A3C8F",cursor:"pointer"},"−",()=>{const n={...S.homeCart};n[med.id]>1?n[med.id]--:delete n[med.id];S.homeCart=n;render();}));
+        qrow.appendChild(d({flex:"1",textAlign:"center",fontWeight:"900",fontSize:"16px",color:"#1A3C8F",background:"#EEF2FF",padding:"11px 0"},""+qty));
+        qrow.appendChild(b({flex:"1",padding:"11px 0",background:"#fff",border:"none",fontSize:"20px",fontWeight:"900",color:"#1A3C8F",cursor:"pointer"},"+",()=>{S.homeCart={...S.homeCart,[med.id]:(S.homeCart[med.id]||0)+1};render();}));
+        details.appendChild(qrow);
+      }
+      row.appendChild(details);
+      resBg.appendChild(row);
+    });
+
+    if(mm.length===0){
+      const empty = d({textAlign:"center",padding:"40px 20px",color:"#888"});
+      empty.appendChild(d({fontSize:"40px",marginBottom:"10px"},"😔"));
+      empty.appendChild(d({fontWeight:"700",fontSize:"16px",marginBottom:"6px"},"Medicine nahi mili"));
+      empty.appendChild(d({fontSize:"13px"},"Prescription upload karein — hum dhundh denge"));
+      resBg.appendChild(empty);
+    }
+    scroll.appendChild(resBg);
+
+    // Cart bar above nav
+    if(cc>0){
+      const cb = el("div",{cls:"cart-bar"});
+      const left = d({display:"flex",alignItems:"center",gap:"10px"});
+      left.appendChild(d({background:"#fff",borderRadius:"10px",width:"32px",height:"32px",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:"900",fontSize:"14px",color:"#1A3C8F"},""+cc));
+      const ci = d({});
+      ci.appendChild(d({color:"#fff",fontWeight:"800",fontSize:"13px"},"Cart mein "+cc+" item"+(cc>1?"s":"")));
+      ci.appendChild(d({color:"rgba(255,255,255,0.7)",fontSize:"11px"},"Pharmacy auto-match hogi"));
+      left.appendChild(ci);
+      cb.appendChild(left);
+      cb.appendChild(b({background:"#fff",border:"none",borderRadius:"12px",padding:"10px 16px",color:"#1A3C8F",fontWeight:"900",fontSize:"13px",cursor:"pointer",fontFamily:"inherit"},"Checkout →",()=>set({screen:"smartcart"})));
+      scroll.appendChild(cb);
+    }
+  }
+
+  wrap.appendChild(scroll);
+  wrap.appendChild(renderBottomNav());
+  return wrap;
+}
+
+// BOTTOM NAV
+function renderBottomNav(){
+  const nav = el("div",{cls:"bottom-nav"});
+  [{id:"home",icon:"🏠",label:"Home"},{id:"profile",icon:"👤",label:"Profile"}].forEach(t => {
+    const active = S.tab===t.id;
+    const btn2 = el("button",{cls:"nav-btn",onClick:()=>{
+      if(t.id==="profile") set({screen:"profile",tab:"profile"});
+      else set({screen:"home",tab:"home"});
+    }});
+    btn2.appendChild(el("span",{style:{fontSize:"22px"}},t.icon));
+    btn2.appendChild(el("span",{style:{fontSize:"11px",fontWeight:"700",color:active?"#1A3C8F":"#aaa"}},t.label));
+    if(active) btn2.appendChild(el("div",{cls:"nav-dot"}));
+    nav.appendChild(btn2);
+  });
+  return nav;
+}
+
+// PROFILE SCREEN
+function renderProfile(){
+  const wrap = d({display:"flex",flexDirection:"column",minHeight:"100vh"});
+  const scroll = el("div",{cls:"scroll",style:{flex:"1",padding:"20px 16px 20px"}});
+
+  // Avatar
+  const av = d({background:"linear-gradient(135deg,#1A3C8F,#2563EB,#3B82F6)",borderRadius:"20px",padding:"24px 20px",textAlign:"center",marginBottom:"20px",boxShadow:"0 8px 32px rgba(37,99,235,0.2)"});
+  av.appendChild(d({width:"70px",height:"70px",borderRadius:"50%",background:"rgba(255,255,255,0.2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"32px",margin:"0 auto 10px"},"👤"));
+  av.appendChild(d({color:"#fff",fontWeight:"800",fontSize:"16px"},"Guest User"));
+  av.appendChild(d({color:"rgba(255,255,255,0.7)",fontSize:"12px",marginTop:"2px"},"Login karein apna profile dekhne ke liye"));
+  scroll.appendChild(av);
+
+  if(S.registeredShop){
+    const sc = d({background:"#fff",borderRadius:"20px",padding:"16px",boxShadow:"0 4px 20px rgba(0,0,0,0.06)",marginBottom:"16px",cursor:"pointer",display:"flex",gap:"14px",alignItems:"center"});
+    sc.appendChild(d({width:"50px",height:"50px",borderRadius:"14px",background:"#EEF2FF",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"24px",flexShrink:"0"},"🏪"));
+    const si = d({flex:"1"});
+    si.appendChild(d({fontWeight:"800",fontSize:"15px",color:"#1A1A1A"},S.registeredShop.name));
+    si.appendChild(d({fontSize:"12px",color:"#888",marginTop:"2px"},"Apna Store Dashboard kholein →"));
+    sc.appendChild(si);
+    sc.appendChild(d({color:"#ccc",fontSize:"20px"},"›"));
+    sc.onclick = () => set({screen:"dashboard",dashTab:"overview"});
+    scroll.appendChild(sc);
+  } else {
+    const oc = d({background:"#fff",borderRadius:"20px",padding:"20px",boxShadow:"0 4px 20px rgba(0,0,0,0.06)",marginBottom:"16px"});
+    const ocRow = d({display:"flex",gap:"14px",alignItems:"flex-start"});
+    ocRow.appendChild(d({width:"50px",height:"50px",borderRadius:"14px",background:"#EEF2FF",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"24px",flexShrink:"0"},"🏪"));
+    const ot = d({flex:"1"});
+    ot.appendChild(d({fontWeight:"800",fontSize:"15px",color:"#1A1A1A",marginBottom:"4px"},"Medical Store Owner?"));
+    ot.appendChild(d({fontSize:"12px",color:"#888",marginBottom:"12px",lineHeight:"1.5"},"Apni dukan Dawalo pe list karein aur nearby customers tak pahunchein. Bilkul free!"));
+    ot.appendChild(b({background:"#1A3C8F",border:"none",borderRadius:"12px",padding:"10px 18px",color:"#fff",fontWeight:"800",fontSize:"13px",cursor:"pointer",fontFamily:"inherit"},"+ Apni Dukan List Karein",()=>set({modal:"shopForm"})));
+    ocRow.appendChild(ot);
+    oc.appendChild(ocRow);
+    scroll.appendChild(oc);
+  }
+
+  const menu = d({background:"#fff",borderRadius:"20px",overflow:"hidden",boxShadow:"0 4px 20px rgba(0,0,0,0.06)"});
+  [{icon:"📋",label:"My Orders"},{icon:"📍",label:"Saved Addresses"},{icon:"❤️",label:"Favourite Shops"},{icon:"🔔",label:"Notifications"},{icon:"⚙️",label:"Settings"},{icon:"❓",label:"Help & Support"}].forEach((item,i)=>{
+    const row = d({display:"flex",alignItems:"center",gap:"14px",padding:"16px 18px",borderBottom:i<5?"1px solid #F3F4F6":"none",cursor:"pointer"});
+    row.appendChild(el("span",{style:{fontSize:"20px"}},item.icon));
+    row.appendChild(d({flex:"1",fontWeight:"700",fontSize:"14px",color:"#1A1A1A"},item.label));
+    row.appendChild(d({color:"#ccc"},"›"));
+    menu.appendChild(row);
+  });
+  scroll.appendChild(menu);
+
+  const adminLink = d({textAlign:"center",marginTop:"24px",padding:"8px",fontSize:"11px",color:"#ccc",cursor:"pointer"},"🛡️ Admin Login");
+  adminLink.onclick = () => set({modal:"adminLogin",adminPin:"",adminPinErr:""});
+  scroll.appendChild(adminLink);
+
+  wrap.appendChild(scroll);
+  wrap.appendChild(renderBottomNav());
+  return wrap;
+}
+
+// SMART CART SCREEN
+function renderSmartCart(){
+  const wrap = d({display:"flex",flexDirection:"column",minHeight:"100vh"});
+  const cc = cartCount();
+  const q = S.cartSearch||"";
+
+  // Header
+  const hdr = d({background:"linear-gradient(135deg,#1A3C8F,#2563EB)",padding:"16px 20px 18px",flexShrink:"0"});
+  const hRow = d({display:"flex",alignItems:"center",gap:"12px",marginBottom:"14px"});
+  hRow.appendChild(b({background:"rgba(255,255,255,0.15)",border:"none",borderRadius:"12px",width:"40px",height:"40px",color:"#fff",fontSize:"18px",cursor:"pointer"},"←",()=>set({screen:"home",tab:"home"})));
+  const ht = d({flex:"1"});
+  ht.appendChild(d({color:"#fff",fontWeight:"900",fontSize:"17px"},"🛒 Smart Cart"));
+  ht.appendChild(d({color:"rgba(255,255,255,0.7)",fontSize:"12px"},"Best pharmacy auto-match hogi"));
+  hRow.appendChild(ht);
+  if(cc>0){ const cb=d({background:"#fff",borderRadius:"14px",padding:"8px 14px",display:"flex",alignItems:"center",gap:"6px"}); cb.appendChild(el("span",{style:{fontSize:"16px"}},"🛒")); cb.appendChild(d({fontWeight:"900",fontSize:"14px",color:"#1A3C8F"},""+cc)); hRow.appendChild(cb); }
+  hdr.appendChild(hRow);
+  const sb2 = d({background:"#fff",borderRadius:"14px",display:"flex",alignItems:"center",overflow:"hidden"});
+  const si2 = el("input",{style:{flex:"1",border:"none",outline:"none",padding:"12px 14px",fontSize:"14px",fontFamily:"inherit",color:"#1A1A1A"},placeholder:"Medicine ya category likhein...",type:"text"});
+  si2.value=q; si2.oninput=e=>{S.cartSearch=e.target.value;render();};
+  sb2.appendChild(si2);
+  if(q){ sb2.appendChild(b({background:"none",border:"none",color:"#aaa",fontSize:"18px",cursor:"pointer",padding:"0 8px"},"✕",()=>set({cartSearch:""}))); }
+  hdr.appendChild(sb2);
+  wrap.appendChild(hdr);
+
+  const scroll = el("div",{cls:"scroll",style:{flex:"1",padding:"14px 16px"}});
+  const filtered = CATALOG.filter(m=>m.name.toLowerCase().includes(q.toLowerCase())||m.cat.toLowerCase().includes(q.toLowerCase()));
+  filtered.forEach(med => {
+    const qty = S.homeCart[med.id]||0;
+    const card = el("div",{cls:"cart-item-card",style:{border:qty>0?"2px solid #BFDBFE":"2px solid transparent"}});
+    card.appendChild(d({width:"52px",height:"52px",borderRadius:"14px",background:qty>0?"#EEF2FF":"#F8FAFF",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"26px",flexShrink:"0"},med.emoji));
+    const info = d({flex:"1"});
+    info.appendChild(d({fontWeight:"800",fontSize:"13px",color:"#1A1A1A",marginBottom:"2px"},med.name));
+    info.appendChild(d({fontSize:"11px",color:"#888",marginBottom:"4px"},med.cat));
+    const pr = d({display:"flex",gap:"5px",alignItems:"center"});
+    pr.appendChild(d({fontSize:"14px",fontWeight:"900",color:"#1A3C8F"},"₹"+med.price));
+    const mrp2=d({fontSize:"11px",color:"#aaa"},"₹"+med.mrp);mrp2.style.textDecoration="line-through";pr.appendChild(mrp2);
+    pr.appendChild(d({background:"#DCFCE7",color:"#16A34A",fontSize:"9px",fontWeight:"800",padding:"2px 6px",borderRadius:"5px"},med.disc+"% OFF"));
+    info.appendChild(pr);
+    card.appendChild(info);
+    if(qty===0){
+      card.appendChild(b({background:"#1A3C8F",border:"none",borderRadius:"10px",padding:"8px 14px",color:"#fff",fontWeight:"800",fontSize:"12px",cursor:"pointer",fontFamily:"inherit",flexShrink:"0"},"+ Add",()=>{S.homeCart={...S.homeCart,[med.id]:1};render();}));
+    } else {
+      const qb = d({display:"flex",alignItems:"center",gap:"7px",flexShrink:"0"});
+      qb.appendChild(b({width:"28px",height:"28px",borderRadius:"8px",border:"2px solid #E5E7EB",background:"#fff",fontSize:"16px",fontWeight:"900",color:"#1A3C8F",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"},"−",()=>{const n={...S.homeCart};n[med.id]>1?n[med.id]--:delete n[med.id];S.homeCart=n;render();}));
+      qb.appendChild(d({fontWeight:"900",fontSize:"14px",color:"#1A3C8F",minWidth:"14px",textAlign:"center"},""+qty));
+      qb.appendChild(b({width:"28px",height:"28px",borderRadius:"8px",background:"#1A3C8F",border:"none",fontSize:"16px",fontWeight:"900",color:"#fff",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"},"+",()=>{S.homeCart={...S.homeCart,[med.id]:(S.homeCart[med.id]||0)+1};render();}));
+      card.appendChild(qb);
+    }
+    scroll.appendChild(card);
+  });
+  wrap.appendChild(scroll);
+
+  if(cc>0){
+    const footer = d({background:"#fff",borderTop:"1px solid #E5E7EB",padding:"12px 16px 20px",flexShrink:"0"});
+    footer.appendChild(b({width:"100%",padding:"15px",background:"linear-gradient(135deg,#1A3C8F,#2563EB)",border:"none",borderRadius:"14px",color:"#fff",fontWeight:"900",fontSize:"15px",cursor:"pointer",fontFamily:"inherit"},"🔍 Best Pharmacy Dhundho — "+cc+" items →",()=>{
+      const matches = computeMatches();
+      set({screen:"cartResults",cartMatches:matches});
+    }));
+    wrap.appendChild(footer);
+  }
+  return wrap;
+}
+
+// CART RESULTS SCREEN
+function renderCartResults(){
+  const matches = S.cartMatches||[];
+  const best = matches[0];
+  if(!best) return renderSmartCart();
+  const cartItems = Object.keys(S.homeCart).map(id=>CATALOG.find(m=>m.id===id)).filter(Boolean);
+  const perfect = best.matchCount===cartItems.length;
+
+  const wrap = d({display:"flex",flexDirection:"column",minHeight:"100vh"});
+  const hdr = d({background:perfect?"linear-gradient(135deg,#059669,#10B981)":"linear-gradient(135deg,#1A3C8F,#2563EB)",padding:"16px 20px 18px",flexShrink:"0"});
+  const hRow = d({display:"flex",alignItems:"center",gap:"12px"});
+  hRow.appendChild(b({background:"rgba(255,255,255,0.15)",border:"none",borderRadius:"12px",width:"40px",height:"40px",color:"#fff",fontSize:"18px",cursor:"pointer"},"←",()=>set({screen:"smartcart"})));
+  const ht = d({flex:"1"});
+  ht.appendChild(d({color:"#fff",fontWeight:"900",fontSize:"17px"},perfect?"🎉 Perfect Match!":"⭐ Best Available Match"));
+  ht.appendChild(d({color:"rgba(255,255,255,0.75)",fontSize:"12px"},best.matchCount+"/"+cartItems.length+" medicines found"));
+  hRow.appendChild(ht);
+  hdr.appendChild(hRow);
+  wrap.appendChild(hdr);
+
+  const scroll = el("div",{cls:"scroll",style:{flex:"1",padding:"16px"}});
+  const card = el("div",{cls:"card",style:{overflow:"hidden",marginBottom:"16px"}});
+  const ci = d({padding:"18px"});
+  ci.appendChild(d({fontWeight:"900",fontSize:"20px",color:"#1A1A1A",marginBottom:"6px"},best.shop.name));
+  ci.appendChild(d({fontSize:"12px",color:"#888",marginBottom:"16px"},"📍 "+best.shop.area+" • ★ "+best.shop.rating+" • "+best.shop.distanceKm+" km"));
+  cartItems.forEach((item,i) => {
+    const found = best.available.find(a=>a.id===item.id);
+    const row = d({display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 0",borderBottom:i<cartItems.length-1?"1px solid #F3F4F6":"none"});
+    const left = d({display:"flex",gap:"10px",alignItems:"center"});
+    left.appendChild(el("span",{style:{fontSize:"22px"}},item.emoji));
+    left.appendChild(d({fontWeight:"700",fontSize:"14px",color:"#1A1A1A"},item.name));
+    row.appendChild(left);
+    row.appendChild(found ? d({fontWeight:"800",fontSize:"15px",color:"#1A3C8F"},"₹"+found.shopPrice) : d({fontSize:"12px",color:"#DC2626",fontWeight:"700"},"❌ Nahi mili"));
+    ci.appendChild(row);
+  });
+  const totRow = d({marginTop:"14px",paddingTop:"14px",borderTop:"2px dashed #E5E7EB",display:"flex",justifyContent:"space-between",alignItems:"center"});
+  totRow.appendChild(d({fontSize:"13px",color:"#888"},best.shop.deliveryEnabled?"Delivery ₹"+best.deliveryCharge+" included":"Pickup order"));
+  const tr = d({textAlign:"right"});
+  tr.appendChild(d({fontSize:"12px",color:"#888"},"Total"));
+  tr.appendChild(d({fontWeight:"900",fontSize:"22px",color:"#1A1A1A"},"₹"+best.totalWithDelivery));
+  totRow.appendChild(tr);
+  ci.appendChild(totRow);
+  card.appendChild(ci);
+  scroll.appendChild(card);
+
+  if(best.missing.length>0){
+    const missCard = d({background:"#FFFBEB",borderRadius:"16px",padding:"14px 16px",marginBottom:"16px",border:"1px solid #FDE68A"});
+    missCard.appendChild(d({fontWeight:"800",fontSize:"13px",color:"#92400E",marginBottom:"10px"},"⚠️ "+best.missing.length+" medicine yahan nahi mili"));
+    best.missing.forEach(m=>{
+      const mRow=d({background:"#fff",borderRadius:"12px",padding:"11px 14px",marginBottom:"8px",border:"1px solid #FDE68A",display:"flex",alignItems:"center",gap:"8px"});
+      mRow.appendChild(el("span",{style:{fontSize:"18px"}},m.emoji));
+      mRow.appendChild(d({fontWeight:"800",fontSize:"13px",color:"#1A1A1A"},m.name));
+      mRow.appendChild(d({marginLeft:"auto",fontSize:"11px",color:"#888"},"Unavailable"));
+      missCard.appendChild(mRow);
+    });
+    scroll.appendChild(missCard);
+  }
+  wrap.appendChild(scroll);
+
+  const footer = d({background:"#fff",borderTop:"1px solid #F3F4F6",padding:"16px",flexShrink:"0"});
+  footer.appendChild(b({width:"100%",padding:"18px",background:"linear-gradient(135deg,#059669,#16A34A)",border:"none",borderRadius:"16px",color:"#fff",fontWeight:"900",fontSize:"17px",fontFamily:"inherit",cursor:"pointer"},"✅ Order Karo — ₹"+best.totalWithDelivery,()=>{
+    set({screen:"orderSuccess",confirmedOrder:{shop:best.shop,available:best.available,totalWithDelivery:best.totalWithDelivery},homeCart:{}});
+  }));
+  if(best.shop.deliveryEnabled) footer.appendChild(d({textAlign:"center",fontSize:"12px",color:"#888",marginTop:"8px"},"🛵 "+Math.round(best.shop.distanceKm*8+10)+" min mein ghar pe milega"));
+  wrap.appendChild(footer);
+  return wrap;
+}
+
+// ORDER SUCCESS
+function renderOrderSuccess(){
+  const o = S.confirmedOrder;
+  const wrap = d({display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:"100vh",padding:"30px 20px",background:"#F0F4FF"});
+  wrap.appendChild(d({width:"100px",height:"100px",borderRadius:"50%",background:"#DCFCE7",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"48px",marginBottom:"20px",boxShadow:"0 0 0 16px rgba(34,197,94,0.1)"},"✅"));
+  wrap.appendChild(d({fontWeight:"900",fontSize:"22px",color:"#1A1A1A",marginBottom:"6px",textAlign:"center"},"Order Ho Gaya! 🎉"));
+  wrap.appendChild(d({fontSize:"14px",color:"#888",marginBottom:"24px",textAlign:"center"},o.shop.name+" ko request bheji ja rahi hai..."));
+  const card = d({background:"#fff",borderRadius:"20px",padding:"20px",width:"100%",boxShadow:"0 4px 20px rgba(0,0,0,0.08)",marginBottom:"20px"});
+  o.available.forEach(item=>{
+    const row=d({display:"flex",justifyContent:"space-between",marginBottom:"6px"});
+    row.appendChild(d({fontSize:"13px",color:"#555"},item.emoji+" "+item.name));
+    row.appendChild(d({fontSize:"13px",fontWeight:"700",color:"#1A3C8F"},"₹"+item.shopPrice));
+    card.appendChild(row);
+  });
+  const tot=d({borderTop:"1px dashed #E5E7EB",paddingTop:"10px",marginTop:"6px",display:"flex",justifyContent:"space-between"});
+  tot.appendChild(d({fontSize:"15px",fontWeight:"800"},"Total"));
+  tot.appendChild(d({fontSize:"15px",fontWeight:"900",color:"#1A3C8F"},"₹"+o.totalWithDelivery));
+  card.appendChild(tot);
+  wrap.appendChild(card);
+  const waitBox = d({background:"#EEF2FF",borderRadius:"16px",padding:"14px 20px",width:"100%",textAlign:"center",marginBottom:"24px"});
+  waitBox.appendChild(d({fontSize:"13px",color:"#1A3C8F",fontWeight:"700"},"⏳ Dukandaar ke accept karne ka wait karein..."));
+  waitBox.appendChild(d({fontSize:"12px",color:"#888",marginTop:"4px"},"Usually 2-3 minutes mein respond karte hain"));
+  wrap.appendChild(waitBox);
+  wrap.appendChild(b({width:"100%",padding:"16px",background:"#1A3C8F",border:"none",borderRadius:"16px",color:"#fff",fontWeight:"800",fontSize:"15px",cursor:"pointer",fontFamily:"inherit"},"← Wapas Jaayein",()=>set({screen:"home",tab:"home",confirmedOrder:null})));
+  return wrap;
+}
+
+// STORE DASHBOARD
+function renderDashboard(){
+  const wrap = d({display:"flex",flexDirection:"column",minHeight:"100vh"});
+  const shop = S.registeredShop;
+  const totalRev = S.shopOrders.reduce((a,o)=>a+o.total,0);
+
+  // Header
+  const hdr = d({background:"linear-gradient(135deg,#1A3C8F,#2563EB,#3B82F6)",padding:"16px 20px 24px",position:"relative",overflow:"hidden",flexShrink:"0"});
+  hdr.appendChild(d({position:"absolute",top:"-50px",right:"-50px",width:"180px",height:"180px",borderRadius:"50%",background:"rgba(255,255,255,0.08)"}));
+  const hRow = d({display:"flex",alignItems:"center",gap:"12px",marginBottom:"16px",position:"relative"});
+  hRow.appendChild(b({background:"rgba(255,255,255,0.15)",border:"none",borderRadius:"12px",width:"40px",height:"40px",cursor:"pointer",color:"#fff",fontSize:"18px"},"←",()=>set({screen:"profile",tab:"profile"})));
+  const ht = d({flex:"1"});
+  ht.appendChild(d({color:"#fff",fontWeight:"900",fontSize:"17px"},shop.name));
+  ht.appendChild(d({color:"rgba(255,255,255,0.75)",fontSize:"12px"},"📍 "+shop.area));
+  hRow.appendChild(ht);
+  hdr.appendChild(hRow);
+
+  // Toggles
+  const togRow = d({display:"flex",gap:"10px",marginBottom:"16px",position:"relative"});
+  [{label:S.shopOnline?"Shop Online":"Shop Offline",sub:S.shopOnline?"Orders aa rahe hain":"Orders band hain",active:S.shopOnline,icon:S.shopOnline?"🟢":"🔴",border:S.shopOnline?"1.5px solid rgba(34,197,94,0.6)":"1.5px solid rgba(255,255,255,0.2)",bg:S.shopOnline?"rgba(34,197,94,0.25)":"rgba(255,255,255,0.12)",onclick:()=>set({shopOnline:!S.shopOnline})},
+   {label:"Delivery "+(S.deliveryOn?"ON":"OFF"),sub:S.deliveryOn?"Home delivery active":"Sirf pickup",active:S.deliveryOn,icon:"🛵",border:S.deliveryOn?"1.5px solid rgba(96,165,250,0.6)":"1.5px solid rgba(255,255,255,0.2)",bg:S.deliveryOn?"rgba(37,99,235,0.3)":"rgba(255,255,255,0.12)",onclick:()=>set({deliveryOn:!S.deliveryOn})}
+  ].forEach(t=>{
+    const tCard = d({flex:"1",borderRadius:"16px",padding:"12px 14px",background:t.bg,border:t.border,cursor:"pointer",display:"flex",alignItems:"center",gap:"10px"});
+    tCard.appendChild(d({width:"36px",height:"36px",borderRadius:"10px",background:t.active?(t.icon==="🛵"?"#2563EB":"#22C55E"):"rgba(255,255,255,0.2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"18px"},t.icon));
+    const ti=d({});ti.appendChild(d({color:"#fff",fontWeight:"900",fontSize:"13px"},t.label));ti.appendChild(d({color:"rgba(255,255,255,0.7)",fontSize:"10px",marginTop:"1px"},t.sub));tCard.appendChild(ti);
+    tCard.onclick=t.onclick;togRow.appendChild(tCard);
+  });
+  hdr.appendChild(togRow);
+
+  const statsRow = d({display:"flex",gap:"10px",position:"relative"});
+  [{icon:"📦",val:S.shopOrders.length,label:"Total Orders"},{icon:"💰",val:"₹"+totalRev,label:"Revenue"},{icon:"💊",val:S.shopInventory.length,label:"Products"}].forEach(sc=>{
+    const c=d({flex:"1",background:"rgba(255,255,255,0.16)",borderRadius:"16px",padding:"14px 12px",border:"1px solid rgba(255,255,255,0.2)"});
+    c.appendChild(d({fontSize:"20px",marginBottom:"4px"},sc.icon));c.appendChild(d({color:"#fff",fontWeight:"900",fontSize:"22px"},sc.val));c.appendChild(d({color:"rgba(255,255,255,0.75)",fontSize:"11px",fontWeight:"600"},sc.label));statsRow.appendChild(c);
+  });
+  hdr.appendChild(statsRow);
+  wrap.appendChild(hdr);
+
+  // Tab Bar
+  const tabBar = d({display:"flex",background:"#fff",padding:"10px 10px",gap:"6px",boxShadow:"0 2px 12px rgba(0,0,0,0.06)",overflowX:"auto",flexShrink:"0"});
+  [{id:"overview",icon:"📊",label:"Overview"},{id:"quicksetup",icon:"⚡",label:"Quick Setup"},{id:"inventory",icon:"📦",label:"Inventory"},{id:"orders",icon:"📋",label:"Orders"}].forEach(t=>{
+    const active=S.dashTab===t.id;
+    const tb=b({flexShrink:"0",padding:"10px 10px",border:"none",borderRadius:"14px",cursor:"pointer",background:active?"linear-gradient(135deg,#1A3C8F,#2563EB)":"#F3F4F6",color:active?"#fff":"#888",fontWeight:"800",fontSize:"11px",fontFamily:"inherit",display:"flex",flexDirection:"column",alignItems:"center",gap:"3px",boxShadow:active?"0 4px 12px rgba(37,99,235,0.3)":"none"},"",()=>set({dashTab:t.id}));
+    tb.appendChild(el("span",{style:{fontSize:"16px"}},t.icon));tb.appendChild(document.createTextNode(t.label));
+    tabBar.appendChild(tb);
+  });
+  wrap.appendChild(tabBar);
+
+  const scroll = el("div",{cls:"scroll",style:{flex:"1",padding:"16px"}});
+
+  // OVERVIEW TAB
+  if(S.dashTab==="overview"){
+    if(S.shopInventory.length===0){
+      const promo=d({background:"linear-gradient(135deg,#7C3AED,#A855F7)",borderRadius:"18px",padding:"16px 18px",marginBottom:"14px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",boxShadow:"0 4px 16px rgba(124,58,237,0.3)"});
+      const pt=d({});pt.appendChild(d({color:"#fff",fontWeight:"900",fontSize:"14px",marginBottom:"3px"},"⚡ Quick Setup se shuru karein"));pt.appendChild(d({color:"rgba(255,255,255,0.85)",fontSize:"12px"},"Bas tick karo — 2 min mein ready"));promo.appendChild(pt);
+      promo.appendChild(d({color:"#fff",fontSize:"22px"},"→"));promo.onclick=()=>set({dashTab:"quicksetup"});scroll.appendChild(promo);
+    }
+    const welcome=d({background:"linear-gradient(135deg,#EEF2FF,#F8FAFF)",borderRadius:"20px",padding:"18px",boxShadow:"0 4px 20px rgba(37,99,235,0.08)",marginBottom:"14px",border:"1px solid #E0E7FF"});
+    welcome.appendChild(d({fontWeight:"900",fontSize:"16px",color:"#1A1A1A",marginBottom:"6px"},"👋 Namaste, "+shop.owner+"!"));
+    const wt=d({fontSize:"12.5px",color:"#666",lineHeight:"1.6"});wt.innerHTML="Aapki dukan <strong style='color:#1A3C8F'>"+esc(shop.name)+"</strong> ab Dawalo pe live hai. Customers ab aapke products search kar sakte hain.";welcome.appendChild(wt);scroll.appendChild(welcome);
+    const qRow=d({display:"flex",gap:"10px"});
+    [{icon:"📦",label:"Manage Inventory",sub:S.shopInventory.length+" medicines",bg:"linear-gradient(135deg,#1A3C8F,#2563EB)",tab:"inventory",shadow:"rgba(37,99,235,0.25)"},{icon:"📋",label:"View Orders",sub:S.shopOrders.length+" total",bg:"linear-gradient(135deg,#059669,#10B981)",tab:"orders",shadow:"rgba(16,185,129,0.25)"}].forEach(a=>{
+      const ac=d({flex:"1",background:a.bg,borderRadius:"18px",padding:"18px",textAlign:"center",cursor:"pointer",boxShadow:"0 6px 20px "+a.shadow});
+      ac.appendChild(d({fontSize:"30px",marginBottom:"8px"},a.icon));ac.appendChild(d({fontWeight:"800",fontSize:"13px",color:"#fff"},a.label));ac.appendChild(d({fontSize:"11px",color:"rgba(255,255,255,0.8)",marginTop:"2px"},a.sub));ac.onclick=()=>set({dashTab:a.tab});qRow.appendChild(ac);
+    });scroll.appendChild(qRow);
+  }
+
+  // QUICK SETUP TAB
+  if(S.dashTab==="quicksetup"){
+    scroll.appendChild(d({background:"linear-gradient(135deg,#1A3C8F,#2563EB)",borderRadius:"18px",padding:"16px 18px",marginBottom:"16px",color:"#fff"}),[d({fontWeight:"900",fontSize:"16px",marginBottom:"4px"},"⚡ Quick Setup"),d({fontSize:"12.5px",opacity:"0.9",lineHeight:"1.5"},"Typing nahi karni — bas tick ✓ karo jo medicine aapke paas hai, price daalo, aur Save!")].reduce((p,c)=>{p.appendChild(c);return p;},d({})));
+    const qsCats=["All",...new Set(CATALOG.map(m=>m.cat))];
+    const catRow=d({display:"flex",gap:"8px",marginBottom:"14px",overflowX:"auto",paddingBottom:"4px"});
+    qsCats.forEach(cat=>{const cb=d({flexShrink:"0",padding:"7px 16px",borderRadius:"20px",background:S.qsCat===cat?"#1A3C8F":"#F3F4F6",color:S.qsCat===cat?"#fff":"#555",fontWeight:"700",fontSize:"12px",cursor:"pointer"},cat);cb.onclick=()=>set({qsCat:cat});catRow.appendChild(cb);});scroll.appendChild(catRow);
+    const qsFiltered=S.qsCat==="All"?CATALOG:CATALOG.filter(m=>m.cat===S.qsCat);
+    qsFiltered.forEach(med=>{
+      const sel=S.qsSel[med.id],has=sel?.has||false;
+      const toggle=()=>{const n={...S.qsSel};n[med.id]=n[med.id]?.has?{has:false,price:n[med.id]?.price||med.price}:{has:true,price:n[med.id]?.price??med.price};S.qsSel=n;render();};
+      const row=el("div",{cls:"qs-card",style:{border:has?"2px solid #BBF7D0":"2px solid transparent"}});
+      const cb2=el("div",{cls:"qs-check"+(has?" checked":"")},has?"✓":"");cb2.onclick=toggle;row.appendChild(cb2);
+      row.appendChild(d({width:"44px",height:"44px",borderRadius:"12px",flexShrink:"0",background:has?"#F0FDF4":"#F8FAFF",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"22px"},med.emoji));
+      const mi=d({flex:"1",cursor:"pointer"});mi.appendChild(d({fontWeight:"800",fontSize:"13px",color:"#1A1A1A"},med.name));mi.appendChild(d({fontSize:"11px",color:"#888"},"MRP ₹"+med.mrp+" • "+med.cat));mi.onclick=toggle;row.appendChild(mi);
+      if(has){
+        const pi=d({flexShrink:"0",display:"flex",alignItems:"center",gap:"4px"});pi.appendChild(d({fontSize:"13px",color:"#888"},"₹"));
+        const inp=el("input",{type:"number",style:{width:"56px",padding:"8px 6px",border:"1.5px solid #BBF7D0",borderRadius:"8px",fontSize:"13px",fontWeight:"800",color:"#16A34A",textAlign:"center",fontFamily:"inherit",outline:"none"}});inp.value=sel.price;inp.onclick=e=>e.stopPropagation();inp.oninput=e=>{S.qsSel={...S.qsSel,[med.id]:{...S.qsSel[med.id],price:e.target.value}};};pi.appendChild(inp);row.appendChild(pi);
+      }
+      scroll.appendChild(row);
+    });
+    const selCount=Object.values(S.qsSel).filter(v=>v?.has).length;
+    if(selCount>0){scroll.appendChild(d({height:"8px"}));scroll.appendChild(b({width:"100%",padding:"15px",background:"linear-gradient(135deg,#16A34A,#059669)",border:"none",borderRadius:"14px",color:"#fff",fontWeight:"900",fontSize:"15px",cursor:"pointer",fontFamily:"inherit",boxShadow:"0 4px 16px rgba(22,163,74,0.35)"},"💾 Save Inventory — "+selCount+" medicines",()=>{const items=Object.entries(S.qsSel).filter(([,v])=>v?.has).map(([id,v])=>{const m=CATALOG.find(x=>x.id===id);return{id:"qs_"+id,name:m.name,price:String(v.price),qty:"50"};});S.shopInventory=[...S.shopInventory.filter(i=>!String(i.id).startsWith("qs_")),...items];render();}));}
+  }
+
+  // INVENTORY TAB
+  if(S.dashTab==="inventory"){
+    const actRow=d({display:"flex",gap:"10px",marginBottom:"14px"});
+    actRow.appendChild(b({flex:"1",padding:"14px",background:"#1A3C8F",border:"none",borderRadius:"14px",color:"#fff",fontWeight:"800",fontSize:"13px",cursor:"pointer",fontFamily:"inherit"},"➕ Manual Add",()=>set({showAddMed:true})));
+    actRow.appendChild(b({flex:"1",padding:"14px",background:"#fff",border:"2px solid #1A3C8F",borderRadius:"14px",color:"#1A3C8F",fontWeight:"800",fontSize:"13px",cursor:"pointer",fontFamily:"inherit"},"📤 Bulk Upload",()=>{}));
+    scroll.appendChild(actRow);
+    if(S.showAddMed){
+      const form=d({background:"#fff",borderRadius:"18px",padding:"16px",boxShadow:"0 4px 20px rgba(0,0,0,0.1)",border:"2px solid #BFDBFE",marginBottom:"14px"});
+      form.appendChild(d({fontWeight:"800",fontSize:"14px",color:"#1A1A1A",marginBottom:"12px"},"➕ Nayi Medicine Add Karein"));
+      const ni=el("input",{cls:"form-input",style:{marginBottom:"10px"},placeholder:"Medicine ka Naam *",type:"text"});ni.value=S.newMed.name;ni.oninput=e=>{S.newMed.name=e.target.value;};form.appendChild(ni);
+      const pqRow=d({display:"flex",gap:"10px",marginBottom:"12px"});
+      const pi2=el("input",{cls:"form-input",style:{flex:"1"},placeholder:"Price ₹",type:"number"});pi2.value=S.newMed.price;pi2.oninput=e=>{S.newMed.price=e.target.value;};pqRow.appendChild(pi2);
+      const qi=el("input",{cls:"form-input",style:{flex:"1"},placeholder:"Quantity",type:"number"});qi.value=S.newMed.qty;qi.oninput=e=>{S.newMed.qty=e.target.value;};pqRow.appendChild(qi);
+      form.appendChild(pqRow);
+      const fb=d({display:"flex",gap:"10px"});
+      fb.appendChild(b({flex:"1",padding:"11px",background:"#F3F4F6",border:"none",borderRadius:"10px",color:"#555",fontWeight:"700",fontSize:"13px",cursor:"pointer",fontFamily:"inherit"},"Cancel",()=>set({showAddMed:false,newMed:{name:"",price:"",qty:""}})));
+      fb.appendChild(b({flex:"1",padding:"11px",background:"#1A3C8F",border:"none",borderRadius:"10px",color:"#fff",fontWeight:"800",fontSize:"13px",cursor:"pointer",fontFamily:"inherit"},"✅ Add Medicine",()=>{if(!S.newMed.name)return;S.shopInventory=[...S.shopInventory,{...S.newMed,id:Date.now()}];S.showAddMed=false;S.newMed={name:"",price:"",qty:""};render();}));
+      form.appendChild(fb);scroll.appendChild(form);
+    }
+    if(S.shopInventory.length===0){const e2=d({textAlign:"center",padding:"40px 20px",color:"#888"});e2.appendChild(d({fontSize:"40px",marginBottom:"10px"},"📦"));e2.appendChild(d({fontWeight:"700",fontSize:"15px"},"Koi medicine nahi hai"));e2.appendChild(d({fontSize:"12px",marginTop:"4px"},"Quick Setup se ek ek tick karo ya manual add karein"));scroll.appendChild(e2);}
+    S.shopInventory.forEach(item=>{
+      const row=d({background:"#fff",borderRadius:"16px",padding:"12px",display:"flex",gap:"12px",alignItems:"center",boxShadow:"0 2px 12px rgba(0,0,0,0.05)",marginBottom:"10px"});
+      row.appendChild(d({width:"50px",height:"50px",borderRadius:"12px",background:"#F8FAFF",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"22px",flexShrink:"0"},"💊"));
+      const ri=d({flex:"1"});ri.appendChild(d({fontWeight:"800",fontSize:"14px",color:"#1A1A1A"},item.name));ri.appendChild(d({display:"flex",gap:"10px",marginTop:"2px"}),[d({fontSize:"12px",color:"#1A3C8F",fontWeight:"700"},"₹"+item.price),d({fontSize:"12px",color:"#888"},"Stock: "+item.qty)].reduce((p,c)=>{p.appendChild(c);return p;},d({display:"flex",gap:"10px"})));row.appendChild(ri);
+      const delBtn=d({display:"flex",gap:"6px"});
+      delBtn.appendChild(b({background:"#FEF2F2",border:"none",borderRadius:"10px",width:"34px",height:"34px",cursor:"pointer",fontSize:"14px"},"🗑️",()=>{S.shopInventory=S.shopInventory.filter(i=>i.id!==item.id);render();}));
+      row.appendChild(delBtn);scroll.appendChild(row);
+    });
+  }
+
+  // ORDERS TAB
+  if(S.dashTab==="orders"){
+    const sC={Pending:{bg:"#FEF3C7",color:"#D97706"},Accepted:{bg:"#DBEAFE",color:"#2563EB"},Delivered:{bg:"#DCFCE7",color:"#16A34A"},Cancelled:{bg:"#FEE2E2",color:"#DC2626"}};
+    if(S.shopOrders.length===0){const e3=d({textAlign:"center",padding:"40px 20px",color:"#888"});e3.appendChild(d({fontSize:"40px",marginBottom:"10px"},"📋"));e3.appendChild(d({fontWeight:"700",fontSize:"15px"},"Abhi koi order nahi hai"));scroll.appendChild(e3);}
+    S.shopOrders.forEach(o=>{
+      const card=d({background:"#fff",borderRadius:"16px",padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.05)",marginBottom:"10px"});
+      const head=d({display:"flex",justifyContent:"space-between",marginBottom:"8px"});head.appendChild(d({fontWeight:"800",fontSize:"14px",color:"#1A1A1A"},"#"+o.id));head.appendChild(d({fontSize:"11px",fontWeight:"800",padding:"3px 10px",borderRadius:"8px",background:sC[o.status]?.bg||"#F3F4F6",color:sC[o.status]?.color||"#555"},o.status));card.appendChild(head);
+      card.appendChild(d({fontSize:"13px",color:"#444",marginBottom:"4px"},"💊 "+o.medicine));
+      const foot=d({display:"flex",justifyContent:"space-between",fontSize:"12px",color:"#888"});foot.appendChild(d({},(o.mode==="delivery"?"🛵 Delivery":"🚶 Pickup")));foot.appendChild(d({fontWeight:"800",color:"#1A3C8F"},"₹"+o.total));card.appendChild(foot);
+      scroll.appendChild(card);
+    });
+  }
+
+  wrap.appendChild(scroll);
+  return wrap;
+}
+
+// ADMIN PANEL
+function renderAdmin(){
+  const wrap = d({display:"flex",flexDirection:"column",minHeight:"100vh"});
+  const totalRev = S.adminStores.reduce((a,s)=>a+s.revenue,0);
+  const pendingCount = S.adminStores.filter(s=>s.status==="pending").length;
+
+  // Header
+  const hdr=d({background:"linear-gradient(135deg,#1F2937,#374151,#4B5563)",padding:"16px 20px 24px",position:"relative",overflow:"hidden",flexShrink:"0"});
+  hdr.appendChild(d({position:"absolute",top:"-50px",right:"-50px",width:"180px",height:"180px",borderRadius:"50%",background:"rgba(255,255,255,0.06)"}));
+  const hRow=d({display:"flex",alignItems:"center",gap:"12px",marginBottom:"16px",position:"relative"});
+  hRow.appendChild(b({background:"rgba(255,255,255,0.15)",border:"none",borderRadius:"12px",width:"40px",height:"40px",cursor:"pointer",color:"#fff",fontSize:"18px"},"←",()=>set({screen:"profile",tab:"profile"})));
+  const ht=d({});ht.appendChild(d({color:"#fff",fontWeight:"900",fontSize:"17px"},"🛡️ Admin Panel"));ht.appendChild(d({color:"rgba(255,255,255,0.7)",fontSize:"12px"},"Dawalo Management"));hRow.appendChild(ht);hdr.appendChild(hRow);
+  const sRow=d({display:"flex",gap:"10px",position:"relative"});
+  [{icon:"🏪",val:S.adminStores.length,label:"Total Shops"},{icon:"📦",val:6,label:"Total Orders"},{icon:"💰",val:"₹"+totalRev,label:"Revenue"}].forEach(sc=>{
+    const c=d({flex:"1",background:"rgba(255,255,255,0.12)",borderRadius:"16px",padding:"14px 12px",border:"1px solid rgba(255,255,255,0.15)"});c.appendChild(d({fontSize:"20px",marginBottom:"4px"},sc.icon));c.appendChild(d({color:"#fff",fontWeight:"900",fontSize:"22px"},sc.val));c.appendChild(d({color:"rgba(255,255,255,0.7)",fontSize:"11px",fontWeight:"600"},sc.label));sRow.appendChild(c);
+  });hdr.appendChild(sRow);wrap.appendChild(hdr);
+
+  // Tab bar
+  const tabBar=d({display:"flex",background:"#fff",padding:"10px 12px",gap:"6px",boxShadow:"0 2px 12px rgba(0,0,0,0.06)",overflowX:"auto",flexShrink:"0"});
+  [{id:"overview",icon:"📊",label:"Overview"},{id:"stores",icon:"🏪",label:"Stores"},{id:"approvals",icon:"✅",label:"Approvals"},{id:"medicines",icon:"💊",label:"Medicines"},{id:"commission",icon:"💰",label:"Commission"}].forEach(t=>{
+    const active=S.adminTab===t.id;
+    const tb=b({flexShrink:"0",padding:"8px 10px",border:"none",borderRadius:"12px",cursor:"pointer",background:active?"linear-gradient(135deg,#1F2937,#4B5563)":"#F3F4F6",color:active?"#fff":"#888",fontWeight:"800",fontSize:"11px",fontFamily:"inherit",display:"flex",flexDirection:"column",alignItems:"center",gap:"2px",position:"relative"},"",()=>set({adminTab:t.id}));
+    tb.appendChild(el("span",{style:{fontSize:"15px"}},t.icon));tb.appendChild(document.createTextNode(t.label));
+    if(t.id==="approvals"&&pendingCount>0){const badge=d({position:"absolute",top:"2px",right:"2px",background:"#DC2626",color:"#fff",fontSize:"8px",fontWeight:"900",width:"14px",height:"14px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center"},""+pendingCount);tb.appendChild(badge);}
+    tabBar.appendChild(tb);
+  });wrap.appendChild(tabBar);
+
+  const scroll=el("div",{cls:"scroll",style:{flex:"1",padding:"16px"}});
+  const ss={approved:{bg:"#DCFCE7",color:"#16A34A",label:"✅ Approved"},pending:{bg:"#FEF3C7",color:"#D97706",label:"⏳ Pending"},blocked:{bg:"#FEE2E2",color:"#DC2626",label:"🚫 Blocked"}};
+
+  if(S.adminTab==="overview"){
+    const stDiv=d({display:"flex",gap:"10px",marginBottom:"14px"});
+    [{emoji:"✅",val:S.adminStores.filter(s=>s.status==="approved").length,label:"Approved Shops",c:"#16A34A"},{emoji:"⏳",val:pendingCount,label:"Pending Review",c:"#D97706"},{emoji:"🚫",val:S.adminStores.filter(s=>s.status==="blocked").length,label:"Blocked",c:"#DC2626"}].forEach(st=>{const c=d({flex:"1",background:"#fff",borderRadius:"16px",padding:"16px",boxShadow:"0 2px 12px rgba(0,0,0,0.05)",textAlign:"center"});c.appendChild(d({fontSize:"26px",marginBottom:"6px"},st.emoji));c.appendChild(d({fontWeight:"900",fontSize:"20px",color:st.c},st.val));c.appendChild(d({fontSize:"11px",color:"#888"},st.label));stDiv.appendChild(c);});scroll.appendChild(stDiv);
+    scroll.appendChild(d({fontWeight:"800",fontSize:"14px",color:"#1A1A1A",marginBottom:"12px"},"🏆 Top Performing Shops"));
+    [...S.adminStores].sort((a,b)=>b.revenue-a.revenue).slice(0,3).forEach((s,i)=>{const row=d({background:"#fff",borderRadius:"16px",padding:"12px 14px",display:"flex",alignItems:"center",gap:"12px",boxShadow:"0 2px 12px rgba(0,0,0,0.05)",marginBottom:"8px"});row.appendChild(el("span",{style:{fontSize:"20px"}},i===0?"🥇":i===1?"🥈":"🥉"));const ri=d({flex:"1"});ri.appendChild(d({fontWeight:"800",fontSize:"13px",color:"#1A1A1A"},s.name));ri.appendChild(d({fontSize:"11px",color:"#888"},s.area+" • "+s.orders+" orders"));row.appendChild(ri);row.appendChild(d({fontWeight:"900",fontSize:"14px",color:"#1A3C8F"},"₹"+s.revenue));scroll.appendChild(row);});
+  }
+
+  if(S.adminTab==="stores"){
+    S.adminStores.forEach(s=>{
+      const card=d({background:"#fff",borderRadius:"16px",padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.05)",marginBottom:"10px"});
+      const head=d({display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"8px"});const hi=d({});hi.appendChild(d({fontWeight:"800",fontSize:"14px",color:"#1A1A1A"},s.name));hi.appendChild(d({fontSize:"12px",color:"#888"},"👤 "+s.owner+" • 📍 "+s.area));head.appendChild(hi);head.appendChild(d({fontSize:"11px",fontWeight:"800",padding:"3px 10px",borderRadius:"8px",background:ss[s.status].bg,color:ss[s.status].color,whiteSpace:"nowrap"},ss[s.status].label));card.appendChild(head);
+      card.appendChild(d({display:"flex",gap:"14px",marginBottom:"10px",fontSize:"12px",color:"#666"}),[el("span",{},"📦 "+s.orders+" orders"),el("span",{},"💰 ₹"+s.revenue)].reduce((p,c)=>{p.appendChild(c);return p;},d({display:"flex",gap:"14px"})));
+      if(s.status!=="blocked")card.appendChild(b({width:"100%",padding:"10px",background:"#FEF2F2",border:"1px solid #FECACA",borderRadius:"12px",color:"#DC2626",fontWeight:"800",fontSize:"12px",cursor:"pointer",fontFamily:"inherit"},"🚫 Block",()=>{S.adminStores=S.adminStores.map(x=>x.id===s.id?{...x,status:"blocked"}:x);render();}));
+      else card.appendChild(b({width:"100%",padding:"10px",background:"#F0FDF4",border:"1px solid #BBF7D0",borderRadius:"12px",color:"#16A34A",fontWeight:"800",fontSize:"12px",cursor:"pointer",fontFamily:"inherit"},"✅ Unblock",()=>{S.adminStores=S.adminStores.map(x=>x.id===s.id?{...x,status:"approved"}:x);render();}));
+      scroll.appendChild(card);
+    });
+  }
+
+  if(S.adminTab==="approvals"){
+    const pend=S.adminStores.filter(s=>s.status==="pending");
+    if(pend.length===0){const e4=d({textAlign:"center",padding:"40px 20px",color:"#888"});e4.appendChild(d({fontSize:"40px",marginBottom:"10px"},"✅"));e4.appendChild(d({fontWeight:"700",fontSize:"15px"},"Sab clear hai!"));e4.appendChild(d({fontSize:"12px",marginTop:"4px"},"Koi pending approval nahi hai"));scroll.appendChild(e4);}
+    pend.forEach(s=>{const card=d({background:"#fff",borderRadius:"16px",padding:"14px",boxShadow:"0 2px 12px rgba(0,0,0,0.05)",border:"1px solid #FDE68A",marginBottom:"10px"});card.appendChild(d({fontWeight:"800",fontSize:"14px",color:"#1A1A1A",marginBottom:"4px"},s.name));card.appendChild(d({fontSize:"12px",color:"#888",marginBottom:"10px"},"👤 "+s.owner+" • 📍 "+s.area+" • 📞 "+s.phone));const bRow=d({display:"flex",gap:"8px"});bRow.appendChild(b({flex:"1",padding:"10px",background:"#1A3C8F",border:"none",borderRadius:"12px",color:"#fff",fontWeight:"800",fontSize:"12px",cursor:"pointer",fontFamily:"inherit"},"✅ Approve",()=>{S.adminStores=S.adminStores.map(x=>x.id===s.id?{...x,status:"approved"}:x);render();}));bRow.appendChild(b({flex:"1",padding:"10px",background:"#FEF2F2",border:"1px solid #FECACA",borderRadius:"12px",color:"#DC2626",fontWeight:"800",fontSize:"12px",cursor:"pointer",fontFamily:"inherit"},"❌ Reject",()=>{S.adminStores=S.adminStores.map(x=>x.id===s.id?{...x,status:"blocked"}:x);render();}));card.appendChild(bRow);scroll.appendChild(card);});
+  }
+
+  if(S.adminTab==="medicines"){
+    const head2=d({display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"14px"});
+    head2.appendChild(d({}),[d({fontWeight:"900",fontSize:"16px",color:"#1A1A1A"},"💊 Master Medicine List"),d({fontSize:"12px",color:"#888",marginTop:"2px"},"Shop owners yahan se select karenge")].reduce((p,c)=>{p.appendChild(c);return p;},d({})));
+    head2.appendChild(b({background:"#1A3C8F",border:"none",borderRadius:"12px",padding:"10px 14px",color:"#fff",fontWeight:"800",fontSize:"13px",cursor:"pointer",fontFamily:"inherit"},"+ Add",()=>set({showMasterForm:!S.showMasterForm})));
+    scroll.appendChild(head2);
+    if(S.showMasterForm){
+      const mf=d({background:"#fff",borderRadius:"18px",padding:"16px",boxShadow:"0 4px 20px rgba(0,0,0,0.1)",border:"2px solid #BFDBFE",marginBottom:"14px"});
+      mf.appendChild(d({fontWeight:"800",fontSize:"14px",color:"#1A1A1A",marginBottom:"12px"},"➕ Nayi Medicine Add Karo"));
+      const mn=el("input",{cls:"form-input",style:{marginBottom:"10px"},placeholder:"Medicine Name *",type:"text"});mn.value=S.newMasterMed.name;mn.oninput=e=>{S.newMasterMed.name=e.target.value;};mf.appendChild(mn);
+      const catSel=el("select",{cls:"form-input",style:{marginBottom:"10px"}});catSel.innerHTML='<option value="">Select category</option>'+["Fever","Antibiotic","Allergy","Acidity","Pain","Diabetes","Heart","Supplement","Skin","Eye","Dental"].map(c=>'<option value="'+c+'">'+c+'</option>').join('');catSel.value=S.newMasterMed.cat;catSel.onchange=e=>{S.newMasterMed.cat=e.target.value;};mf.appendChild(catSel);
+      const mPQ=d({display:"flex",gap:"10px",marginBottom:"12px"});const mp3=el("input",{cls:"form-input",style:{flex:"1"},placeholder:"MRP ₹",type:"number"});mp3.value=S.newMasterMed.mrp;mp3.oninput=e=>{S.newMasterMed.mrp=e.target.value;};const mp4=el("input",{cls:"form-input",style:{flex:"1"},placeholder:"Selling Price ₹",type:"number"});mp4.value=S.newMasterMed.price;mp4.oninput=e=>{S.newMasterMed.price=e.target.value;};mPQ.appendChild(mp3);mPQ.appendChild(mp4);mf.appendChild(mPQ);
+      const mBtns=d({display:"flex",gap:"10px"});mBtns.appendChild(b({flex:"1",padding:"11px",background:"#F3F4F6",border:"none",borderRadius:"10px",color:"#555",fontWeight:"700",fontSize:"13px",cursor:"pointer",fontFamily:"inherit"},"Cancel",()=>set({showMasterForm:false,newMasterMed:{name:"",cat:"",mrp:"",price:""}})));mBtns.appendChild(b({flex:"1",padding:"11px",background:"#1A3C8F",border:"none",borderRadius:"10px",color:"#fff",fontWeight:"800",fontSize:"13px",cursor:"pointer",fontFamily:"inherit"},"✅ Save",()=>{if(!S.newMasterMed.name)return;S.masterMeds=[...S.masterMeds,{id:"mm"+Date.now(),...S.newMasterMed}];S.showMasterForm=false;S.newMasterMed={name:"",cat:"",mrp:"",price:""};render();}));mf.appendChild(mBtns);scroll.appendChild(mf);
+    }
+    S.masterMeds.forEach(med=>{
+      const row=d({background:"#fff",borderRadius:"16px",padding:"14px",boxShadow:"0 2px 10px rgba(0,0,0,0.06)",display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"8px"});
+      const mi=d({});mi.appendChild(d({fontWeight:"800",fontSize:"14px",color:"#1A1A1A"},med.name));
+      const sub=d({fontSize:"12px",color:"#888",marginTop:"2px"});sub.innerHTML=esc(med.cat)+" • <span style='color:#1A3C8F;font-weight:700'>₹"+esc(med.price)+"</span> <span style='text-decoration:line-through;color:#bbb'>₹"+esc(med.mrp)+"</span>";mi.appendChild(sub);row.appendChild(mi);
+      row.appendChild(b({background:"#FEF2F2",border:"none",borderRadius:"8px",width:"32px",height:"32px",cursor:"pointer",fontSize:"14px"},"🗑️",()=>{S.masterMeds=S.masterMeds.filter(m=>m.id!==med.id);render();}));scroll.appendChild(row);
+    });
+    scroll.appendChild(d({marginTop:"12px",background:"#EEF2FF",borderRadius:"12px",padding:"10px 14px",fontSize:"12px",color:"#1A3C8F"},"💡 "+S.masterMeds.length+" medicines list mein hain. Shop owners apni inventory mein yahan se select karenge."));
+  }
+
+  if(S.adminTab==="commission"){
+    const totalDue=S.wallets.reduce((a,w)=>a+w.due,0);
+    const tiles=d({display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px",marginBottom:"16px"});
+    [{label:"Total Due Pending",val:"₹"+totalDue,icon:"💰",bg:"#FEF3C7",tc:"#D97706"},{label:"Restricted Accounts",val:S.wallets.filter(w=>w.status==="restricted").length,icon:"🔴",bg:"#FEE2E2",tc:"#DC2626"},{label:"Active Pharmacies",val:S.wallets.filter(w=>w.status==="active").length,icon:"✅",bg:"#DCFCE7",tc:"#16A34A"},{label:"Commission Rate",val:S.commRate+"%",icon:"📊",bg:"#EEF2FF",tc:"#1A3C8F"}].forEach(t=>{const tile=d({background:t.bg,borderRadius:"16px",padding:"14px"});tile.appendChild(d({fontSize:"22px",marginBottom:"4px"},t.icon));tile.appendChild(d({fontSize:"20px",fontWeight:"900",color:t.tc},t.val));tile.appendChild(d({fontSize:"11px",color:"#555",marginTop:"2px"},t.label));tiles.appendChild(tile);});scroll.appendChild(tiles);
+    const commCard=d({background:"#fff",borderRadius:"20px",padding:"18px",boxShadow:"0 2px 16px rgba(0,0,0,0.07)",marginBottom:"16px"});
+    const cHead=d({display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:S.commOn?"14px":"0"});const ci=d({});ci.appendChild(d({fontWeight:"800",fontSize:"15px",color:"#1A1A1A"},"Commission System"));ci.appendChild(d({fontSize:"12px",color:"#888",marginTop:"2px"},S.commOn?"ON — "+S.commRate+"% per order":"OFF — Koi commission nahi"));cHead.appendChild(ci);
+    const tog=d({width:"52px",height:"28px",borderRadius:"99px",background:S.commOn?"#1A3C8F":"#D1D5DB",position:"relative",cursor:"pointer",transition:"background 0.3s"});tog.appendChild(d({width:"22px",height:"22px",background:"#fff",borderRadius:"50%",position:"absolute",top:"3px",left:S.commOn?"27px":"3px",transition:"left 0.3s",boxShadow:"0 1px 4px rgba(0,0,0,0.2)"}));tog.onclick=()=>set({commOn:!S.commOn});cHead.appendChild(tog);commCard.appendChild(cHead);
+    if(S.commOn){const rates=d({display:"flex",gap:"8px",flexWrap:"wrap",marginBottom:"12px"});[1,2,3,5,7,10].forEach(r=>{const rb=d({padding:"8px 16px",background:S.commRate===r?"#1A3C8F":"#F3F4F6",color:S.commRate===r?"#fff":"#555",borderRadius:"10px",fontWeight:"800",fontSize:"13px",cursor:"pointer"},""+r+"%");rb.onclick=()=>set({commRate:r});rates.appendChild(rb);});commCard.appendChild(rates);const ex=d({background:"#F0F4FF",borderRadius:"12px",padding:"12px 14px"});ex.appendChild(d({fontSize:"12px",color:"#555",fontWeight:"700",marginBottom:"4px"},"💡 Example"));ex.appendChild(d({fontSize:"13px",color:"#1A3C8F",fontWeight:"600"},"Order ₹1000 → Pharmacy ko ₹1000 milega → Wallet Due mein ₹"+(1000*S.commRate/100)+" add hoga"));commCard.appendChild(ex);}
+    scroll.appendChild(commCard);
+    S.wallets.forEach(w=>{
+      const wc=d({background:"#fff",borderRadius:"18px",padding:"16px",boxShadow:"0 2px 12px rgba(0,0,0,0.07)",border:w.status==="restricted"?"2px solid #FCA5A5":"2px solid transparent",marginBottom:"10px"});
+      const wHead=d({display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"10px"});const wi=d({});wi.appendChild(d({fontWeight:"800",fontSize:"14px",color:"#1A1A1A"},w.name));wi.appendChild(d({fontSize:"11px",color:"#888"},"📍 "+w.area));wHead.appendChild(wi);wHead.appendChild(d({background:w.status==="restricted"?"#FEE2E2":"#DCFCE7",color:w.status==="restricted"?"#DC2626":"#16A34A",fontSize:"11px",fontWeight:"800",padding:"3px 10px",borderRadius:"20px"},w.status==="restricted"?"🔴 Restricted":"✅ Active"));wc.appendChild(wHead);
+      const wGrid=d({display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"8px"});[{bg:w.due>0?"#FFF5F5":"#F0FDF4",val:"₹"+w.due,col:w.due>0?"#DC2626":"#16A34A",lbl:"Current Due"},{bg:"#F0F4FF",val:"₹"+w.totalSales.toLocaleString(),col:"#1A3C8F",lbl:"Total Sales"},{bg:"#F9FAFB",val:"₹"+w.limit,col:"#7C3AED",lbl:"Credit Limit"}].forEach(ws=>{const wst=d({background:ws.bg,borderRadius:"10px",padding:"8px",textAlign:"center"});wst.appendChild(d({fontSize:"13px",fontWeight:"800",color:ws.col},ws.val));wst.appendChild(d({fontSize:"10px",color:"#888"},ws.lbl));wGrid.appendChild(wst);});wc.appendChild(wGrid);
+      const pct=Math.min((w.due/w.limit)*100,100);const barWrap=d({height:"6px",background:"#F3F4F6",borderRadius:"99px",overflow:"hidden",marginTop:"8px"});barWrap.appendChild(d({height:"100%",width:pct+"%",background:pct>=100?"#DC2626":pct>=70?"#F59E0B":"#22C55E",borderRadius:"99px"}));wc.appendChild(barWrap);scroll.appendChild(wc);
+    });
+  }
+
+  wrap.appendChild(scroll);
+  return wrap;
+}
+
+// ─── MODALS ───────────────────────────────────────────────────
+function renderModal(){
+  if(!S.modal) return null;
+  const overlay = d({position:"absolute",top:"0",left:"0",right:"0",bottom:"0",background:"rgba(0,0,0,0.55)",zIndex:"500",display:"flex",flexDirection:"column",justifyContent:"flex-end"});
+  overlay.onclick = () => set({modal:null});
+
+  if(S.modal==="shopForm"){
+    const sheet = d({background:"#fff",borderRadius:"20px 20px 0 0",padding:"20px 20px 30px",maxHeight:"90%",overflowY:"auto"});
+    sheet.onclick = e => e.stopPropagation();
+    sheet.appendChild(d({width:"40px",height:"4px",background:"#E5E7EB",borderRadius:"4px",margin:"0 auto 16px"}));
+    const head=d({display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"16px"});
+    const htxt=d({});htxt.appendChild(d({fontWeight:"900",fontSize:"18px",color:"#1A1A1A"},"🏪 Apni Dukan Register Karein"));htxt.appendChild(d({fontSize:"12px",color:"#888",marginTop:"2px"},"Basic details bharein, baad mein inventory add karein"));head.appendChild(htxt);
+    head.appendChild(b({background:"#F3F4F6",border:"none",borderRadius:"10px",width:"32px",height:"32px",fontSize:"16px",cursor:"pointer",color:"#888"},"✕",()=>set({modal:null})));sheet.appendChild(head);
+    const fd=S.shopFormData;
+    [["name","Shop ka Naam *","e.g. Sharma Medical Store"],["owner","Owner ka Naam *","e.g. Rajesh Sharma"],["phone","Phone Number *","e.g. 9876543210"],["area","Area / Mohalla *","e.g. Mithanpura"]].forEach(([f,label,ph])=>{
+      sheet.appendChild(el("label",{cls:"form-label"},label));
+      const inp=el("input",{cls:"form-input",style:{marginBottom:"14px"},placeholder:ph,type:"text"});inp.value=fd[f];inp.oninput=e=>{S.shopFormData[f]=e.target.value;};sheet.appendChild(inp);
+    });
+    sheet.appendChild(el("label",{cls:"form-label"},"Full Address *"));
+    const ta=el("textarea",{cls:"form-input",style:{marginBottom:"14px",resize:"none",height:"64px"},placeholder:"e.g. Near Hanuman Mandir, Main Road"});ta.value=fd.address;ta.oninput=e=>{S.shopFormData.address=e.target.value;};sheet.appendChild(ta);
+    const ok=fd.name&&fd.owner&&fd.phone&&fd.area&&fd.address;
+    sheet.appendChild(b({width:"100%",padding:"16px",background:ok?"#1A3C8F":"#D1D5DB",border:"none",borderRadius:"16px",color:"#fff",fontWeight:"800",fontSize:"16px",cursor:ok?"pointer":"not-allowed",fontFamily:"inherit"},ok?"✅ Register Karein →":"Sabhi fields fill karein *",()=>{if(!ok)return;set({registeredShop:{...fd},modal:null,screen:"dashboard",dashTab:"overview",shopFormData:{name:"",owner:"",phone:"",area:"",address:""}});}));
+    overlay.appendChild(sheet);
+  }
+
+  if(S.modal==="orderModal"){
+    const shop=S.selectedShop, med=S.selectedMedicine;
+    const mp=shop.inventory[med]||0, dc=calcDelivery(shop.distanceKm);
+    const total=S.orderMode==="delivery"?mp+dc:mp;
+    const sheet=d({background:"#fff",borderRadius:"20px 20px 0 0",padding:"24px 20px 40px"});
+    sheet.onclick=e=>e.stopPropagation();
+    sheet.appendChild(d({width:"40px",height:"4px",background:"#E5E7EB",borderRadius:"4px",margin:"0 auto 20px"}));
+    const shopInfo=d({display:"flex",gap:"12px",alignItems:"center",background:"#F0F4FF",borderRadius:"16px",padding:"14px",marginBottom:"20px"});
+    shopInfo.appendChild(el("span",{style:{fontSize:"30px"}},"🏥"));
+    const si3=d({});si3.appendChild(d({fontWeight:"800",fontSize:"15px",color:"#1A1A1A"},shop.name));si3.appendChild(d({fontSize:"12px",color:"#888"},"📍 "+shop.area+" • "+shop.distanceKm+" km"));si3.appendChild(d({fontSize:"13px",color:"#1A3C8F",fontWeight:"700",marginTop:"2px"},"💊 "+med+" — ₹"+mp));shopInfo.appendChild(si3);sheet.appendChild(shopInfo);
+    sheet.appendChild(d({fontWeight:"800",fontSize:"15px",color:"#1A1A1A",marginBottom:"12px"},"Kaise lenge aap? 🤔"));
+    const modeRow=d({display:"flex",gap:"12px",marginBottom:"20px"});
+    const opts=[{id:"pickup",icon:"🚶",title:"Khud Lunga",sub:"Self Pickup",badge:"FREE",bbg:"#DCFCE7",bc:"#16A34A"}];
+    if(shop.deliveryEnabled) opts.push({id:"delivery",icon:"🛵",title:"Ghar Pe Chahiye",sub:"Home Delivery",badge:dc!==null?"+₹"+dc:"N/A",bbg:"#FEF3C7",bc:"#D97706"});
+    opts.forEach(opt=>{
+      const oc=d({flex:"1",border:S.orderMode===opt.id?"2px solid #1A3C8F":"2px solid #E5E7EB",borderRadius:"16px",padding:"16px 12px",textAlign:"center",cursor:"pointer",background:S.orderMode===opt.id?"#EEF2FF":"#fff",transition:"all 0.2s"});
+      oc.appendChild(d({fontSize:"28px",marginBottom:"6px"},opt.icon));oc.appendChild(d({fontWeight:"800",fontSize:"14px",color:"#1A1A1A"},opt.title));oc.appendChild(d({fontSize:"12px",color:"#888",marginTop:"2px"},opt.sub));oc.appendChild(d({marginTop:"8px",background:opt.bbg,color:opt.bc,fontWeight:"800",fontSize:"13px",padding:"4px 10px",borderRadius:"8px"},opt.badge));
+      oc.onclick=()=>{S.orderMode=opt.id;render();};modeRow.appendChild(oc);
+    });
+    sheet.appendChild(modeRow);
+    if(S.orderMode){
+      const bill=d({background:"#F8FAFF",borderRadius:"16px",padding:"16px",marginBottom:"20px",border:"1px solid #E0E7FF"});
+      bill.appendChild(d({fontWeight:"800",fontSize:"14px",color:"#1A1A1A",marginBottom:"12px"},"💰 Bill Summary"));
+      [[med,"₹"+mp],["Delivery Charge",S.orderMode==="delivery"?"+₹"+dc:"FREE"]].forEach(([k,v])=>{const row=d({display:"flex",justifyContent:"space-between",marginBottom:"8px"});row.appendChild(el("span",{style:{fontSize:"13px",color:"#666"}},k));const vs=el("span",{style:{fontSize:"13px",fontWeight:"700",color:v.startsWith("+")?"#D97706":v==="FREE"?"#16A34A":"#1A1A1A"}},v);row.appendChild(vs);bill.appendChild(row);});
+      const totRow2=d({borderTop:"1px dashed #CBD5E1",paddingTop:"10px",marginTop:"4px",display:"flex",justifyContent:"space-between"});totRow2.appendChild(el("span",{style:{fontSize:"15px",fontWeight:"800",color:"#1A1A1A"}},"Total"));totRow2.appendChild(el("span",{style:{fontSize:"15px",fontWeight:"900",color:"#1A3C8F"}},"₹"+total));bill.appendChild(totRow2);sheet.appendChild(bill);
+    }
+    sheet.appendChild(b({width:"100%",padding:"16px",background:S.orderMode?"#1A3C8F":"#D1D5DB",border:"none",borderRadius:"16px",color:"#fff",fontWeight:"800",fontSize:"16px",cursor:S.orderMode?"pointer":"not-allowed",fontFamily:"inherit",transition:"background 0.2s"},S.orderMode?(S.orderMode==="pickup"?"🚶 Pickup Confirm Karein":"🛵 Delivery Order — ₹"+total):"Pehle option chunein ☝️",()=>{if(!S.orderMode)return;set({screen:"orderSuccess",modal:null,confirmedOrder:{shop,medicine:med,mode:S.orderMode,total,available:[{id:"x",name:med,emoji:"💊",shopPrice:mp}],totalWithDelivery:total},orderMode:null});}));
+    overlay.appendChild(sheet);
+  }
+
+  if(S.modal==="adminLogin"){
+    const sheet=d({background:"#fff",borderRadius:"20px 20px 0 0",padding:"24px 20px 36px"});
+    sheet.onclick=e=>e.stopPropagation();
+    sheet.appendChild(d({width:"40px",height:"4px",background:"#E5E7EB",borderRadius:"4px",margin:"0 auto 20px"}));
+    const av=d({textAlign:"center",marginBottom:"20px"});av.appendChild(d({width:"60px",height:"60px",borderRadius:"50%",background:"#1F2937",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"28px",margin:"0 auto 12px"},"🛡️"));av.appendChild(d({fontWeight:"900",fontSize:"18px",color:"#1A1A1A"},"Admin Login"));av.appendChild(d({fontSize:"12px",color:"#888",marginTop:"4px"},"Demo PIN: 1234"));sheet.appendChild(av);
+    sheet.appendChild(el("label",{cls:"form-label"},"Admin PIN"));
+    const pinInp=el("input",{cls:"form-input",style:{marginBottom:"8px"},placeholder:"****",type:"password"});pinInp.value=S.adminPin;pinInp.oninput=e=>{S.adminPin=e.target.value;S.adminPinErr="";render();};sheet.appendChild(pinInp);
+    if(S.adminPinErr) sheet.appendChild(d({background:"#FEF2F2",border:"1px solid #FECACA",borderRadius:"10px",padding:"10px 12px",fontSize:"12px",color:"#DC2626",marginBottom:"12px"},"⚠️ "+S.adminPinErr));
+    sheet.appendChild(b({width:"100%",padding:"16px",background:S.adminPin?"#1F2937":"#D1D5DB",border:"none",borderRadius:"16px",color:"#fff",fontWeight:"800",fontSize:"16px",cursor:S.adminPin?"pointer":"not-allowed",fontFamily:"inherit",marginTop:"8px"},"🛡️ Admin Panel Kholein",()=>{if(S.adminPin==="1234")set({modal:null,screen:"admin",adminTab:"overview"});else{S.adminPinErr="Galat PIN. Try again.";render();}}));
+    overlay.appendChild(sheet);
+  }
+
+  return overlay;
+}
+
+// ─── RENDER ───────────────────────────────────────────────────
+function render(){
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+  const container = d({position:"relative"});
+  let screenEl;
+  switch(S.screen){
+    case "home":        screenEl = renderHome(); break;
+    case "profile":     screenEl = renderProfile(); break;
+    case "smartcart":   screenEl = renderSmartCart(); break;
+    case "cartResults": screenEl = renderCartResults(); break;
+    case "orderSuccess":screenEl = renderOrderSuccess(); break;
+    case "dashboard":   screenEl = renderDashboard(); break;
+    case "admin":       screenEl = renderAdmin(); break;
+    default:            screenEl = renderHome();
+  }
+  container.appendChild(screenEl);
+  const modal = renderModal();
+  if(modal) container.appendChild(modal);
+  app.appendChild(container);
+}
+
+// ─── TIMERS ───────────────────────────────────────────────────
+setInterval(()=>{ S.pulse=!S.pulse; render(); }, 1500);
+setInterval(()=>{ S.bannerIdx=(S.bannerIdx+1)%BANNERS.length; render(); }, 3500);
+
+// ─── INIT ─────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>

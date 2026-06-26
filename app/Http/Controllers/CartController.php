@@ -1,0 +1,146 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Medicine;
+use App\Models\Shop;
+use Illuminate\Http\Request;
+
+class CartController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = $request->input('q', '');
+        $cart = session('cart', []);
+        $cartCount = array_sum($cart);
+
+        $catalogQuery = Medicine::query();
+        if ($query) {
+            $catalogQuery->where('name', 'like', "%{$query}%")
+                         ->orWhere('category', 'like', "%{$query}%");
+        }
+        $catalog = $catalogQuery->get()->map(function ($med) {
+            $disc = $med->mrp > 0 ? round((($med->mrp - $med->price) / $med->mrp) * 100) : 0;
+            return (object) [
+                'id' => $med->id,
+                'name' => $med->name,
+                'category' => $med->category,
+                'emoji' => $med->emoji,
+                'price' => (float)$med->price,
+                'mrp' => (float)$med->mrp,
+                'disc' => $disc
+            ];
+        });
+
+        return view('customer.smartcart', compact('catalog', 'cart', 'cartCount', 'query'));
+    }
+
+    public function add(Request $request)
+    {
+        $request->validate(['medicine_id' => 'required|integer']);
+        $medId = $request->medicine_id;
+        
+        $cart = session('cart', []);
+        $cart[$medId] = ($cart[$medId] ?? 0) + 1;
+        session(['cart' => $cart]);
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+        return redirect()->back()->with('success', 'Medicine added to cart!');
+    }
+
+    public function update(Request $request)
+    {
+        $request->validate([
+            'medicine_id' => 'required|integer',
+            'qty' => 'required|integer|min:0'
+        ]);
+        $medId = $request->medicine_id;
+        $qty = $request->qty;
+
+        $cart = session('cart', []);
+        if ($qty == 0) {
+            unset($cart[$medId]);
+        } else {
+            $cart[$medId] = $qty;
+        }
+        session(['cart' => $cart]);
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+        return redirect()->back();
+    }
+
+    public function results()
+    {
+        $cart = session('cart', []);
+        $cartItems = Medicine::whereIn('id', array_keys($cart))->get();
+        if ($cartItems->isEmpty()) {
+            return redirect('/smartcart')->with('error', 'Cart is empty!');
+        }
+
+        $allShops = Shop::where('status', 'approved')->where('is_online', true)->get();
+        $matches = [];
+
+        foreach ($allShops as $shop) {
+            $available = [];
+            $missing = [];
+            $totalPrice = 0;
+
+            foreach ($cartItems as $med) {
+                // Generate inv key matches
+                $invKey = preg_replace('/(\s+\d+mg|\s+\d+g|\s+mg)/i', '', $med->name);
+                
+                // Look up in inventories relation
+                $inv = $shop->inventories()
+                            ->where(function($q) use ($med, $invKey) {
+                                $q->where('medicine_id', $med->id)
+                                  ->orWhere('name', 'like', "%{$invKey}%");
+                            })->first();
+
+                if ($inv) {
+                    $available[] = [
+                        'id' => $med->id,
+                        'name' => $med->name,
+                        'emoji' => $med->emoji,
+                        'shopPrice' => (float)$inv->price
+                    ];
+                    $totalPrice += $inv->price * $cart[$med->id];
+                } else {
+                    $missing[] = $med;
+                }
+            }
+
+            $deliveryCharge = $shop->distance_km > 10 ? 0 : round($shop->distance_km * 8);
+
+            $matches[] = [
+                'shop' => $shop,
+                'available' => $available,
+                'missing' => $missing,
+                'matchCount' => count($available),
+                'totalPrice' => $totalPrice,
+                'deliveryCharge' => $deliveryCharge,
+                'totalWithDelivery' => $totalPrice + ($shop->delivery_enabled ? $deliveryCharge : 0)
+            ];
+        }
+
+        // Sort: highest match count first, then cheapest total price
+        usort($matches, function ($a, $b) {
+            if ($b['matchCount'] !== $a['matchCount']) {
+                return $b['matchCount'] - $a['matchCount'];
+            }
+            return $a['totalWithDelivery'] <=> $b['totalWithDelivery'];
+        });
+
+        $bestMatch = $matches[0] ?? null;
+        if (!$bestMatch) {
+            return redirect('/smartcart')->with('error', 'No matching shops found!');
+        }
+
+        $cartCount = array_sum($cart);
+
+        return view('customer.cart_results', compact('bestMatch', 'cart', 'cartItems', 'cartCount'));
+    }
+}
