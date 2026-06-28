@@ -13,11 +13,13 @@ class Medicine extends Model
         'emoji',
         'mrp',
         'price',
+        'images',
     ];
 
     protected $casts = [
         'mrp' => 'float',
         'price' => 'float',
+        'images' => 'array',
     ];
 
     public function inventories(): HasMany

@@ -173,17 +173,29 @@ class ShopController extends Controller
         $request->validate([
             'name' => 'required|string',
             'price' => 'required|numeric',
-            'qty' => 'required|integer'
+            'qty' => 'required|integer',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         $master = Medicine::where('name', 'like', '%' . $request->name . '%')->first();
+
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('uploads/medicines'), $filename);
+                $imagePaths[] = '/uploads/medicines/' . $filename;
+            }
+        }
 
         Inventory::create([
             'shop_id' => $shop->id,
             'medicine_id' => $master ? $master->id : null,
             'name' => $master ? null : $request->name,
             'price' => $request->price,
-            'quantity' => $request->qty
+            'quantity' => $request->qty,
+            'images' => !empty($imagePaths) ? $imagePaths : null
         ]);
 
         return redirect('/shop/inventory')->with('success', 'Medicine stock added manually!');

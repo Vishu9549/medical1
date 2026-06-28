@@ -74,8 +74,32 @@ class DatabaseSeeder extends Seeder
             ['key' => 'comm_rate', 'value' => '2', 'created_at' => now(), 'updated_at' => now()],
         ]);
 
-        // 3. Medicines
-        $medicines = [
+        // 3. Medicines (5,000 items generator)
+        $prefixes = ['Al', 'Ben', 'Cal', 'Dol', 'Ery', 'Flu', 'Glip', 'Hep', 'Ibu', 'Juv', 'Kof', 'Lip', 'Met', 'Neo', 'Ome', 'Pan', 'Qin', 'Ros', 'Sita', 'Tel', 'Uni', 'Val', 'Zol'];
+        $middles = ['a', 'o', 'i', 'e', 'u', 'as', 'in', 'ex', 'or', 'ap', 'ip', 'op', 'at'];
+        $suffixes = ['stat', 'nac', 'zole', 'cillin', 'pril', 'sartan', 'olol', 'press', 'phage', 'formin', 'tidine', 'fen', 'cef', 'mox', 'dopa', 'zine'];
+        $dosages = ['5mg', '10mg', '25mg', '50mg', '100mg', '250mg', '500mg', '650mg', '1g'];
+        
+        $categoriesData = [
+            'Fever' => '🌡️',
+            'Antibiotic' => '💊',
+            'Allergy' => '🤧',
+            'Acidity' => '🔵',
+            'Pain' => '🩹',
+            'Diabetes' => '💉',
+            'Heart' => '❤️',
+            'Supplement' => '🍊',
+            'Skin' => '🧴',
+            'Eye' => '👁️',
+            'Dental' => '🦷'
+        ];
+
+        $medsToInsert = [];
+        $uniqueNames = [];
+        $counter = 1;
+
+        // Add the core 12 medicines to preserve previous references
+        $coreMeds = [
             ['id' => 1, 'name' => 'Paracetamol 500mg', 'category' => 'Fever', 'emoji' => '🌡️', 'mrp' => 32, 'price' => 25],
             ['id' => 2, 'name' => 'Azithromycin 500mg', 'category' => 'Antibiotic', 'emoji' => '💊', 'mrp' => 120, 'price' => 95],
             ['id' => 3, 'name' => 'Cetirizine 10mg', 'category' => 'Allergy', 'emoji' => '🤧', 'mrp' => 28, 'price' => 22],
@@ -90,8 +114,45 @@ class DatabaseSeeder extends Seeder
             ['id' => 12, 'name' => 'Metronidazole 400mg', 'category' => 'Antibiotic', 'emoji' => '💊', 'mrp' => 42, 'price' => 34],
         ];
 
-        foreach ($medicines as $med) {
-            DB::table('medicines')->insert(array_merge($med, ['created_at' => now(), 'updated_at' => now()]));
+        foreach ($coreMeds as $m) {
+            $uniqueNames[strtolower($m['name'])] = true;
+            $medsToInsert[] = array_merge($m, ['created_at' => now(), 'updated_at' => now()]);
+            $counter++;
+        }
+
+        // Generate up to 5,000 items
+        while ($counter <= 5000) {
+            $cat = array_rand($categoriesData);
+            $emoji = $categoriesData[$cat];
+            
+            $name = $prefixes[array_rand($prefixes)] 
+                  . $middles[array_rand($middles)] 
+                  . $suffixes[array_rand($suffixes)] 
+                  . ' ' 
+                  . $dosages[array_rand($dosages)];
+
+            if (!isset($uniqueNames[strtolower($name)])) {
+                $uniqueNames[strtolower($name)] = true;
+                $mrp = rand(15, 500);
+                $price = round($mrp * (rand(70, 95) / 100)); // 5% to 30% discount
+                
+                $medsToInsert[] = [
+                    'id' => $counter,
+                    'name' => $name,
+                    'category' => $cat,
+                    'emoji' => $emoji,
+                    'mrp' => $mrp,
+                    'price' => $price,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+                $counter++;
+            }
+        }
+
+        // Chunk and batch insert for optimal memory performance
+        foreach (array_chunk($medsToInsert, 500) as $chunk) {
+            DB::table('medicines')->insert($chunk);
         }
 
         // 4. Shops

@@ -54,7 +54,7 @@
       <div style="background:#fff; border-radius:18px; padding:16px; box-shadow:0 4px 20px rgba(0,0,0,0.1); border:2px solid #BFDBFE; margin-bottom:14px; max-width:500px; margin-left:auto; margin-right:auto;">
         <h4 style="font-weight:800; font-size:14px; color:#1A1A1A; margin-bottom:12px;">➕ Add Master Medicine</h4>
         
-        <form action="{{ url('/admin/medicines/add') }}" method="POST">
+        <form action="{{ url('/admin/medicines/add') }}" method="POST" enctype="multipart/form-data">
           @csrf
           <div style="margin-bottom:10px;">
             <input type="text" name="name" class="form-input" placeholder="Medicine Name *" required>
@@ -71,6 +71,10 @@
             <input type="number" step="0.01" name="mrp" class="form-input" style="flex:1;" placeholder="MRP ₹" required>
             <input type="number" step="0.01" name="price" class="form-input" style="flex:1;" placeholder="Selling Price ₹" required>
           </div>
+          <div style="margin-bottom:12px;">
+            <label class="form-label">Upload Medicine Images</label>
+            <input type="file" name="images[]" multiple class="form-input" accept="image/*">
+          </div>
           <div style="display:flex; gap:10px;">
             <a href="{{ url('/admin/medicines') }}" class="btn-outline" style="flex:1; text-decoration:none; text-align:center; padding:11px; font-size:13px; color:#555; border-color:#E5E7EB;">Cancel</a>
             <button type="submit" class="btn-blue" style="flex:1; padding:11px; font-size:13px;">Save Item</button>
@@ -83,8 +87,12 @@
     <div class="responsive-grid">
       @foreach($medicines as $med)
         <div style="background:#fff; border-radius:16px; padding:12px; display:flex; gap:12px; align-items:center; box-shadow:0 2px 12px rgba(0,0,0,0.05); margin:0;">
-          <div style="width:50px; height:50px; border-radius:12px; background:#F8FAFF; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0;">
-            {{ $med->emoji }}
+          <div style="width:50px; height:50px; border-radius:12px; background:#F8FAFF; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; overflow:hidden; position:relative;">
+            @if(!empty($med->images))
+              <img src="{{ asset($med->images[0]) }}" style="width:100%; height:100%; object-fit:cover;">
+            @else
+              {{ $med->emoji }}
+            @endif
           </div>
           <div style="flex:1;">
             <div style="font-weight:800; font-size:14px; color:#1A1A1A;">{{ $med->name }}</div>
@@ -93,6 +101,13 @@
               <span style="font-size:12px; color:#1A3C8F; font-weight:700;">₹{{ $med->price }}</span>
               <span style="font-size:12px; color:#aaa; text-decoration:line-through;">₹{{ $med->mrp }}</span>
             </div>
+            @if(!empty($med->images) && count($med->images) > 1)
+              <div style="display:flex; gap:4px; margin-top:6px;">
+                @foreach($med->images as $img)
+                  <img src="{{ asset($img) }}" style="width:24px; height:24px; border-radius:4px; object-fit:cover; border:1px solid #eee;">
+                @endforeach
+              </div>
+            @endif
           </div>
           <div>
             <form action="{{ url('/admin/medicines/delete/'.$med->id) }}" method="POST" onsubmit="return confirm('Master item ko permanent delete karein?');">

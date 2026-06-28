@@ -13,11 +13,13 @@ class Inventory extends Model
         'name',
         'price',
         'quantity',
+        'images',
     ];
 
     protected $casts = [
         'price' => 'float',
         'quantity' => 'integer',
+        'images' => 'array',
     ];
 
     public function shop(): BelongsTo

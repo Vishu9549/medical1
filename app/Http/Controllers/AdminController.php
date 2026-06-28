@@ -77,7 +77,9 @@ class AdminController extends Controller
             'name' => 'required|string',
             'category' => 'required|string',
             'mrp' => 'required|numeric',
-            'price' => 'required|numeric'
+            'price' => 'required|numeric',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         $emojis = [
@@ -96,12 +98,22 @@ class AdminController extends Controller
 
         $emoji = $emojis[$request->category] ?? '💊';
 
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('uploads/medicines'), $filename);
+                $imagePaths[] = '/uploads/medicines/' . $filename;
+            }
+        }
+
         Medicine::create([
             'name' => $request->name,
             'category' => $request->category,
             'emoji' => $emoji,
             'mrp' => $request->mrp,
-            'price' => $request->price
+            'price' => $request->price,
+            'images' => !empty($imagePaths) ? $imagePaths : null
         ]);
 
         return redirect('/admin/medicines')->with('success', 'Master medicine added successfully!');

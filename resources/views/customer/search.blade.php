@@ -43,8 +43,12 @@
             $disc = $med->mrp > 0 ? round((($med->mrp - $med->price) / $med->mrp) * 100) : 0;
           @endphp
           <div class="med-row" style="background:{{ $qty > 0 ? '#FAFBFF' : '#fff' }}; border: 1px solid #E5E7EB; border-radius: 14px; margin-bottom: 0;">
-            <div class="med-img">
-              <div>{{ $med->emoji }}</div>
+            <div class="med-img" style="overflow:hidden; position:relative;">
+              @if(!empty($med->images))
+                <img src="{{ asset($med->images[0]) }}" style="width:100%; height:100%; object-fit:cover;">
+              @else
+                <div>{{ $med->emoji }}</div>
+              @endif
               @if($idx < 2)
                 <div class="bestseller">Bestseller ✦</div>
               @endif
