@@ -83,6 +83,11 @@
       🔍 Best Pharmacy Dhundho — <span id="checkout-item-count">{{ $cartCount }}</span> items →
     </a>
   </div>
+
+  <!-- Floating Action Button (FAB) for quick checkout -->
+  <a href="{{ url('/smartcart/results') }}" id="smartcart-fab" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; border-radius: 50%; width: 56px; height: 56px; display: {{ $cartCount > 0 ? 'flex' : 'none' }}; align-items: center; justify-content: center; background: linear-gradient(135deg,#1A3C8F,#2563EB); color: #fff; font-size: 22px; box-shadow: 0 8px 24px rgba(37,99,235,0.4); text-decoration: none; border: none; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1.0)'">
+    🔍
+  </a>
 </div>
 
 <script>
@@ -131,12 +136,15 @@
             // Update checkout button count
             const checkoutBar = document.getElementById('smartcart-checkout-bar');
             const checkoutCountSpan = document.getElementById('checkout-item-count');
+            const checkoutFab = document.getElementById('smartcart-fab');
             
             if (data.cartCount > 0) {
               if (checkoutBar) checkoutBar.style.display = 'block';
               if (checkoutCountSpan) checkoutCountSpan.innerText = data.cartCount;
+              if (checkoutFab) checkoutFab.style.display = 'flex';
             } else {
               if (checkoutBar) checkoutBar.style.display = 'none';
+              if (checkoutFab) checkoutFab.style.display = 'none';
             }
 
             // Update top header count badge
