@@ -25,9 +25,14 @@ Route::get('/smartcart', [CartController::class, 'index']);
 Route::post('/cart/add', [CartController::class, 'add']);
 Route::post('/cart/update', [CartController::class, 'update']);
 
-// Protected Customer/User Routes (Requires Authentication)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [HomeController::class, 'profile']);
+    Route::get('/profile/orders', [HomeController::class, 'orders']);
+    Route::get('/profile/addresses', [HomeController::class, 'addresses']);
+    Route::get('/profile/favourites', [HomeController::class, 'favourites']);
+    Route::get('/profile/notifications', [HomeController::class, 'notifications']);
+    Route::get('/profile/settings', [HomeController::class, 'settings']);
+    Route::get('/profile/help', [HomeController::class, 'help']);
     Route::get('/smartcart/results', [CartController::class, 'results']);
     Route::post('/order', [OrderController::class, 'store']);
     Route::get('/order/{id}/success', [OrderController::class, 'success']);

@@ -159,20 +159,20 @@
     <div style="background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.06);">
       @php
         $menuItems = [
-          ['icon' => '📋', 'label' => 'My Orders'],
-          ['icon' => '📍', 'label' => 'Saved Addresses'],
-          ['icon' => '❤️', 'label' => 'Favourite Shops'],
-          ['icon' => '🔔', 'label' => 'Notifications'],
-          ['icon' => '⚙️', 'label' => 'Settings'],
-          ['icon' => '❓', 'label' => 'Help & Support']
+          ['icon' => '📋', 'label' => 'My Orders', 'url' => url('/profile/orders')],
+          ['icon' => '📍', 'label' => 'Saved Addresses', 'url' => url('/profile/addresses')],
+          ['icon' => '❤️', 'label' => 'Favourite Shops', 'url' => url('/profile/favourites')],
+          ['icon' => '🔔', 'label' => 'Notifications', 'url' => url('/profile/notifications')],
+          ['icon' => '⚙️', 'label' => 'Settings', 'url' => url('/profile/settings')],
+          ['icon' => '❓', 'label' => 'Help & Support', 'url' => url('/profile/help')]
         ];
       @endphp
       @foreach($menuItems as $idx => $item)
-        <div style="display:flex; align-items:center; gap:14px; padding:16px 18px; border-bottom:{{ $idx < 5 ? '1px solid #F3F4F6' : 'none' }}; cursor:pointer;">
+        <a href="{{ $item['url'] }}" style="display:flex; align-items:center; gap:14px; padding:16px 18px; border-bottom:{{ $idx < 5 ? '1px solid #F3F4F6' : 'none' }}; cursor:pointer; text-decoration:none;">
           <span style="font-size:20px;">{{ $item['icon'] }}</span>
           <div style="flex:1; font-weight:700; font-size:14px; color:#1A1A1A;">{{ $item['label'] }}</div>
           <div style="color:#ccc;">›</div>
-        </div>
+        </a>
       @endforeach
     </div>
 

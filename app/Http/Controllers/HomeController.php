@@ -108,4 +108,63 @@ class HomeController extends Controller
 
         return view('customer.profile', compact('registeredShop', 'cartCount'));
     }
+
+    public function orders()
+    {
+        $orders = \App\Models\Order::where('user_id', \Illuminate\Support\Facades\Auth::id())->latest()->get();
+        $cart = session('cart', []);
+        $cartCount = array_sum($cart);
+
+        return view('customer.profile_orders', compact('orders', 'cartCount'));
+    }
+
+    public function addresses()
+    {
+        $cart = session('cart', []);
+        $cartCount = array_sum($cart);
+        $orders = \App\Models\Order::where('user_id', \Illuminate\Support\Facades\Auth::id())
+            ->whereNotNull('delivery_address')
+            ->distinct()
+            ->pluck('delivery_address');
+
+        return view('customer.profile_addresses', compact('orders', 'cartCount'));
+    }
+
+    public function favourites()
+    {
+        $cart = session('cart', []);
+        $cartCount = array_sum($cart);
+        $shops = Shop::where('status', 'approved')->where('rating', '>=', 4.5)->limit(3)->get();
+
+        return view('customer.profile_favourites', compact('shops', 'cartCount'));
+    }
+
+    public function notifications()
+    {
+        $cart = session('cart', []);
+        $cartCount = array_sum($cart);
+        $notifications = [
+            ['title' => 'Order Status Update', 'text' => 'Aapka Dolo 650 ka order Sharma Medical ne accept kar liya hai! ⚡', 'time' => '10 mins ago'],
+            ['title' => 'Cashback Added 💰', 'text' => 'Dawalo wallet check karein, new promo coupon applied.', 'time' => '2 hours ago']
+        ];
+
+        return view('customer.profile_notifications', compact('notifications', 'cartCount'));
+    }
+
+    public function settings()
+    {
+        $cart = session('cart', []);
+        $cartCount = array_sum($cart);
+        $user = \Illuminate\Support\Facades\Auth::user();
+
+        return view('customer.profile_settings', compact('user', 'cartCount'));
+    }
+
+    public function help()
+    {
+        $cart = session('cart', []);
+        $cartCount = array_sum($cart);
+
+        return view('customer.profile_help', compact('cartCount'));
+    }
 }
