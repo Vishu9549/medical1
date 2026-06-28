@@ -93,25 +93,6 @@
       </a>
     </div>
 
-    <!-- Interactive Location Map -->
-    <div style="padding:0 0 24px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <div style="font-weight:800; font-size:16px; color:#1A1A1A; display:flex; align-items:center; gap:8px;">
-          <span>🗺️</span> Interactive Shops Map
-        </div>
-        <button onclick="requestGeolocation()" class="btn-outline" style="font-size:11px; padding:6px 10px; border-radius:8px; display:flex; align-items:center; gap:4px; border:1px solid #1A3C8F;">
-          📍 Get Location
-        </button>
-      </div>
-      <div style="position: relative;">
-        <div id="home-map" style="height: 300px; width: 100%; border-radius: 18px; border: 2px solid #E5E7EB; box-shadow: 0 4px 16px rgba(0,0,0,0.06); z-index: 1;"></div>
-        <!-- Floating Selected Shop Badge on Map -->
-        <div id="map-selected-shop-overlay" style="display: none; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); border: 1.5px solid #1A3C8F; border-radius: 12px; padding: 6px 14px; font-weight: 800; font-size: 12px; color: #1A3C8F; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.12); align-items: center; gap: 6px;">
-          🏪 <span id="map-selected-shop-name">Sharma Medical Store</span>
-        </div>
-      </div>
-    </div>
-
     <!-- Nearby Pharmacies -->
     <div style="padding:0 0 20px;">
       <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
@@ -149,6 +130,25 @@
             </div>
           </div>
         @endforeach
+      </div>
+    </div>
+
+    <!-- Interactive Location Map -->
+    <div style="padding:0 0 24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div style="font-weight:800; font-size:16px; color:#1A1A1A; display:flex; align-items:center; gap:8px;">
+          <span>🗺️</span> Interactive Shops Map
+        </div>
+        <button onclick="requestGeolocation()" class="btn-outline" style="font-size:11px; padding:6px 10px; border-radius:8px; display:flex; align-items:center; gap:4px; border:1px solid #1A3C8F;">
+          📍 Get Location
+        </button>
+      </div>
+      <div style="position: relative;">
+        <div id="home-map" style="height: 300px; width: 100%; border-radius: 18px; border: 2px solid #E5E7EB; box-shadow: 0 4px 16px rgba(0,0,0,0.06); z-index: 1;"></div>
+        <!-- Floating Selected Shop Badge on Map -->
+        <div id="map-selected-shop-overlay" style="display: none; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); border: 1.5px solid #1A3C8F; border-radius: 12px; padding: 6px 14px; font-weight: 800; font-size: 12px; color: #1A3C8F; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.12); align-items: center; gap: 6px;">
+          🏪 <span id="map-selected-shop-name">Sharma Medical Store</span>
+        </div>
       </div>
     </div>
 
