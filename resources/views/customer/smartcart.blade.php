@@ -86,7 +86,7 @@
 
   <!-- Floating Action Button (FAB) for quick checkout -->
   <a href="{{ url('/smartcart/results') }}" id="smartcart-fab" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; border-radius: 50%; width: 56px; height: 56px; display: {{ $cartCount > 0 ? 'flex' : 'none' }}; align-items: center; justify-content: center; background: linear-gradient(135deg,#1A3C8F,#2563EB); color: #fff; font-size: 22px; box-shadow: 0 8px 24px rgba(37,99,235,0.4); text-decoration: none; border: none; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1.0)'">
-    🔍
+    🛒
   </a>
 </div>
 
