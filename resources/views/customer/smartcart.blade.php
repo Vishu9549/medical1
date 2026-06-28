@@ -13,12 +13,10 @@
         <h2 style="color:#fff; font-weight:900; font-size:20px; margin:0;">🛒 Smart Cart</h2>
         <p style="color:rgba(255,255,255,0.7); font-size:12px; margin:0;">Best pharmacy auto-match hogi</p>
       </div>
-      @if($cartCount > 0)
-        <div style="background:#fff; border-radius:14px; padding:8px 14px; display:flex; align-items:center; gap:6px;">
-          <span>🛒</span>
-          <strong style="font-weight:900; font-size:14px; color:#1A3C8F;">{{ $cartCount }}</strong>
-        </div>
-      @endif
+      <div id="header-cart-badge" style="background:#fff; border-radius:14px; padding:8px 14px; display:{{ $cartCount > 0 ? 'flex' : 'none' }}; align-items:center; gap:6px;">
+        <span>🛒</span>
+        <strong style="font-weight:900; font-size:14px; color:#1A3C8F;">{{ $cartCount }}</strong>
+      </div>
     </div>
 
     <!-- Search in Smart Cart -->
@@ -50,69 +48,119 @@
             </div>
           </div>
           <div class="cart-controls" data-med-id="{{ $med->id }}">
-            @if($qty == 0)
-              <form action="{{ url('/cart/add') }}" method="POST" class="cart-form">
+            <!-- Add Button Form (visible when qty == 0) -->
+            <form action="{{ url('/cart/add') }}" method="POST" class="cart-form add-form-el" style="{{ $qty == 0 ? 'display:block;' : 'display:none;' }}">
+              @csrf
+              <input type="hidden" name="medicine_id" value="{{ $med->id }}">
+              <button type="submit" class="btn-blue" style="font-size:12px; padding:8px 14px;">+ Add</button>
+            </form>
+
+            <!-- Quantity Update controls (visible when qty > 0) -->
+            <div class="qty-control-el" style="{{ $qty > 0 ? 'display:flex;' : 'display:none;' }}; align-items:center; gap:7px;">
+              <form action="{{ url('/cart/update') }}" method="POST" class="cart-form dec-form-el">
                 @csrf
                 <input type="hidden" name="medicine_id" value="{{ $med->id }}">
-                <button type="submit" class="btn-blue" style="font-size:12px; padding:8px 14px;">+ Add</button>
+                <input type="hidden" name="qty" class="qty-input-dec" value="{{ $qty - 1 }}">
+                <button type="submit" style="width:28px; height:28px; border-radius:8px; border:2px solid #E5E7EB; background:#fff; font-size:16px; font-weight:900; color:#1A3C8F; cursor:pointer; display:flex; align-items:center; justify-content:center;">−</button>
               </form>
-            @else
-              <div style="display:flex; align-items:center; gap:7px;">
-                <form action="{{ url('/cart/update') }}" method="POST" class="cart-form">
-                  @csrf
-                  <input type="hidden" name="medicine_id" value="{{ $med->id }}">
-                  <input type="hidden" name="qty" value="{{ $qty - 1 }}">
-                  <button type="submit" style="width:28px; height:28px; border-radius:8px; border:2px solid #E5E7EB; background:#fff; font-size:16px; font-weight:900; color:#1A3C8F; cursor:pointer; display:flex; align-items:center; justify-content:center;">−</button>
-                </form>
-                <div style="font-weight:900; font-size:14px; color:#1A3C8F; min-width:14px; text-align:center;">{{ $qty }}</div>
-                <form action="{{ url('/cart/update') }}" method="POST" class="cart-form">
-                  @csrf
-                  <input type="hidden" name="medicine_id" value="{{ $med->id }}">
-                  <input type="hidden" name="qty" value="{{ $qty + 1 }}">
-                  <button type="submit" style="width:28px; height:28px; border-radius:8px; background:#1A3C8F; border:none; font-size:16px; font-weight:900; color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center;">+</button>
-                </form>
-              </div>
-            @endif
+              <div class="qty-display" style="font-weight:900; font-size:14px; color:#1A3C8F; min-width:14px; text-align:center;">{{ $qty }}</div>
+              <form action="{{ url('/cart/update') }}" method="POST" class="cart-form inc-form-el">
+                @csrf
+                <input type="hidden" name="medicine_id" value="{{ $med->id }}">
+                <input type="hidden" name="qty" class="qty-input-inc" value="{{ $qty + 1 }}">
+                <button type="submit" style="width:28px; height:28px; border-radius:8px; background:#1A3C8F; border:none; font-size:16px; font-weight:900; color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center;">+</button>
+              </form>
+            </div>
           </div>
         </div>
       @endforeach
     </div>
   </div>
 
-  @if($cartCount > 0)
-    <div style="background:#fff; border-top:1px solid #E5E7EB; padding:12px 16px 20px; flex-shrink:0; border-radius:14px; margin-top:16px;">
-      <a href="{{ url('/smartcart/results') }}" class="btn-blue" style="width:100%; padding:15px; background:linear-gradient(135deg,#1A3C8F,#2563EB); border:none; border-radius:14px; color:#fff; font-weight:900; font-size:15px; display:block; text-align:center; text-decoration:none;">
-        🔍 Best Pharmacy Dhundho — {{ $cartCount }} items →
-      </a>
-    </div>
-  @endif
+  <!-- Checkout Button Container -->
+  <div id="smartcart-checkout-bar" style="background:#fff; border-top:1px solid #E5E7EB; padding:12px 16px 20px; flex-shrink:0; border-radius:14px; margin-top:16px; {{ $cartCount > 0 ? 'display:block;' : 'display:none;' }}">
+    <a href="{{ url('/smartcart/results') }}" class="btn-blue" style="width:100%; padding:15px; background:linear-gradient(135deg,#1A3C8F,#2563EB); border:none; border-radius:14px; color:#fff; font-weight:900; font-size:15px; display:block; text-align:center; text-decoration:none;">
+      🔍 Best Pharmacy Dhundho — <span id="checkout-item-count">{{ $cartCount }}</span> items →
+    </a>
+  </div>
 </div>
 
 <script>
-  document.querySelectorAll('.cart-form').forEach(form => {
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const url = this.getAttribute('action');
-      const formData = new FormData(this);
+  function attachCartSubmitHandlers(container) {
+    container.querySelectorAll('.cart-form').forEach(form => {
+      if (form.dataset.hasListener) return;
+      form.dataset.hasListener = "true";
 
-      fetch(url, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          window.location.reload();
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        this.submit();
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const url = this.getAttribute('action');
+        const formData = new FormData(this);
+
+        fetch(url, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const medControls = form.closest('.cart-controls');
+            const cardEl = form.closest('.cart-item-card');
+            
+            const addForm = medControls.querySelector('.add-form-el');
+            const qtyControl = medControls.querySelector('.qty-control-el');
+            const qtyDisplay = medControls.querySelector('.qty-display');
+            const qtyInputDec = medControls.querySelector('.qty-input-dec');
+            const qtyInputInc = medControls.querySelector('.qty-input-inc');
+
+            if (data.qty === 0) {
+              addForm.style.display = 'block';
+              qtyControl.style.display = 'none';
+              if (cardEl) cardEl.style.borderColor = 'transparent';
+            } else {
+              addForm.style.display = 'none';
+              qtyControl.style.display = 'flex';
+              qtyDisplay.innerText = data.qty;
+              qtyInputDec.value = data.qty - 1;
+              qtyInputInc.value = data.qty + 1;
+              if (cardEl) cardEl.style.borderColor = '#BFDBFE';
+            }
+
+            // Update checkout button count
+            const checkoutBar = document.getElementById('smartcart-checkout-bar');
+            const checkoutCountSpan = document.getElementById('checkout-item-count');
+            
+            if (data.cartCount > 0) {
+              if (checkoutBar) checkoutBar.style.display = 'block';
+              if (checkoutCountSpan) checkoutCountSpan.innerText = data.cartCount;
+            } else {
+              if (checkoutBar) checkoutBar.style.display = 'none';
+            }
+
+            // Update top header count badge
+            let headerBadge = document.getElementById('header-cart-badge');
+            if (headerBadge) {
+              if (data.cartCount > 0) {
+                headerBadge.style.display = 'flex';
+                headerBadge.querySelector('strong').innerText = data.cartCount;
+              } else {
+                headerBadge.style.display = 'none';
+              }
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          this.submit();
+        });
       });
     });
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    attachCartSubmitHandlers(document);
   });
 </script>
 @endsection

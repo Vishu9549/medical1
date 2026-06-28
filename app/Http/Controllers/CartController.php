@@ -45,7 +45,11 @@ class CartController extends Controller
         session(['cart' => $cart]);
 
         if ($request->ajax()) {
-            return response()->json(['success' => true]);
+            return response()->json([
+                'success' => true,
+                'cartCount' => array_sum($cart),
+                'qty' => $cart[$medId]
+            ]);
         }
         return redirect()->back()->with('success', 'Medicine added to cart!');
     }
@@ -68,7 +72,11 @@ class CartController extends Controller
         session(['cart' => $cart]);
 
         if ($request->ajax()) {
-            return response()->json(['success' => true]);
+            return response()->json([
+                'success' => true,
+                'cartCount' => array_sum($cart),
+                'qty' => $qty
+            ]);
         }
         return redirect()->back();
     }
