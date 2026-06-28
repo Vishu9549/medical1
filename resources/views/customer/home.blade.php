@@ -103,7 +103,13 @@
           📍 Get Location
         </button>
       </div>
-      <div id="home-map" style="height: 300px; width: 100%; border-radius: 18px; border: 2px solid #E5E7EB; box-shadow: 0 4px 16px rgba(0,0,0,0.06); z-index: 1;"></div>
+      <div style="position: relative;">
+        <div id="home-map" style="height: 300px; width: 100%; border-radius: 18px; border: 2px solid #E5E7EB; box-shadow: 0 4px 16px rgba(0,0,0,0.06); z-index: 1;"></div>
+        <!-- Floating Selected Shop Badge on Map -->
+        <div id="map-selected-shop-overlay" style="display: none; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); border: 1.5px solid #1A3C8F; border-radius: 12px; padding: 6px 14px; font-weight: 800; font-size: 12px; color: #1A3C8F; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.12); align-items: center; gap: 6px;">
+          🏪 <span id="map-selected-shop-name">Sharma Medical Store</span>
+        </div>
+      </div>
     </div>
 
     <!-- Nearby Pharmacies -->
@@ -258,18 +264,27 @@
       card.style.cursor = 'pointer';
       
       card.addEventListener('click', function(e) {
-        // If they clicked direct action button, let it redirect
         if (e.target.closest('a')) return;
         
         const lat = parseFloat(this.getAttribute('data-lat'));
         const lng = parseFloat(this.getAttribute('data-lng'));
         const id = this.getAttribute('data-id');
+        const name = this.querySelector('span[style*="font-weight:800"]').innerText;
         
         if (lat && lng && map) {
           map.setView([lat, lng], 15, { animate: true, duration: 1.2 });
           if (markers[id]) {
             markers[id].openPopup();
           }
+          
+          // Display floating overlay badge
+          const overlay = document.getElementById('map-selected-shop-overlay');
+          const nameSpan = document.getElementById('map-selected-shop-name');
+          if (overlay && nameSpan) {
+            nameSpan.innerText = name;
+            overlay.style.display = 'flex';
+          }
+
           document.getElementById('home-map').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       });
