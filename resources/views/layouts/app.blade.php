@@ -298,7 +298,7 @@ body{background:#F0F4FF;display:flex;flex-direction:column;min-height:100vh;font
       @endif
     </div>
     <div class="nav-right">
-      <span style="font-size:13px; font-weight:700; color:#60A5FA;">📍 Muzaffarpur</span>
+      <span style="font-size:13px; font-weight:700; color:#60A5FA; cursor:pointer;" onclick="openGlobalLocationModal()">📍 {{ session('user_location', 'Muzaffarpur') }}</span>
       <div style="background:rgba(255,255,255,0.15); border-radius:12px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer;">🔔</div>
     </div>
   </div>
@@ -343,6 +343,30 @@ body{background:#F0F4FF;display:flex;flex-direction:column;min-height:100vh;font
     © 2026 Dawalo App. All rights reserved. Persistent DB powered by Laravel & MySQL.
   </div>
 </div>
+
+<!-- Global Location Selection Modal -->
+<div id="global-location-modal" class="overlay" style="display:none; justify-content:center; align-items:center;">
+  <div class="sheet" style="max-width:400px; text-align:center;">
+    <h3 style="font-weight:900; font-size:18px; margin-bottom:12px; color:#1A202C;">Select City</h3>
+    <p style="font-size:12px; color:#718096; margin-bottom:20px;">Apni city select karein pharmacies aur items dekhne ke liye:</p>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <a href="{{ url('/set-location?city=Muzaffarpur') }}" class="btn-outline" style="text-decoration:none; padding:12px; display:block;">Muzaffarpur</a>
+      <a href="{{ url('/set-location?city=Patna') }}" class="btn-outline" style="text-decoration:none; padding:12px; display:block;">Patna</a>
+      <a href="{{ url('/set-location?city=Jaipur') }}" class="btn-outline" style="text-decoration:none; padding:12px; display:block;">Jaipur</a>
+      <a href="{{ url('/set-location?city=Darbhanga') }}" class="btn-outline" style="text-decoration:none; padding:12px; display:block;">Darbhanga</a>
+    </div>
+    <button onclick="closeGlobalLocationModal()" class="btn-danger" style="margin-top:20px; width:100%; border:none; padding:12px; font-size:13px; cursor:pointer;">Cancel</button>
+  </div>
+</div>
+
+<script>
+function openGlobalLocationModal() {
+  document.getElementById('global-location-modal').style.display = 'flex';
+}
+function closeGlobalLocationModal() {
+  document.getElementById('global-location-modal').style.display = 'none';
+}
+</script>
 
 </body>
 </html>

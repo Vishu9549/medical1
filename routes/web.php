@@ -12,6 +12,7 @@ use App\Http\Controllers\AuthController;
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/search', [HomeController::class, 'search']);
 Route::get('/medicine/{id}', [HomeController::class, 'medicineDetails']);
+Route::get('/set-location', [HomeController::class, 'setLocation']);
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');

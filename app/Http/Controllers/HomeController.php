@@ -21,9 +21,24 @@ class HomeController extends Controller
             ['icon' => '👁️', 'label' => 'Eye', 'color' => '#DCFCE7']
         ];
 
-        $shops = Shop::where('status', 'approved')->get();
-        $shopsCount = $shops->count();
-        $onlineShopsCount = $shops->where('is_online', true)->count();
+        $city = session('user_location', 'Muzaffarpur');
+        $allShops = Shop::where('status', 'approved')->get();
+        
+        $shops = $allShops->sortBy(function($shop) use ($city) {
+            return stripos($shop->address, $city) !== false ? 0 : 1;
+        })->values();
+
+        $cityShops = $allShops->filter(function($shop) use ($city) {
+            return stripos($shop->address, $city) !== false;
+        });
+
+        if ($cityShops->isEmpty()) {
+            $shopsCount = $allShops->count();
+            $onlineShopsCount = $allShops->where('is_online', true)->count();
+        } else {
+            $shopsCount = $cityShops->count();
+            $onlineShopsCount = $cityShops->where('is_online', true)->count();
+        }
 
         $cart = session('cart', []);
         $cartCount = array_sum($cart);
@@ -166,5 +181,12 @@ class HomeController extends Controller
         $cartCount = array_sum($cart);
 
         return view('customer.profile_help', compact('cartCount'));
+    }
+
+    public function setLocation(\Illuminate\Http\Request $request)
+    {
+        $city = $request->input('city', 'Muzaffarpur');
+        session(['user_location' => $city]);
+        return redirect()->back()->with('success', 'Location updated to ' . $city);
     }
 }

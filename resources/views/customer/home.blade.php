@@ -207,8 +207,23 @@
   // Map Integration using Leaflet
   let map;
   let userMarker;
-  const initialLat = 26.1209;
-  const initialLng = 85.3647; // Muzaffarpur Center
+  @php
+    $city = session('user_location', 'Muzaffarpur');
+    $lat = 26.1209;
+    $lng = 85.3647;
+    if ($city === 'Patna') {
+        $lat = 25.5941;
+        $lng = 85.1376;
+    } elseif ($city === 'Jaipur') {
+        $lat = 26.9124;
+        $lng = 75.7873;
+    } elseif ($city === 'Darbhanga') {
+        $lat = 26.1542;
+        $lng = 85.8918;
+    }
+  @endphp
+  const initialLat = {{ $lat }};
+  const initialLng = {{ $lng }};
 
   const shopsData = [
     @foreach($shops as $shop)
