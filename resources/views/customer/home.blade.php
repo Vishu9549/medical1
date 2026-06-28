@@ -95,15 +95,24 @@
 
     <!-- Nearby Pharmacies -->
     <div style="padding:0 0 20px;">
-      <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
-        <div style="width:10px; height:10px; border-radius:50%; background:#22C55E; box-shadow:0 0 0 4px rgba(34,197,94,0.3);"></div>
-        <div style="font-weight:800; font-size:16px; color:#1A1A1A;">Open Nearby Pharmacies</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:10px; height:10px; border-radius:50%; background:#22C55E; box-shadow:0 0 0 4px rgba(34,197,94,0.3);"></div>
+          <div style="font-weight:800; font-size:16px; color:#1A1A1A;">Open Nearby Pharmacies</div>
+        </div>
+        <!-- Filter Controls -->
+        <div style="display:flex; gap:6px;">
+          <button onclick="filterShops('city')" id="btn-filter-city" class="btn-blue" style="font-size:11px; padding:6px 12px; border-radius:10px; border:none; cursor:pointer;">My City</button>
+          <button onclick="filterShops('all')" id="btn-filter-all" class="btn-outline" style="font-size:11px; padding:6px 12px; border-radius:10px; border:none; cursor:pointer; background:#fff; color:#1A3C8F; border:1.5px solid #1A3C8F;">All Shops</button>
+          <button onclick="sortShopsByDistance()" id="btn-sort-dist" class="btn-outline" style="font-size:11px; padding:6px 12px; border-radius:10px; border:none; cursor:pointer; background:#fff; color:#1A3C8F; border:1.5px solid #1A3C8F;">Near Me</button>
+        </div>
       </div>
       
       <div class="responsive-grid" id="shops-list-container">
         @foreach($shops as $shop)
           <div class="shop-card-wrapper" 
                data-id="{{ $shop->id }}" 
+               data-city="{{ stripos($shop->address, 'Patna') !== false ? 'Patna' : (stripos($shop->address, 'Jaipur') !== false ? 'Jaipur' : (stripos($shop->address, 'Darbhanga') !== false ? 'Darbhanga' : 'Muzaffarpur')) }}"
                data-lat="{{ $shop->latitude ?? 0 }}" 
                data-lng="{{ $shop->longitude ?? 0 }}"
                data-dist="{{ $shop->distance_km }}"
@@ -382,10 +391,82 @@
     }
   }
 
+  let activeFilter = 'city';
+
+  function filterShops(type) {
+    activeFilter = type;
+    const currentCity = "{{ session('user_location', 'Muzaffarpur') }}";
+
+    // Toggle active styles on buttons
+    const btnCity = document.getElementById('btn-filter-city');
+    const btnAll = document.getElementById('btn-filter-all');
+    const btnSort = document.getElementById('btn-sort-dist');
+
+    if (type === 'city') {
+      btnCity.className = 'btn-blue';
+      btnCity.style.background = '#1A3C8F';
+      btnCity.style.color = '#fff';
+
+      btnAll.className = 'btn-outline';
+      btnAll.style.background = '#fff';
+      btnAll.style.color = '#1A3C8F';
+
+      btnSort.className = 'btn-outline';
+      btnSort.style.background = '#fff';
+      btnSort.style.color = '#1A3C8F';
+    } else if (type === 'all') {
+      btnCity.className = 'btn-outline';
+      btnCity.style.background = '#fff';
+      btnCity.style.color = '#1A3C8F';
+
+      btnAll.className = 'btn-blue';
+      btnAll.style.background = '#1A3C8F';
+      btnAll.style.color = '#fff';
+
+      btnSort.className = 'btn-outline';
+      btnSort.style.background = '#fff';
+      btnSort.style.color = '#1A3C8F';
+    }
+
+    document.querySelectorAll('.shop-card-wrapper').forEach(card => {
+      const cardCity = card.getAttribute('data-city');
+      if (type === 'city') {
+        if (cardCity === currentCity) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      } else {
+        card.style.display = 'block';
+      }
+    });
+  }
+
+  function sortShopsByDistance() {
+    const btnCity = document.getElementById('btn-filter-city');
+    const btnAll = document.getElementById('btn-filter-all');
+    const btnSort = document.getElementById('btn-sort-dist');
+
+    btnCity.className = 'btn-outline';
+    btnCity.style.background = '#fff';
+    btnCity.style.color = '#1A3C8F';
+
+    btnAll.className = 'btn-outline';
+    btnAll.style.background = '#fff';
+    btnAll.style.color = '#1A3C8F';
+
+    btnSort.className = 'btn-blue';
+    btnSort.style.background = '#1A3C8F';
+    btnSort.style.color = '#fff';
+
+    requestGeolocation();
+  }
+
   // Initialize Map and request location automatically on page load
   window.addEventListener('DOMContentLoaded', () => {
     initMap();
     requestGeolocation();
+    filterShops('city');
   });
 </script>
 @endsection
