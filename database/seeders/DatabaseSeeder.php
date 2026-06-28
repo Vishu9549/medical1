@@ -266,36 +266,30 @@ class DatabaseSeeder extends Seeder
             DB::table('wallets')->insert(array_merge($wallet, ['created_at' => now(), 'updated_at' => now()]));
         }
 
-        // 6. Inventories
-        $inventories = [
-            // Shop 1
-            ['shop_id' => 1, 'medicine_id' => 1, 'price' => 25, 'quantity' => 50],
-            ['shop_id' => 1, 'medicine_id' => 6, 'price' => 30, 'quantity' => 50],
-            ['shop_id' => 1, 'medicine_id' => 3, 'price' => 20, 'quantity' => 50],
-            ['shop_id' => 1, 'medicine_id' => 4, 'price' => 45, 'quantity' => 50],
-            ['shop_id' => 1, 'medicine_id' => 5, 'price' => 22, 'quantity' => 50],
+        // 6. Inventories (Populating all 5,000 medicines to all shops with random prices and quantities)
+        $invToInsert = [];
+        $allShops = [1, 2, 3, 4, 5];
+        
+        foreach ($allShops as $shopId) {
+            foreach ($medsToInsert as $med) {
+                $variance = rand(-3, 5); // Slight price variance per shop
+                $price = max(5, $med['price'] + $variance);
+                $quantity = rand(10, 150); // Random stock quantity
 
-            // Shop 2
-            ['shop_id' => 2, 'medicine_id' => 2, 'price' => 90, 'quantity' => 50],
-            ['shop_id' => 2, 'medicine_id' => 1, 'price' => 18, 'quantity' => 50],
-            ['shop_id' => 2, 'medicine_id' => 7, 'price' => 35, 'quantity' => 50],
-            ['shop_id' => 2, 'medicine_id' => 8, 'price' => 80, 'quantity' => 50],
+                $invToInsert[] = [
+                    'shop_id' => $shopId,
+                    'medicine_id' => $med['id'],
+                    'name' => null,
+                    'price' => $price,
+                    'quantity' => $quantity,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+            }
+        }
 
-            // Shop 3
-            ['shop_id' => 3, 'medicine_id' => 3, 'price' => 22, 'quantity' => 50],
-            ['shop_id' => 3, 'medicine_id' => 5, 'price' => 20, 'quantity' => 50],
-            ['shop_id' => 3, 'medicine_id' => 6, 'price' => 28, 'quantity' => 50],
-            ['shop_id' => 3, 'medicine_id' => 4, 'price' => 40, 'quantity' => 50],
-            ['shop_id' => 3, 'medicine_id' => 1, 'price' => 15, 'quantity' => 50],
-
-            // Shop 4
-            ['shop_id' => 4, 'medicine_id' => 7, 'price' => 30, 'quantity' => 50],
-            ['shop_id' => 4, 'medicine_id' => 8, 'price' => 75, 'quantity' => 50],
-            ['shop_id' => 4, 'medicine_id' => 2, 'price' => 85, 'quantity' => 50],
-        ];
-
-        foreach ($inventories as $inv) {
-            DB::table('inventories')->insert(array_merge($inv, ['created_at' => now(), 'updated_at' => now()]));
+        foreach (array_chunk($invToInsert, 500) as $chunk) {
+            DB::table('inventories')->insert($chunk);
         }
 
         // 7. Orders
