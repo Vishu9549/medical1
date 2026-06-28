@@ -35,6 +35,7 @@ class HomeController extends Controller
     {
         $query = $request->input('q', '');
         $shopId = $request->input('shop_id');
+        $selectedCategories = $request->input('categories', []);
         $selectedShop = null;
 
         $medQuery = Medicine::query();
@@ -53,11 +54,46 @@ class HomeController extends Controller
             });
         }
 
+        if (!empty($selectedCategories)) {
+            $medQuery->whereIn('category', $selectedCategories);
+        }
+
         $medicines = $medQuery->get();
         $cart = session('cart', []);
         $cartCount = array_sum($cart);
 
-        return view('customer.search', compact('medicines', 'cart', 'cartCount', 'query', 'selectedShop'));
+        // Get all unique categories for checkbox sidebar filter
+        $allCategories = ['Fever', 'Antibiotic', 'Allergy', 'Acidity', 'Pain', 'Diabetes', 'Heart', 'Supplement', 'Skin', 'Eye', 'Dental'];
+
+        return view('customer.search', compact('medicines', 'cart', 'cartCount', 'query', 'selectedShop', 'allCategories', 'selectedCategories'));
+    }
+
+    public function medicineDetails($id, Request $request)
+    {
+        $medicine = Medicine::findOrFail($id);
+        $shopId = $request->input('shop_id');
+        $selectedShop = null;
+        $price = $medicine->price;
+
+        if ($shopId) {
+            $selectedShop = Shop::find($shopId);
+            if ($selectedShop) {
+                $inventory = $selectedShop->inventories()->where('medicine_id', $id)->first();
+                if ($inventory) {
+                    $price = $inventory->price;
+                }
+            }
+        }
+
+        $relatedMedicines = Medicine::where('category', $medicine->category)
+            ->where('id', '!=', $id)
+            ->limit(6)
+            ->get();
+
+        $cart = session('cart', []);
+        $cartCount = array_sum($cart);
+
+        return view('customer.medicine_details', compact('medicine', 'relatedMedicines', 'price', 'selectedShop', 'cart', 'cartCount'));
     }
 
     public function profile()

@@ -20,6 +20,22 @@
       <input name="q" class="search-input" placeholder="Medicine ka naam likhein..." type="text" value="{{ $query }}" id="search-q">
       <button type="submit" class="search-btn">🔍 Search</button>
     </form>
+
+    <!-- Multiple Category Filters -->
+    <div style="margin-top: 14px; position: relative; z-index: 1;">
+      <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.7); font-weight: 800; margin-bottom: 6px;">Filter Categories:</div>
+      <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;" class="hide-scrollbar">
+        @foreach($allCategories as $cat)
+          @php
+            $isChecked = in_array($cat, $selectedCategories);
+          @endphp
+          <button type="button" onclick="toggleCategoryFilter('{{ $cat }}')" style="flex-shrink: 0; border: none; border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+            {{ $isChecked ? 'background:#fff; color:#1A3C8F; box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-weight:800;' : 'background:rgba(255,255,255,0.15); color:#fff;' }}">
+            {{ $cat }}
+          </button>
+        @endforeach
+      </div>
+    </div>
   </div>
 
   <!-- === RESULTS === -->
@@ -41,20 +57,21 @@
           @php
             $qty = $cart[$med->id] ?? 0;
             $disc = $med->mrp > 0 ? round((($med->mrp - $med->price) / $med->mrp) * 100) : 0;
+            $detailUrl = url('/medicine/'.$med->id.(!empty(request('shop_id')) ? '?shop_id='.request('shop_id') : ''));
           @endphp
           <div class="med-row" style="background:{{ $qty > 0 ? '#FAFBFF' : '#fff' }}; border: 1px solid #E5E7EB; border-radius: 14px; margin-bottom: 0;">
-            <div class="med-img" style="overflow:hidden; position:relative;">
+            <a href="{{ $detailUrl }}" class="med-img" style="overflow:hidden; position:relative; display:flex;">
               @if(!empty($med->images))
                 <img src="{{ asset($med->images[0]) }}" style="width:100%; height:100%; object-fit:cover;">
               @else
                 <div>{{ $med->emoji }}</div>
               @endif
               @if($idx < 2)
-                <div class="bestseller">Bestseller ✦</div>
+                <div class="bestseller" style="z-index: 2;">Bestseller ✦</div>
               @endif
-            </div>
+            </a>
             <div style="flex:1; padding-left:14px; display:flex; flex-direction:column; justify-content:space-between;">
-              <div>
+              <a href="{{ $detailUrl }}" style="text-decoration:none; display:block;">
                 <div style="font-weight:800; font-size:15px; color:#1A1A1A; line-height:1.3; margin-bottom:3px;">{{ $med->name }}</div>
                 <div style="font-size:12px; color:#888; margin-bottom:8px;">{{ $med->category }} • 10 tablets</div>
                 <div style="font-size:12px; color:#7C3AED; font-weight:700; margin-bottom:8px;">⚡ Get in 45 mins</div>
@@ -63,7 +80,7 @@
                   <span style="font-size:13px; color:#aaa; text-decoration:line-through;">₹{{ $med->mrp }}</span>
                   <span style="font-size:12px; color:#E05D2E; font-weight:800;">{{ $disc }}% off</span>
                 </div>
-              </div>
+              </a>
               
               <div class="cart-controls" data-med-id="{{ $med->id }}">
                 @if($qty == 0)
@@ -123,6 +140,22 @@
 </div>
 
 <script>
+  function toggleCategoryFilter(category) {
+    const urlParams = new URLSearchParams(window.location.search);
+    let categories = urlParams.getAll('categories[]');
+    
+    if (categories.includes(category)) {
+      categories = categories.filter(c => c !== category);
+    } else {
+      categories.push(category);
+    }
+    
+    urlParams.delete('categories[]');
+    categories.forEach(c => urlParams.append('categories[]', c));
+    
+    window.location.search = urlParams.toString();
+  }
+
   // AJAX enhancement for premium experience
   document.querySelectorAll('.cart-form').forEach(form => {
     form.addEventListener('submit', function(e) {

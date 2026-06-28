@@ -11,6 +11,7 @@ use App\Http\Controllers\AuthController;
 // Customer Front-End Routes (Public)
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/search', [HomeController::class, 'search']);
+Route::get('/medicine/{id}', [HomeController::class, 'medicineDetails']);
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
