@@ -317,7 +317,7 @@ body{background:#F0F4FF;display:flex;flex-direction:column;min-height:100vh;font
     <!-- Col 1: About -->
     <div class="footer-col">
       <h3>Dawalo 💊</h3>
-      <p>Muzaffarpur's primary online medicine aggregator. Finding and checking live pharmacy stock in 5 km coverage. Order directly and get deliveries in under 45 mins.</p>
+      <p>{{ session('user_location', 'Muzaffarpur') }}'s primary online medicine aggregator. Finding and checking live pharmacy stock in 5 km coverage. Order directly and get deliveries in under 45 mins.</p>
     </div>
     <!-- Col 2: Navigation -->
     <div class="footer-col">
@@ -335,7 +335,7 @@ body{background:#F0F4FF;display:flex;flex-direction:column;min-height:100vh;font
       <ul>
         <li><span style="font-size:13.5px;">📧 support@dawalo.in</span></li>
         <li><span style="font-size:13.5px;">📞 +91 9876543210</span></li>
-        <li><span style="font-size:13.5px;">📍 Mithanpura, Muzaffarpur, Bihar</span></li>
+        <li><span style="font-size:13.5px;">📍 {{ session('user_location', 'Muzaffarpur') }}, Bihar</span></li>
       </ul>
     </div>
   </div>

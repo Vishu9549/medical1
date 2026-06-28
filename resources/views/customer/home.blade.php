@@ -304,6 +304,34 @@
         const uLat = position.coords.latitude;
         const uLng = position.coords.longitude;
 
+        // Auto detect and update closest city if not set in sessionStorage
+        if (!sessionStorage.getItem('location_auto_detected')) {
+          const cities = [
+            { name: 'Muzaffarpur', lat: 26.1209, lng: 85.3647 },
+            { name: 'Patna', lat: 25.5941, lng: 85.1376 },
+            { name: 'Jaipur', lat: 26.9124, lng: 75.7873 },
+            { name: 'Darbhanga', lat: 26.1542, lng: 85.8918 }
+          ];
+          
+          let closestCity = 'Muzaffarpur';
+          let minDist = Infinity;
+          
+          cities.forEach(c => {
+            const d = calculateDistance(uLat, uLng, c.lat, c.lng);
+            if (d < minDist) {
+              minDist = d;
+              closestCity = c.name;
+            }
+          });
+          
+          sessionStorage.setItem('location_auto_detected', 'true');
+          const currentSessionCity = "{{ session('user_location', 'Muzaffarpur') }}";
+          if (closestCity !== currentSessionCity) {
+            window.location.href = "{{ url('/set-location') }}?city=" + closestCity;
+            return;
+          }
+        }
+
         // Center map on user location
         map.setView([uLat, uLng], 14);
 
