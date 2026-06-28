@@ -7,8 +7,16 @@
     <!-- User Profile Header Card -->
     <div style="background:linear-gradient(135deg,#1A3C8F,#2563EB,#3B82F6); border-radius:20px; padding:24px 20px; text-align:center; margin-bottom:20px; box-shadow:0 8px 32px rgba(37,99,235,0.2);">
       <div style="width:70px; height:70px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:32px; margin:0 auto 10px;">👤</div>
-      <div style="color:#fff; font-weight:800; font-size:16px;">Guest User</div>
-      <div style="color:rgba(255,255,255,0.7); font-size:12px; margin-top:2px;">Login/Register directly with your phone number</div>
+      @if(Auth::check())
+        <div style="color:#fff; font-weight:800; font-size:17px;">{{ Auth::user()->name }}</div>
+        <div style="color:rgba(255,255,255,0.85); font-size:13px; margin-top:2px;">📞 {{ Auth::user()->phone ?? 'No Phone' }}</div>
+        <span style="background:rgba(255,255,255,0.2); color:#fff; font-size:10px; font-weight:800; padding:3px 10px; border-radius:12px; display:inline-block; margin-top:8px; text-transform:uppercase;">
+          🛡️ {{ Auth::user()->role }}
+        </span>
+      @else
+        <div style="color:#fff; font-weight:800; font-size:16px;">Guest User</div>
+        <div style="color:rgba(255,255,255,0.7); font-size:12px; margin-top:2px;">Login/Register directly with your phone number</div>
+      @endif
     </div>
 
     <!-- Shop Management card -->
