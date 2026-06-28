@@ -219,9 +219,22 @@
   function initMap() {
     map = L.map('home-map').setView([initialLat, initialLng], 14);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const streetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+    });
+
+    const satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    });
+
+    streetMap.addTo(map);
+
+    const baseMaps = {
+      "Street View 🗺️": streetMap,
+      "Satellite View 🛰️": satelliteMap
+    };
+
+    L.control.layers(baseMaps).addTo(map);
 
     // Place pharmacy markers on the map
     shopsData.forEach(shop => {

@@ -98,9 +98,23 @@
       <script>
         window.addEventListener('DOMContentLoaded', () => {
           const map = L.map('register-map').setView([26.1209, 85.3647], 13);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          
+          const streetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap'
-          }).addTo(map);
+          });
+
+          const satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri'
+          });
+
+          streetMap.addTo(map);
+
+          const baseMaps = {
+            "Street View 🗺️": streetMap,
+            "Satellite View 🛰️": satelliteMap
+          };
+
+          L.control.layers(baseMaps).addTo(map);
 
           let marker;
 
