@@ -264,29 +264,8 @@
       card.style.cursor = 'pointer';
       
       card.addEventListener('click', function(e) {
-        if (e.target.closest('a')) return;
-        
-        const lat = parseFloat(this.getAttribute('data-lat'));
-        const lng = parseFloat(this.getAttribute('data-lng'));
         const id = this.getAttribute('data-id');
-        const name = this.querySelector('span[style*="font-weight:800"]').innerText;
-        
-        if (lat && lng && map) {
-          map.setView([lat, lng], 15, { animate: true, duration: 1.2 });
-          if (markers[id]) {
-            markers[id].openPopup();
-          }
-          
-          // Display floating overlay badge
-          const overlay = document.getElementById('map-selected-shop-overlay');
-          const nameSpan = document.getElementById('map-selected-shop-name');
-          if (overlay && nameSpan) {
-            nameSpan.innerText = name;
-            overlay.style.display = 'flex';
-          }
-
-          document.getElementById('home-map').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        window.location.href = "{{ url('/search') }}?shop_id=" + id;
       });
     });
   }
