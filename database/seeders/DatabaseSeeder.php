@@ -186,7 +186,7 @@ class DatabaseSeeder extends Seeder
                 'reviews' => 89,
                 'distance_km' => 1.2,
                 'is_top' => false,
-                'delivery_enabled' => false,
+                'delivery_enabled' => true,
                 'is_online' => true,
                 'status' => 'approved',
                 'user_id' => 3,

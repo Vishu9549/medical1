@@ -13,6 +13,7 @@ class Order extends Model
         'mode',
         'total_price',
         'delivery_charge',
+        'delivery_address',
         'items',
         'user_id',
     ];

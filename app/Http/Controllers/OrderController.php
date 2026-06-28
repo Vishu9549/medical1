@@ -54,8 +54,14 @@ class OrderController extends Controller
         }
 
         $deliveryCharge = 0;
+        $deliveryAddress = null;
         if ($request->mode === 'delivery') {
             $deliveryCharge = $shop->distance_km > 10 ? 0 : round($shop->distance_km * 8);
+            $deliveryAddress = $request->address_name . ', ' 
+                             . $request->address_line1 . ', ' 
+                             . $request->address_line2 . ', ' 
+                             . $request->address_city . ' - ' 
+                             . $request->address_pincode;
         }
 
         $order = Order::create([
@@ -64,6 +70,7 @@ class OrderController extends Controller
             'mode' => $request->mode,
             'total_price' => $totalPrice,
             'delivery_charge' => $deliveryCharge,
+            'delivery_address' => $deliveryAddress,
             'items' => $items,
             'user_id' => Auth::id() // Securely bind order to customer
         ]);
