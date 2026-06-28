@@ -124,7 +124,7 @@
 
   <!-- Cart floating bar -->
   @if($cartCount > 0)
-    <div class="cart-bar" style="position: sticky; bottom: 20px; z-index: 99;">
+    <div class="cart-bar" style="position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 600px; z-index: 9999; margin: 0;">
       <div style="display:flex; align-items:center; gap:10px;">
         <div style="background:#fff; border-radius:10px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:14px; color:#1A3C8F;">
           {{ $cartCount }}
@@ -134,7 +134,7 @@
           <div style="color:rgba(255,255,255,0.7); font-size:11px;">Pharmacy auto-match hogi</div>
         </div>
       </div>
-      <a href="{{ url('/smartcart') }}" class="btn-outline" style="background:#fff; color:#1A3C8F; border:none; padding:10px 16px; font-size:13px;">Checkout →</a>
+      <a href="{{ url('/smartcart') }}" class="btn-outline" style="background:#fff; color:#1A3C8F; border:none; padding:10px 16px; font-size:13px; text-decoration:none;">Checkout →</a>
     </div>
   @endif
 </div>

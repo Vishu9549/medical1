@@ -137,7 +137,7 @@
 
   <!-- Cart floating bar -->
   @if($cartCount > 0)
-    <div class="cart-bar" style="position: sticky; bottom: 20px; z-index: 99; margin:0 16px 20px;">
+    <div class="cart-bar" style="position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 600px; z-index: 9999; margin: 0;">
       <div style="display:flex; align-items:center; gap:10px;">
         <div style="background:#fff; border-radius:10px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:14px; color:#1A3C8F;">
           {{ $cartCount }}
