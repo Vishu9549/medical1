@@ -216,6 +216,8 @@
     @endforeach
   ];
 
+  let markers = {};
+
   function initMap() {
     map = L.map('home-map').setView([initialLat, initialLng], 14);
 
@@ -239,10 +241,38 @@
     // Place pharmacy markers on the map
     shopsData.forEach(shop => {
       if (shop.lat && shop.lng) {
-        L.marker([shop.lat, shop.lng])
+        const marker = L.marker([shop.lat, shop.lng])
           .addTo(map)
           .bindPopup(`<strong>${shop.name}</strong><br><a href="${shop.url}" class="btn-blue" style="font-size:11px; padding:4px 8px; text-decoration:none; display:inline-block; color:#fff; border-radius:6px; margin-top:6px;">Order Now</a>`);
+        markers[shop.id] = marker;
       }
+    });
+
+    setupCardClickHandlers();
+  }
+
+  function setupCardClickHandlers() {
+    document.querySelectorAll('.shop-card-wrapper').forEach(card => {
+      if (card.dataset.hasListener) return;
+      card.dataset.hasListener = "true";
+      card.style.cursor = 'pointer';
+      
+      card.addEventListener('click', function(e) {
+        // If they clicked direct action button, let it redirect
+        if (e.target.closest('a')) return;
+        
+        const lat = parseFloat(this.getAttribute('data-lat'));
+        const lng = parseFloat(this.getAttribute('data-lng'));
+        const id = this.getAttribute('data-id');
+        
+        if (lat && lng && map) {
+          map.setView([lat, lng], 15, { animate: true, duration: 1.2 });
+          if (markers[id]) {
+            markers[id].openPopup();
+          }
+          document.getElementById('home-map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
     });
   }
 
@@ -306,6 +336,8 @@
         // Clear and re-append sorted items
         container.innerHTML = "";
         shopWrappers.forEach(wrap => container.appendChild(wrap));
+
+        setupCardClickHandlers();
 
       }, error => {
         console.warn("Geolocation permission denied:", error);
