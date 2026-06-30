@@ -142,24 +142,7 @@
       </div>
     </div>
 
-    <!-- Interactive Location Map -->
-    <div style="padding:0 0 24px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <div style="font-weight:800; font-size:16px; color:#1A1A1A; display:flex; align-items:center; gap:8px;">
-          <span>🗺️</span> Interactive Shops Map
-        </div>
-        <button onclick="requestGeolocation()" class="btn-outline" style="font-size:11px; padding:6px 10px; border-radius:8px; display:flex; align-items:center; gap:4px; border:1px solid #1A3C8F;">
-          📍 Get Location
-        </button>
-      </div>
-      <div style="position: relative;">
-        <div id="home-map" style="height: 300px; width: 100%; border-radius: 18px; border: 2px solid #E5E7EB; box-shadow: 0 4px 16px rgba(0,0,0,0.06); z-index: 1;"></div>
-        <!-- Floating Selected Shop Badge on Map -->
-        <div id="map-selected-shop-overlay" style="display: none; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); border: 1.5px solid #1A3C8F; border-radius: 12px; padding: 6px 14px; font-weight: 800; font-size: 12px; color: #1A3C8F; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.12); align-items: center; gap: 6px;">
-          🏪 <span id="map-selected-shop-name">Sharma Medical Store</span>
-        </div>
-      </div>
-    </div>
+
 
   </div>
 
@@ -213,74 +196,6 @@
     }
   }, 4000);
 
-  // Map Integration using Leaflet
-  let map;
-  let userMarker;
-  @php
-    $city = session('user_location', 'Muzaffarpur');
-    $lat = 26.1209;
-    $lng = 85.3647;
-    if ($city === 'Patna') {
-        $lat = 25.5941;
-        $lng = 85.1376;
-    } elseif ($city === 'Jaipur') {
-        $lat = 26.9124;
-        $lng = 75.7873;
-    } elseif ($city === 'Darbhanga') {
-        $lat = 26.1542;
-        $lng = 85.8918;
-    }
-  @endphp
-  const initialLat = {{ $lat }};
-  const initialLng = {{ $lng }};
-
-  const shopsData = [
-    @foreach($shops as $shop)
-      {
-        id: {{ $shop->id }},
-        name: "{{ $shop->name }}",
-        lat: {{ $shop->latitude ?? 0 }},
-        lng: {{ $shop->longitude ?? 0 }},
-        url: "{{ url('/search?shop_id='.$shop->id) }}"
-      },
-    @endforeach
-  ];
-
-  let markers = {};
-
-  function initMap() {
-    map = L.map('home-map').setView([initialLat, initialLng], 14);
-
-    const streetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    });
-
-    const satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-    });
-
-    streetMap.addTo(map);
-
-    const baseMaps = {
-      "Street View 🗺️": streetMap,
-      "Satellite View 🛰️": satelliteMap
-    };
-
-    L.control.layers(baseMaps).addTo(map);
-
-    // Place pharmacy markers on the map
-    shopsData.forEach(shop => {
-      if (shop.lat && shop.lng) {
-        const marker = L.marker([shop.lat, shop.lng])
-          .addTo(map)
-          .bindPopup(`<strong>${shop.name}</strong><br><a href="${shop.url}" class="btn-blue" style="font-size:11px; padding:4px 8px; text-decoration:none; display:inline-block; color:#fff; border-radius:6px; margin-top:6px;">Order Now</a>`);
-        markers[shop.id] = marker;
-      }
-    });
-
-    setupCardClickHandlers();
-  }
-
   function setupCardClickHandlers() {
     document.querySelectorAll('.shop-card-wrapper').forEach(card => {
       if (card.dataset.hasListener) return;
@@ -293,6 +208,8 @@
       });
     });
   }
+
+
 
   // Haversine formula to compute distance in km
   function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -339,24 +256,6 @@
             window.location.href = "{{ url('/set-location') }}?city=" + closestCity;
             return;
           }
-        }
-
-        // Center map on user location
-        map.setView([uLat, uLng], 14);
-
-        if (userMarker) {
-          userMarker.setLatLng([uLat, uLng]);
-        } else {
-          // Custom blue icon for User Location
-          const blueIcon = L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-          });
-          userMarker = L.marker([uLat, uLng], { icon: blueIcon }).addTo(map).bindPopup("<b>Aap Yahan Hain! 📍</b>").openPopup();
         }
 
         // Calculate and update distances dynamically
@@ -462,9 +361,8 @@
     requestGeolocation();
   }
 
-  // Initialize Map and request location automatically on page load
+  // Initialize and request location automatically on page load
   window.addEventListener('DOMContentLoaded', () => {
-    initMap();
     requestGeolocation();
     filterShops('city');
   });
