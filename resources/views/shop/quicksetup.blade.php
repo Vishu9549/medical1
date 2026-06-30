@@ -86,7 +86,8 @@
           @endphp
           <div class="qs-card catalogue-row-item" 
                data-name="{{ strtolower($med->name) }}" 
-               data-company="{{ $med->company }}" 
+               data-generic="{{ strtolower($med->generic_name) }}" 
+               data-company="{{ strtolower($med->company) }}" 
                style="border: {{ $hasInShop ? '2px solid #3B82F6' : '2px solid transparent' }}; display:flex; align-items:center; gap:12px; background:#fff; padding:14px; border-radius:16px; box-shadow:0 2px 10px rgba(0,0,0,0.04);">
             
             <!-- Checkbox Select -->
@@ -152,14 +153,20 @@
   // Client-side instant filter catalogue list
   function filterCatalogueList() {
     const searchVal = document.getElementById('catalogue-search').value.toLowerCase().trim();
-    const companyVal = document.getElementById('company-filter').value;
+    const companyVal = document.getElementById('company-filter').value.toLowerCase().trim();
 
     document.querySelectorAll('.catalogue-row-item').forEach(row => {
       const name = row.getAttribute('data-name');
+      const generic = row.getAttribute('data-generic');
       const company = row.getAttribute('data-company');
 
-      const matchesSearch = !searchVal || name.includes(searchVal);
-      const matchesCompany = companyVal === 'All' || company === companyVal;
+      // Search matches either Name, Generic Formula, or Manufacturer Company/Brand
+      const matchesSearch = !searchVal || 
+                            name.includes(searchVal) || 
+                            generic.includes(searchVal) || 
+                            company.includes(searchVal);
+
+      const matchesCompany = companyVal === 'all' || company === companyVal;
 
       if (matchesSearch && matchesCompany) {
         row.style.display = 'flex';
