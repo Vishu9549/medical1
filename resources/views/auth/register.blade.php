@@ -35,13 +35,7 @@
         <input type="text" name="phone" class="form-input" placeholder="e.g. 9876543210" value="{{ old('phone') }}" required>
       </div>
 
-      <div style="margin-bottom:12px;">
-        <label class="form-label">Aap kaun hain? (Account Role)</label>
-        <select name="role" class="form-input" required>
-          <option value="customer" {{ old('role') === 'customer' ? 'selected' : '' }}>Customer (Medicine Kharidni Hai)</option>
-          <option value="shop_owner" {{ old('role') === 'shop_owner' ? 'selected' : '' }}>Store Owner (Dukan List Karni Hai)</option>
-        </select>
-      </div>
+
 
       <div style="margin-bottom:12px;">
         <label class="form-label">Password</label>
@@ -58,8 +52,9 @@
       </button>
     </form>
 
-    <div style="text-align:center; margin-top:18px; font-size:13px; color:#666;">
-      Pehle se account hai? <a href="{{ url('/login') }}" style="color:#2563EB; font-weight:700; text-decoration:none;">Login Karein</a>
+    <div style="text-align:center; margin-top:18px; font-size:13px; color:#666; display:flex; flex-direction:column; gap:8px;">
+      <div>Pehle se account hai? <a href="{{ url('/login') }}" style="color:#2563EB; font-weight:700; text-decoration:none;">Login Karein</a></div>
+      <div style="border-top:1px dashed #E5E7EB; padding-top:8px;">Pharmacy Dukan list karni hai? <a href="{{ url('/register/shop') }}" style="color:#059669; font-weight:700; text-decoration:none;">Register Pharmacy Store</a></div>
     </div>
   </div>
 </div>

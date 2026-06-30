@@ -32,8 +32,9 @@
       </button>
     </form>
 
-    <div style="text-align:center; margin-top:18px; font-size:13px; color:#666;">
-      Naya account chahiye? <a href="{{ url('/register') }}" style="color:#2563EB; font-weight:700; text-decoration:none;">Register Karein</a>
+    <div style="text-align:center; margin-top:18px; font-size:13px; color:#666; display:flex; flex-direction:column; gap:8px;">
+      <div>Naya account chahiye? <a href="{{ url('/register') }}" style="color:#2563EB; font-weight:700; text-decoration:none;">Customer Registration</a></div>
+      <div style="border-top:1px dashed #E5E7EB; padding-top:8px;">Dukan partner banna hai? <a href="{{ url('/register/shop') }}" style="color:#059669; font-weight:700; text-decoration:none;">Pharmacy Partner Registration</a></div>
     </div>
   </div>
 </div>
