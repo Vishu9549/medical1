@@ -20,13 +20,7 @@
     <form action="{{ url('/register/shop') }}" method="POST">
       @csrf
 
-      <div style="display:grid; grid-template-columns: 1fr; gap:20px; margin-bottom:20px;">
-        @media (min-width: 600px) {
-          div[style*="display:grid"] {
-            grid-template-columns: 1fr 1fr !important;
-          }
-        }
-      </div>
+
       
       <!-- Layout columns grid using flexbox/grid styled inline -->
       <div style="display:flex; flex-direction:column; gap:24px;">
@@ -64,6 +58,13 @@
         <div style="flex:1;">
           <h3 style="font-weight:800; font-size:14px; color:#1A3C8F; border-bottom:1px solid #E5E7EB; padding-bottom:6px; margin-bottom:12px;">🏪 Pharmacy Store Details</h3>
           
+          <div style="margin-bottom:12px; position:relative;">
+            <label class="form-label">🔍 Search Pharmacy Location</label>
+            <input type="text" id="search-address" class="form-input" placeholder="Type to search (e.g. Mithanpura, Muzaffarpur)" oninput="debouncedSearchAddress(this.value)">
+            <!-- Search Results Dropdown -->
+            <div id="search-results" style="display:none; position:absolute; left:0; right:0; top:100%; background:#fff; border:1px solid #E5E7EB; border-radius:12px; max-height:200px; overflow-y:auto; z-index:1000; box-shadow:0 10px 20px rgba(0,0,0,0.1); margin-top:4px;"></div>
+          </div>
+
           <div style="margin-bottom:12px;">
             <label class="form-label">Pharmacy Name</label>
             <input type="text" name="shop_name" class="form-input" placeholder="e.g. Sharma Medical Store" value="{{ old('shop_name') }}" required>
@@ -71,7 +72,7 @@
 
           <div style="margin-bottom:12px;">
             <label class="form-label">City / Region Area</label>
-            <select name="area" class="form-input" required>
+            <select name="area" id="area-select" class="form-input" required>
               <option value="Muzaffarpur" {{ old('area') === 'Muzaffarpur' ? 'selected' : '' }}>Muzaffarpur</option>
               <option value="Patna" {{ old('area') === 'Patna' ? 'selected' : '' }}>Patna</option>
               <option value="Jaipur" {{ old('area') === 'Jaipur' ? 'selected' : '' }}>Jaipur</option>
@@ -81,7 +82,7 @@
 
           <div style="margin-bottom:12px;">
             <label class="form-label">Full Address</label>
-            <input type="text" name="address" class="form-input" placeholder="Shop Address, Mithanpura" value="{{ old('address') }}" required>
+            <input type="text" name="address" id="address-input" class="form-input" placeholder="Shop Address, Mithanpura" value="{{ old('address') }}" required>
           </div>
 
           <div style="display:flex; gap:10px; margin-bottom:12px;">
@@ -126,5 +127,72 @@ function detectGPSCoordinates() {
     alert("Geolocation is not supported by this browser.");
   }
 }
+
+let searchTimeout;
+function debouncedSearchAddress(query) {
+  clearTimeout(searchTimeout);
+  if (!query || query.length < 3) {
+    document.getElementById('search-results').style.display = 'none';
+    return;
+  }
+  searchTimeout = setTimeout(() => {
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in`)
+      .then(res => res.json())
+      .then(data => {
+        const resultsDiv = document.getElementById('search-results');
+        resultsDiv.innerHTML = '';
+        if (data.length === 0) {
+          resultsDiv.style.display = 'none';
+          return;
+        }
+        resultsDiv.style.display = 'block';
+        data.forEach(item => {
+          const div = document.createElement('div');
+          div.style.padding = '10px 12px';
+          div.style.cursor = 'pointer';
+          div.style.borderBottom = '1px solid #F3F4F6';
+          div.style.fontSize = '12px';
+          div.style.color = '#374151';
+          div.innerText = item.display_name;
+          div.addEventListener('click', () => {
+            selectSearchedLocation(item);
+          });
+          resultsDiv.appendChild(div);
+        });
+      })
+      .catch(err => console.error(err));
+  }, 400);
+}
+
+function selectSearchedLocation(item) {
+  const lat = parseFloat(item.lat);
+  const lon = parseFloat(item.lon);
+  document.getElementById('lat-input').value = lat.toFixed(6);
+  document.getElementById('lng-input').value = lon.toFixed(6);
+
+  document.getElementById('address-input').value = item.display_name;
+
+  const displayName = item.display_name.toLowerCase();
+  const areaSelect = document.getElementById('area-select');
+  if (displayName.includes('patna')) {
+    areaSelect.value = 'Patna';
+  } else if (displayName.includes('jaipur')) {
+    areaSelect.value = 'Jaipur';
+  } else if (displayName.includes('darbhanga')) {
+    areaSelect.value = 'Darbhanga';
+  } else {
+    areaSelect.value = 'Muzaffarpur';
+  }
+
+  document.getElementById('search-results').style.display = 'none';
+  document.getElementById('search-address').value = item.display_name;
+}
+
+// Close search dropdown on click outside
+document.addEventListener('click', function(e) {
+  if (e.target.id !== 'search-address') {
+    document.getElementById('search-results').style.display = 'none';
+  }
+});
 </script>
 @endsection
