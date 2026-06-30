@@ -168,12 +168,22 @@
         ];
       @endphp
       @foreach($menuItems as $idx => $item)
-        <a href="{{ $item['url'] }}" style="display:flex; align-items:center; gap:14px; padding:16px 18px; border-bottom:{{ $idx < 5 ? '1px solid #F3F4F6' : 'none' }}; cursor:pointer; text-decoration:none;">
+        <a href="{{ $item['url'] }}" style="display:flex; align-items:center; gap:14px; padding:16px 18px; border-bottom:1px solid #F3F4F6; cursor:pointer; text-decoration:none;">
           <span style="font-size:20px;">{{ $item['icon'] }}</span>
           <div style="flex:1; font-weight:700; font-size:14px; color:#1A1A1A;">{{ $item['label'] }}</div>
           <div style="color:#ccc;">›</div>
         </a>
       @endforeach
+      @if(Auth::check())
+        <form id="logout-form" action="{{ url('/logout') }}" method="POST" style="display: none;">
+          @csrf
+        </form>
+        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="display:flex; align-items:center; gap:14px; padding:16px 18px; cursor:pointer; text-decoration:none;">
+          <span style="font-size:20px; color:#DC2626;">🚪</span>
+          <div style="flex:1; font-weight:700; font-size:14px; color:#DC2626;">Logout</div>
+          <div style="color:#DC2626;">›</div>
+        </a>
+      @endif
     </div>
 
     <!-- Admin Panel Shortcut -->
