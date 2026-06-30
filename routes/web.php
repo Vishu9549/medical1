@@ -49,6 +49,7 @@ Route::middleware(['auth', 'role.shop_owner'])->group(function () {
     Route::get('/shop/quicksetup', [ShopController::class, 'quickSetupIndex']);
     Route::post('/shop/quicksetup', [ShopController::class, 'quickSetupSave']);
     Route::get('/shop/inventory', [ShopController::class, 'inventoryIndex']);
+    Route::get('/shop/medicines/search', [ShopController::class, 'medicineSearchSuggestions']);
     Route::post('/shop/inventory/add', [ShopController::class, 'inventoryAdd']);
     Route::delete('/shop/inventory/delete/{id}', [ShopController::class, 'inventoryDelete']);
     Route::get('/shop/orders', [ShopController::class, 'ordersIndex']);

@@ -128,24 +128,7 @@ class AuthController extends Controller
                 'status' => 'active'
             ]);
 
-            // Auto seed first 100 inventories for immediate setup
-            $meds = \App\Models\Medicine::limit(100)->get();
-            $invToInsert = [];
-            foreach ($meds as $med) {
-                $variance = rand(-3, 5);
-                $price = max(5, $med['price'] + $variance);
-                $quantity = rand(10, 150);
 
-                $invToInsert[] = [
-                    'shop_id' => $shop->id,
-                    'medicine_id' => $med['id'],
-                    'price' => $price,
-                    'quantity' => $quantity,
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ];
-            }
-            \App\Models\Inventory::insert($invToInsert);
 
             Auth::login($user);
         });

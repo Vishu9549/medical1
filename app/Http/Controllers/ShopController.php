@@ -165,6 +165,16 @@ class ShopController extends Controller
         return view('shop.inventory', compact('shop', 'inventory'));
     }
 
+    public function medicineSearchSuggestions(Request $request)
+    {
+        $q = $request->input('q', '');
+        if (strlen($q) < 2) {
+            return response()->json([]);
+        }
+        $meds = Medicine::where('name', 'like', '%' . $q . '%')->limit(15)->get();
+        return response()->json($meds);
+    }
+
     public function inventoryAdd(Request $request)
     {
         $shop = $this->getActiveShop();
@@ -178,7 +188,13 @@ class ShopController extends Controller
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $master = Medicine::where('name', 'like', '%' . $request->name . '%')->first();
+        $medId = $request->input('medicine_id');
+        $master = null;
+        if ($medId) {
+            $master = Medicine::find($medId);
+        } else {
+            $master = Medicine::where('name', 'like', '%' . $request->name . '%')->first();
+        }
 
         $imagePaths = [];
         if ($request->hasFile('images')) {

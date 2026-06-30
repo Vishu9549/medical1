@@ -49,8 +49,10 @@
           @csrf
           <input type="hidden" name="shop_id" value="{{ $shop->id }}">
 
-          <div style="margin-bottom:10px;">
-            <input type="text" name="name" class="form-input" placeholder="Medicine ka Naam *" required>
+          <div style="margin-bottom:10px; position:relative;">
+            <input type="hidden" name="medicine_id" id="selected-medicine-id">
+            <input type="text" name="name" id="med-search-input" class="form-input" placeholder="Search medicine (e.g. Paracetamol) *" oninput="debouncedSearchMedicine(this.value)" autocomplete="off" required>
+            <div id="med-search-results" style="display:none; position:absolute; left:0; right:0; top:100%; background:#fff; border:1px solid #E5E7EB; border-radius:12px; max-height:200px; overflow-y:auto; z-index:1000; box-shadow:0 10px 20px rgba(0,0,0,0.1); margin-top:4px;"></div>
           </div>
           <div style="display:flex; gap:10px; margin-bottom:12px;">
             <input type="number" step="0.01" name="price" class="form-input" style="flex:1;" placeholder="Price ₹" required>
@@ -124,4 +126,64 @@
 
   </div>
 </div>
+
+<script>
+let searchTimeout;
+function debouncedSearchMedicine(query) {
+  clearTimeout(searchTimeout);
+  if (!query || query.length < 2) {
+    document.getElementById('med-search-results').style.display = 'none';
+    return;
+  }
+  searchTimeout = setTimeout(() => {
+    fetch(`{{ url('/shop/medicines/search') }}?q=${encodeURIComponent(query)}`)
+      .then(res => res.json())
+      .then(data => {
+        const resultsDiv = document.getElementById('med-search-results');
+        resultsDiv.innerHTML = '';
+        if (data.length === 0) {
+          resultsDiv.style.display = 'none';
+          return;
+        }
+        resultsDiv.style.display = 'block';
+        data.forEach(item => {
+          const div = document.createElement('div');
+          div.style.padding = '10px 12px';
+          div.style.cursor = 'pointer';
+          div.style.borderBottom = '1px solid #F3F4F6';
+          div.style.fontSize = '13px';
+          div.style.color = '#374151';
+          div.style.fontWeight = 'bold';
+          div.innerHTML = `<span style="font-size:16px; margin-right:6px;">${item.emoji || '💊'}</span> ${item.name} <span style="font-size:11px; color:#888; margin-left:8px; font-weight:normal;">(${item.category})</span>`;
+          div.addEventListener('click', () => {
+            selectSearchedMedicine(item);
+          });
+          resultsDiv.appendChild(div);
+        });
+      })
+      .catch(err => console.error(err));
+  }, 300);
+}
+
+function selectSearchedMedicine(item) {
+  document.getElementById('selected-medicine-id').value = item.id;
+  document.getElementById('med-search-input').value = item.name;
+  
+  // Suggest default MRP/price if available
+  const priceInput = document.querySelector('input[name="price"]');
+  if (priceInput && item.price) {
+    priceInput.value = item.price;
+  }
+
+  document.getElementById('med-search-results').style.display = 'none';
+}
+
+// Close search dropdown on click outside
+document.addEventListener('click', function(e) {
+  if (e.target.id !== 'med-search-input') {
+    const results = document.getElementById('med-search-results');
+    if (results) results.style.display = 'none';
+  }
+});
+</script>
 @endsection
