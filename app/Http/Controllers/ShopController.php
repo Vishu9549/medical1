@@ -136,23 +136,24 @@ class ShopController extends Controller
         if (!$shop) return redirect('/profile');
 
         $qsSel = $request->input('qs_sel', []);
+        $addedCount = 0;
 
         foreach ($qsSel as $medIdStr => $data) {
             $medId = (int) str_replace('m', '', $medIdStr);
             $has = isset($data['has']) && $data['has'] === 'true';
             $price = (float) ($data['price'] ?? 0);
+            $qty = (int) ($data['qty'] ?? 50);
 
             if ($has) {
                 Inventory::updateOrCreate(
                     ['shop_id' => $shop->id, 'medicine_id' => $medId],
-                    ['price' => $price, 'quantity' => 50]
+                    ['price' => $price, 'quantity' => $qty]
                 );
-            } else {
-                Inventory::where('shop_id', $shop->id)->where('medicine_id', $medId)->delete();
+                $addedCount++;
             }
         }
 
-        return redirect('/shop/inventory')->with('success', 'Quick setup stock saved successfully!');
+        return redirect('/shop/inventory')->with('success', $addedCount . ' Catalogue medicines added successfully!');
     }
 
     public function inventoryIndex()

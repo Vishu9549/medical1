@@ -34,8 +34,29 @@
 
   <div class="scroll" style="flex:1;">
     <div style="background:linear-gradient(135deg,#1A3C8F,#2563EB); border-radius:18px; padding:16px 18px; margin-bottom:16px; color:#fff;">
-      <div style="font-weight:900; font-size:16px; margin-bottom:4px;">⚡ Quick Setup</div>
-      <div style="font-size:12.5px; opacity:0.9; line-height:1.5;">Typing nahi karni — bas tick ✓ karo jo medicine aapke paas hai, price daalo, aur Save!</div>
+      <div style="font-weight:900; font-size:16px; margin-bottom:4px;">🏪 Medicine Catalogue Selection</div>
+      <div style="font-size:12.5px; opacity:0.9; line-height:1.5;">Select medicines from the global catalogue, input your price and stock level, and click "Add Selected Medicines" below.</div>
+    </div>
+
+    <!-- Search & Brand Filter Layout -->
+    <div style="background:#fff; border-radius:16px; padding:16px; box-shadow:0 2px 12px rgba(0,0,0,0.05); margin-bottom:16px; display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <label class="form-label" style="margin-bottom:4px;">🔍 Search Medicine Name</label>
+        <input type="text" id="catalogue-search" class="form-input" placeholder="Type to filter catalogue (e.g. Paracetamol)..." oninput="filterCatalogueList()">
+      </div>
+      
+      <div>
+        <label class="form-label" style="margin-bottom:4px;">🏭 Filter by Company / Brand</label>
+        @php
+          $companies = $masterMedicines->pluck('company')->unique()->sort();
+        @endphp
+        <select id="company-filter" class="form-input" onchange="filterCatalogueList()">
+          <option value="All">All Companies</option>
+          @foreach($companies as $company)
+            <option value="{{ $company }}">{{ $company }}</option>
+          @endforeach
+        </select>
+      </div>
     </div>
 
     <!-- Category Pills Filter -->
@@ -56,48 +77,96 @@
       @csrf
       <input type="hidden" name="shop_id" value="{{ $shop->id }}">
 
-      <div class="responsive-grid">
+      <div class="responsive-grid" id="catalogue-grid" style="display:flex; flex-direction:column; gap:12px;">
         @foreach($masterMedicines as $med)
           @php
             $hasInShop = $shopInventory->contains('medicine_id', $med->id);
             $shopPrice = $shopInventory->firstWhere('medicine_id', $med->id)?->price ?? $med->price;
+            $shopQty = $shopInventory->firstWhere('medicine_id', $med->id)?->quantity ?? 50;
           @endphp
-          <div class="qs-card" style="border: {{ $hasInShop ? '2px solid #BBF7D0' : '2px solid transparent' }};">
-            <input type="checkbox" name="qs_sel[m{{ $med->id }}][has]" value="true" style="width:20px; height:20px; cursor:pointer;" {{ $hasInShop ? 'checked' : '' }} class="qs-toggle">
-            <div style="width:44px; height:44px; border-radius:12px; flex-shrink:0; background:{{ $hasInShop ? '#F0FDF4' : '#F8FAFF' }}; display:flex; align-items:center; justify-content:center; font-size:22px;">
+          <div class="qs-card catalogue-row-item" 
+               data-name="{{ strtolower($med->name) }}" 
+               data-company="{{ $med->company }}" 
+               style="border: {{ $hasInShop ? '2px solid #3B82F6' : '2px solid transparent' }}; display:flex; align-items:center; gap:12px; background:#fff; padding:14px; border-radius:16px; box-shadow:0 2px 10px rgba(0,0,0,0.04);">
+            
+            <!-- Checkbox Select -->
+            <div style="flex-shrink:0; display:flex; align-items:center;">
+              <input type="checkbox" name="qs_sel[m{{ $med->id }}][has]" value="true" style="width:22px; height:22px; cursor:pointer;" {{ $hasInShop ? 'checked' : '' }} class="qs-toggle">
+            </div>
+
+            <!-- Medicine Icon & Details -->
+            <div style="width:48px; height:48px; border-radius:12px; flex-shrink:0; background:#F8FAFF; display:flex; align-items:center; justify-content:center; font-size:24px;">
               {{ $med->emoji }}
             </div>
-            <div style="flex:1;">
-              <div style="font-weight:800; font-size:13px; color:#1A1A1A;">{{ $med->name }}</div>
-              <div style="font-size:11px; color:#888;">MRP ₹{{ $med->mrp }} • {{ $med->category }}</div>
+            
+            <div style="flex:1; min-width:0;">
+              <div style="font-weight:800; font-size:14px; color:#1A1A1A; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                {{ $med->name }}
+                <span style="font-size:10px; background:#EFF6FF; color:#1E40AF; padding:2px 8px; border-radius:12px; font-weight:700;">{{ $med->strength }}</span>
+              </div>
+              <div style="font-size:11.5px; color:#555; margin-top:2px;">
+                <strong>Generic:</strong> {{ $med->generic_name }}
+              </div>
+              <div style="font-size:11px; color:#888; margin-top:1px;">
+                <strong>Mfg:</strong> {{ $med->company }} • MRP ₹{{ $med->mrp }}
+              </div>
             </div>
-            <div style="flex-shrink:0; display:flex; align-items:center; gap:4px;">
-              <span style="font-size:13px; color:#888;">₹</span>
-              <input type="number" step="0.01" name="qs_sel[m{{ $med->id }}][price]" value="{{ $shopPrice }}" style="width:70px; padding:8px 6px; border:1.5px solid #E5E7EB; border-radius:8px; font-size:13px; font-weight:800; text-align:center; outline:none;" class="qs-price">
+
+            <!-- Price & Stock Level Inputs -->
+            <div style="flex-shrink:0; display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+              <div style="display:flex; align-items:center; gap:4px;">
+                <span style="font-size:11px; font-weight:700; color:#555;">₹</span>
+                <input type="number" step="0.01" name="qs_sel[m{{ $med->id }}][price]" value="{{ $shopPrice }}" style="width:70px; padding:6px; border:1px solid #E5E7EB; border-radius:8px; font-size:12px; font-weight:800; text-align:center; outline:none;" class="qs-price" placeholder="Price">
+              </div>
+              <div style="display:flex; align-items:center; gap:4px;">
+                <span style="font-size:10px; color:#888;">Qty:</span>
+                <input type="number" name="qs_sel[m{{ $med->id }}][qty]" value="{{ $shopQty }}" style="width:70px; padding:6px; border:1px solid #E5E7EB; border-radius:8px; font-size:12px; font-weight:700; text-align:center; outline:none;" placeholder="Stock">
+              </div>
             </div>
+
           </div>
         @endforeach
       </div>
 
-      <div style="height:16px;"></div>
-      <button type="submit" class="btn-green" style="width:100%; padding:15px; font-weight:900; font-size:15px; box-shadow:0 4px 16px rgba(22,163,74,0.35); border:none;">
-        💾 Save Inventory Stocks
+      <div style="height:20px;"></div>
+      <button type="submit" class="btn-blue" style="width:100%; padding:16px; font-weight:900; font-size:15px; border-radius:14px; box-shadow:0 4px 16px rgba(37,99,235,0.3); border:none; color:#fff; cursor:pointer;">
+        💾 Add Selected Medicines
       </button>
     </form>
   </div>
 </div>
 
 <script>
-  // Dynamic border color highlights on checkbox toggle
+  // Highlight selection dynamically
   document.querySelectorAll('.qs-toggle').forEach(checkbox => {
     checkbox.addEventListener('change', function() {
       const card = this.closest('.qs-card');
       if (this.checked) {
-        card.style.borderColor = '#BBF7D0';
+        card.style.borderColor = '#3B82F6';
       } else {
         card.style.borderColor = 'transparent';
       }
     });
   });
+
+  // Client-side instant filter catalogue list
+  function filterCatalogueList() {
+    const searchVal = document.getElementById('catalogue-search').value.toLowerCase().trim();
+    const companyVal = document.getElementById('company-filter').value;
+
+    document.querySelectorAll('.catalogue-row-item').forEach(row => {
+      const name = row.getAttribute('data-name');
+      const company = row.getAttribute('data-company');
+
+      const matchesSearch = !searchVal || name.includes(searchVal);
+      const matchesCompany = companyVal === 'All' || company === companyVal;
+
+      if (matchesSearch && matchesCompany) {
+        row.style.display = 'flex';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
 </script>
 @endsection
