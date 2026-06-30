@@ -71,13 +71,35 @@
           </div>
 
           <div style="margin-bottom:12px;">
-            <label class="form-label">City / Region Area</label>
+            <label class="form-label">City / Region Area Coverage</label>
             <select name="area" id="area-select" class="form-input" required>
               <option value="Muzaffarpur" {{ old('area') === 'Muzaffarpur' ? 'selected' : '' }}>Muzaffarpur</option>
               <option value="Patna" {{ old('area') === 'Patna' ? 'selected' : '' }}>Patna</option>
               <option value="Jaipur" {{ old('area') === 'Jaipur' ? 'selected' : '' }}>Jaipur</option>
               <option value="Darbhanga" {{ old('area') === 'Darbhanga' ? 'selected' : '' }}>Darbhanga</option>
             </select>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-bottom:12px;">
+            <div style="flex:1;">
+              <label class="form-label">State</label>
+              <input type="text" name="state" id="state-input" class="form-input" placeholder="e.g. Bihar" value="{{ old('state') }}">
+            </div>
+            <div style="flex:1;">
+              <label class="form-label">City</label>
+              <input type="text" name="city" id="city-input" class="form-input" placeholder="e.g. Muzaffarpur" value="{{ old('city') }}">
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-bottom:12px;">
+            <div style="flex:1;">
+              <label class="form-label">Area / Locality</label>
+              <input type="text" name="area_name" id="area-name-input" class="form-input" placeholder="e.g. Mithanpura" value="{{ old('area_name') }}">
+            </div>
+            <div style="flex:1;">
+              <label class="form-label">PIN Code</label>
+              <input type="text" name="pin_code" id="pin-input" class="form-input" placeholder="e.g. 842002" value="{{ old('pin_code') }}">
+            </div>
           </div>
 
           <div style="margin-bottom:12px;">
@@ -96,8 +118,8 @@
             </div>
           </div>
           
-          <button type="button" onclick="detectGPSCoordinates()" class="btn-outline" style="width:100%; border:1px solid #1A3C8F; color:#1A3C8F; background:#fff; padding:10px; border-radius:10px; font-weight:800; font-size:12px; cursor:pointer; margin-bottom:12px;">
-            📍 Auto-Detect Coordinates
+          <button type="button" onclick="detectGPSCoordinates(true)" class="btn-outline" style="width:100%; border:1px solid #1A3C8F; color:#1A3C8F; background:#fff; padding:10px; border-radius:10px; font-weight:800; font-size:12px; cursor:pointer; margin-bottom:12px;">
+            📍 Auto-Detect GPS & Geocode Location
           </button>
         </div>
       </div>
@@ -114,19 +136,63 @@
 </div>
 
 <script>
-function detectGPSCoordinates() {
+function detectGPSCoordinates(showAlert = false) {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(position => {
-      document.getElementById('lat-input').value = position.coords.latitude.toFixed(6);
-      document.getElementById('lng-input').value = position.coords.longitude.toFixed(6);
-      alert("GPS coordinates detected successfully!");
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      document.getElementById('lat-input').value = lat.toFixed(6);
+      document.getElementById('lng-input').value = lng.toFixed(6);
+
+      // Perform Reverse Geocoding via Nominatim
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.address) {
+            const addr = data.address;
+            document.getElementById('state-input').value = addr.state || '';
+            document.getElementById('city-input').value = addr.city || addr.town || addr.village || addr.county || '';
+            document.getElementById('area-name-input').value = addr.suburb || addr.neighbourhood || addr.residential || addr.road || '';
+            document.getElementById('pin-input').value = addr.postcode || '';
+            document.getElementById('address-input').value = data.display_name || '';
+
+            // Auto-select city area coverage match
+            const displayName = (data.display_name || '').toLowerCase();
+            const areaSelect = document.getElementById('area-select');
+            if (displayName.includes('patna')) {
+              areaSelect.value = 'Patna';
+            } else if (displayName.includes('jaipur')) {
+              areaSelect.value = 'Jaipur';
+            } else if (displayName.includes('darbhanga')) {
+              areaSelect.value = 'Darbhanga';
+            } else {
+              areaSelect.value = 'Muzaffarpur';
+            }
+
+            if (showAlert) {
+              alert("Location coordinates and details auto-detected successfully!");
+            }
+          }
+        })
+        .catch(err => {
+          console.error("Reverse geocoding failed:", err);
+          if (showAlert) alert("GPS detected, but address geocoding failed.");
+        });
+
     }, err => {
-      alert("GPS detection failed: " + err.message);
+      if (showAlert) {
+        alert("GPS detection failed: " + err.message);
+      }
     });
   } else {
-    alert("Geolocation is not supported by this browser.");
+    if (showAlert) alert("Geolocation is not supported by this browser.");
   }
 }
+
+// Automatically trigger on page load
+window.addEventListener('DOMContentLoaded', () => {
+  detectGPSCoordinates(false);
+});
 
 let searchTimeout;
 function debouncedSearchAddress(query) {
@@ -171,6 +237,19 @@ function selectSearchedLocation(item) {
   document.getElementById('lng-input').value = lon.toFixed(6);
 
   document.getElementById('address-input').value = item.display_name;
+
+  // Attempt to parse out state, city, area and postcode from Nominatim search if possible
+  fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.address) {
+        const addr = data.address;
+        document.getElementById('state-input').value = addr.state || '';
+        document.getElementById('city-input').value = addr.city || addr.town || addr.village || addr.county || '';
+        document.getElementById('area-name-input').value = addr.suburb || addr.neighbourhood || addr.residential || addr.road || '';
+        document.getElementById('pin-input').value = addr.postcode || '';
+      }
+    });
 
   const displayName = item.display_name.toLowerCase();
   const areaSelect = document.getElementById('area-select');
