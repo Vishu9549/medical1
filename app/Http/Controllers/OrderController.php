@@ -28,6 +28,13 @@ class OrderController extends Controller
         }
 
         $shop = Shop::findOrFail($request->shop_id);
+
+        if (!$shop->isOpen()) {
+            $opens = date('h:i A', strtotime($shop->opens_at ?? '09:00'));
+            $closes = date('h:i A', strtotime($shop->closes_at ?? '21:00'));
+            return redirect()->back()->with('error', "Store Closed! Order nahi kiya ja sakta. Store timings: $opens se $closes.");
+        }
+
         $cartItems = \App\Models\Medicine::whereIn('id', array_keys($cart))->get();
 
         $items = [];

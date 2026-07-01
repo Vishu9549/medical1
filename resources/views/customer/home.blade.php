@@ -132,9 +132,27 @@
                   <span style="font-size:11px; color:#aaa;">({{ $shop->reviews }})</span>
                   <span style="font-size:11px; color:#888; font-weight:800;" class="shop-distance-text">{{ $shop->distance_km }} km</span>
                 </div>
+                <div style="font-size:11px; margin-top:4px;">
+                  @php
+                    $isOpen = $shop->isOpen();
+                    $opens = date('h:i A', strtotime($shop->opens_at ?? '09:00'));
+                    $closes = date('h:i A', strtotime($shop->closes_at ?? '21:00'));
+                  @endphp
+                  @if($isOpen)
+                    <span style="color:#16A34A; font-weight:800;">🟢 Open</span> 
+                    <span style="color:#666;">(Closes {{ $closes }})</span>
+                  @else
+                    <span style="color:#DC2626; font-weight:800;">🔴 Closed</span> 
+                    <span style="color:#666;">(Opens {{ $opens }})</span>
+                  @endif
+                </div>
               </div>
               <div>
-                <a href="{{ url('/search?shop_id='.$shop->id) }}" class="btn-blue" style="font-size:12px; padding:8px 12px;">Order</a>
+                @if($isOpen)
+                  <a href="{{ url('/search?shop_id='.$shop->id) }}" class="btn-blue" style="font-size:12px; padding:8px 12px; text-decoration:none;">Order</a>
+                @else
+                  <span style="font-size:12px; padding:8px 12px; background:#F3F4F6; color:#9CA3AF; border-radius:10px; font-weight:800; display:inline-block; text-align:center;">Closed</span>
+                @endif
               </div>
             </div>
           </div>

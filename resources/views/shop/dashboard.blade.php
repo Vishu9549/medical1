@@ -121,6 +121,27 @@
         </p>
       </div>
 
+      <!-- Store Timings Settings Card -->
+      <div style="background:#fff; border-radius:20px; padding:18px; box-shadow:0 4px 20px rgba(0,0,0,0.06); border:1px solid #F3F4F6; margin:0;">
+        <h4 style="font-weight:900; font-size:14px; color:#1A3C8F; margin-top:0; margin-bottom:12px; display:flex; align-items:center; gap:6px;">🕰️ Store Timings</h4>
+        <form action="{{ url('/shop/update-timings') }}" method="POST">
+          @csrf
+          <div style="display:flex; gap:10px; margin-bottom:12px;">
+            <div style="flex:1;">
+              <label class="form-label" style="font-size:11px; margin-bottom:4px; display:block; font-weight:700; color:#555;">Opening Time</label>
+              <input type="time" name="opens_at" class="form-input" style="padding:10px; font-size:13px;" value="{{ $shop->opens_at ?? '09:00' }}" required>
+            </div>
+            <div style="flex:1;">
+              <label class="form-label" style="font-size:11px; margin-bottom:4px; display:block; font-weight:700; color:#555;">Closing Time</label>
+              <input type="time" name="closes_at" class="form-input" style="padding:10px; font-size:13px;" value="{{ $shop->closes_at ?? '21:00' }}" required>
+            </div>
+          </div>
+          <button type="submit" class="btn-blue" style="width:100%; border:none; padding:11px; border-radius:10px; font-weight:800; font-size:12px; color:#fff; cursor:pointer;">
+            Save Store Timings
+          </button>
+        </form>
+      </div>
+
       <!-- Quick Action Grid -->
       <div style="display:flex; gap:16px; margin:0; width:100%; grid-column: 1 / -1;">
         <a href="{{ url('/shop/inventory') }}" style="flex:1; text-decoration:none;">

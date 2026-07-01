@@ -289,4 +289,21 @@ class ShopController extends Controller
 
         return redirect()->back()->with('success', 'Order status updated to ' . $request->status);
     }
+
+    public function updateTimings(Request $request)
+    {
+        $shop = $this->getActiveShop();
+        if (!$shop) return redirect('/profile');
+
+        $request->validate([
+            'opens_at' => 'required|string',
+            'closes_at' => 'required|string',
+        ]);
+
+        $shop->opens_at = $request->opens_at;
+        $shop->closes_at = $request->closes_at;
+        $shop->save();
+
+        return redirect()->back()->with('success', 'Store timings updated successfully!');
+    }
 }

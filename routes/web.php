@@ -54,6 +54,7 @@ Route::middleware(['auth', 'role.shop_owner'])->group(function () {
     Route::delete('/shop/inventory/delete/{id}', [ShopController::class, 'inventoryDelete']);
     Route::get('/shop/orders', [ShopController::class, 'ordersIndex']);
     Route::post('/shop/order/status', [ShopController::class, 'ordersUpdate']);
+    Route::post('/shop/update-timings', [ShopController::class, 'updateTimings']);
 });
 
 // Shop Registration is open to Auth users

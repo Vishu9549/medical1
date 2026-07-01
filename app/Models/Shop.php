@@ -22,7 +22,23 @@ class Shop extends Model
         'is_online',
         'status',
         'user_id',
+        'opens_at',
+        'closes_at',
     ];
+
+    public function isOpen()
+    {
+        date_default_timezone_set('Asia/Kolkata');
+        $currentTime = date('H:i');
+        $opensAt = $this->opens_at ?? '09:00';
+        $closesAt = $this->closes_at ?? '21:00';
+
+        if ($opensAt <= $closesAt) {
+            return ($currentTime >= $opensAt && $currentTime <= $closesAt);
+        } else {
+            return ($currentTime >= $opensAt || $currentTime <= $closesAt);
+        }
+    }
 
     public function user()
     {
