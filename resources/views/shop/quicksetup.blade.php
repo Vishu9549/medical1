@@ -43,17 +43,17 @@
 
     <!-- Search & Brand Filter Layout -->
     <div style="background:#fff; border-radius:18px; padding:20px; box-shadow:0 4px 20px rgba(0,0,0,0.06); margin-bottom:16px; display:flex; flex-direction:column; gap:16px;">
-      <div>
-        <label class="form-label" style="margin-bottom:6px; font-size:13.5px; font-weight:800; color:#1A3C8F;">🔍 Search Medicine Name</label>
-        <input type="text" id="catalogue-search" class="form-input" style="padding:15px 16px; font-size:15px; border-radius:14px;" placeholder="Type to filter catalogue (e.g. Paracetamol)..." oninput="filterCatalogueList()">
+      <div style="display:flex; flex-direction:column; align-items:stretch; width:100%;">
+        <label class="form-label" style="margin-bottom:6px; font-size:13.5px; font-weight:800; color:#1A3C8F; display:block;">🔍 Search Medicine Name</label>
+        <input type="text" id="catalogue-search" class="form-input" style="padding:15px 16px; font-size:15px; border-radius:14px; width:100%; box-sizing:border-box;" placeholder="Type to filter catalogue (e.g. Paracetamol)..." oninput="filterCatalogueList()">
       </div>
       
-      <div>
-        <label class="form-label" style="margin-bottom:6px; font-size:13.5px; font-weight:800; color:#1A3C8F;">🏭 Filter by Company / Brand</label>
+      <div style="display:flex; flex-direction:column; align-items:stretch; width:100%;">
+        <label class="form-label" style="margin-bottom:6px; font-size:13.5px; font-weight:800; color:#1A3C8F; display:block;">🏭 Filter by Company / Brand</label>
         @php
           $companies = $masterMedicines->pluck('company')->unique()->sort();
         @endphp
-        <select id="company-filter" class="form-input" style="padding:15px 16px; font-size:15px; border-radius:14px; height:auto;" onchange="filterCatalogueList()">
+        <select id="company-filter" class="form-input" style="padding:15px 16px; font-size:15px; border-radius:14px; height:auto; width:100%; box-sizing:border-box;" onchange="filterCatalogueList()">
           <option value="All">All Companies</option>
           @foreach($companies as $company)
             <option value="{{ $company }}">{{ $company }}</option>
