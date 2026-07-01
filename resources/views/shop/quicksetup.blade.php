@@ -33,24 +33,27 @@
   </div>
 
   <div class="scroll" style="flex:1;">
-    <div style="background:linear-gradient(135deg,#1A3C8F,#2563EB); border-radius:18px; padding:16px 18px; margin-bottom:16px; color:#fff;">
-      <div style="font-weight:900; font-size:16px; margin-bottom:4px;">🏪 Medicine Catalogue Selection</div>
-      <div style="font-size:12.5px; opacity:0.9; line-height:1.5;">Select medicines from the global catalogue, input your price and stock level, and click "Add Selected Medicines" below.</div>
+    <div style="background:linear-gradient(135deg,#1A3C8F,#2563EB); border-radius:12px; padding:10px 14px; margin-bottom:12px; color:#fff; display:flex; align-items:center; gap:8px;">
+      <span style="font-size:18px;">🏪</span>
+      <div>
+        <div style="font-weight:900; font-size:13px;">Medicine Catalogue Selection</div>
+        <div style="font-size:10.5px; opacity:0.85; margin-top:2px;">Select medicines, set price/stock, and save.</div>
+      </div>
     </div>
 
     <!-- Search & Brand Filter Layout -->
-    <div style="background:#fff; border-radius:16px; padding:16px; box-shadow:0 2px 12px rgba(0,0,0,0.05); margin-bottom:16px; display:flex; flex-direction:column; gap:12px;">
+    <div style="background:#fff; border-radius:18px; padding:20px; box-shadow:0 4px 20px rgba(0,0,0,0.06); margin-bottom:16px; display:flex; flex-direction:column; gap:16px;">
       <div>
-        <label class="form-label" style="margin-bottom:4px;">🔍 Search Medicine Name</label>
-        <input type="text" id="catalogue-search" class="form-input" placeholder="Type to filter catalogue (e.g. Paracetamol)..." oninput="filterCatalogueList()">
+        <label class="form-label" style="margin-bottom:6px; font-size:13.5px; font-weight:800; color:#1A3C8F;">🔍 Search Medicine Name</label>
+        <input type="text" id="catalogue-search" class="form-input" style="padding:15px 16px; font-size:15px; border-radius:14px;" placeholder="Type to filter catalogue (e.g. Paracetamol)..." oninput="filterCatalogueList()">
       </div>
       
       <div>
-        <label class="form-label" style="margin-bottom:4px;">🏭 Filter by Company / Brand</label>
+        <label class="form-label" style="margin-bottom:6px; font-size:13.5px; font-weight:800; color:#1A3C8F;">🏭 Filter by Company / Brand</label>
         @php
           $companies = $masterMedicines->pluck('company')->unique()->sort();
         @endphp
-        <select id="company-filter" class="form-input" onchange="filterCatalogueList()">
+        <select id="company-filter" class="form-input" style="padding:15px 16px; font-size:15px; border-radius:14px; height:auto;" onchange="filterCatalogueList()">
           <option value="All">All Companies</option>
           @foreach($companies as $company)
             <option value="{{ $company }}">{{ $company }}</option>
