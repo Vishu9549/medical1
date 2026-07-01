@@ -120,14 +120,47 @@ class ShopController extends Controller
         if (!$shop) return redirect('/profile');
 
         $category = $request->input('category', 'All');
+        $search = $request->input('q', '');
+        $company = $request->input('company', 'All');
+
         $medQuery = Medicine::query();
         if ($category !== 'All') {
             $medQuery->where('category', $category);
         }
-        $masterMedicines = $medQuery->get();
+        if ($search) {
+            $medQuery->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%");
+            });
+        }
+        
+        $masterMedicinesCollection = $medQuery->get();
+        
+        // Filter by company name dynamically (accessor attribute)
+        if ($company !== 'All') {
+            $masterMedicinesCollection = $masterMedicinesCollection->filter(function($med) use ($company) {
+                return strcasecmp($med->company, $company) === 0;
+            });
+        }
+        
+        $allCompanies = ['Cipla Ltd', 'Abbott India', 'Sun Pharma', 'Alkem Laboratories', 'Mankind Pharma', 'Lupin Ltd'];
+        
+        // Paginate the collection manually
+        $perPage = 30;
+        $page = (int) $request->input('page', 1);
+        $sliced = $masterMedicinesCollection->slice(($page - 1) * $perPage, $perPage)->values();
+        
+        $masterMedicines = new \Illuminate\Pagination\LengthAwarePaginator(
+            $sliced,
+            $masterMedicinesCollection->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
         $shopInventory = Inventory::where('shop_id', $shop->id)->get();
 
-        return view('shop.quicksetup', compact('shop', 'masterMedicines', 'shopInventory', 'category'));
+        return view('shop.quicksetup', compact('shop', 'masterMedicines', 'shopInventory', 'category', 'search', 'company', 'allCompanies'));
     }
 
     public function quickSetupSave(Request $request)

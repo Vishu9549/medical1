@@ -41,35 +41,38 @@
       </div>
     </div>
 
-    <!-- Search & Brand Filter Layout -->
-    <div style="background:#fff; border-radius:18px; padding:20px; box-shadow:0 4px 20px rgba(0,0,0,0.06); margin-bottom:16px; display:flex; flex-direction:column; gap:16px;">
-      <div style="display:flex; flex-direction:column; align-items:stretch; width:100%;">
-        <label class="form-label" style="margin-bottom:6px; font-size:13.5px; font-weight:800; color:#1A3C8F; display:block;">🔍 Search Medicine Name</label>
-        <input type="text" id="catalogue-search" class="form-input" style="padding:15px 16px; font-size:15px; border-radius:14px; width:100%; box-sizing:border-box;" placeholder="Type to filter catalogue (e.g. Paracetamol)..." oninput="filterCatalogueList()">
-      </div>
+    <!-- Search & Brand Filter Layout (GET Form for Server-side filtering) -->
+    <form method="GET" action="{{ url('/shop/quicksetup') }}" id="search-filter-form" style="margin-bottom:16px;">
+      <input type="hidden" name="category" value="{{ $category }}">
       
-      <div style="display:flex; flex-direction:column; align-items:stretch; width:100%;">
-        <label class="form-label" style="margin-bottom:6px; font-size:13.5px; font-weight:800; color:#1A3C8F; display:block;">🏭 Filter by Company / Brand</label>
-        @php
-          $companies = $masterMedicines->pluck('company')->unique()->sort();
-        @endphp
-        <select id="company-filter" class="form-input" style="padding:15px 16px; font-size:15px; border-radius:14px; height:auto; width:100%; box-sizing:border-box;" onchange="filterCatalogueList()">
-          <option value="All">All Companies</option>
-          @foreach($companies as $company)
-            <option value="{{ $company }}">{{ $company }}</option>
-          @endforeach
-        </select>
+      <div style="background:#fff; border-radius:18px; padding:20px; box-shadow:0 4px 20px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:16px;">
+        <div style="display:flex; flex-direction:column; align-items:stretch; width:100%;">
+          <label class="form-label" style="margin-bottom:6px; font-size:13.5px; font-weight:800; color:#1A3C8F; display:block;">🔍 Search Medicine Name</label>
+          <div style="display:flex; gap:10px; width:100%;">
+            <input type="text" name="q" id="catalogue-search" value="{{ $search }}" class="form-input" style="padding:15px 16px; font-size:15px; border-radius:14px; flex:1; box-sizing:border-box;" placeholder="Type to search (e.g. Paracetamol)...">
+            <button type="submit" class="btn-blue" style="border-radius:14px; padding:15px 24px; font-weight:900; font-size:14px; border:none; cursor:pointer; color:#fff;">Search</button>
+          </div>
+        </div>
+        
+        <div style="display:flex; flex-direction:column; align-items:stretch; width:100%;">
+          <label class="form-label" style="margin-bottom:6px; font-size:13.5px; font-weight:800; color:#1A3C8F; display:block;">🏭 Filter by Company / Brand</label>
+          <select name="company" id="company-filter" class="form-input" style="padding:15px 16px; font-size:15px; border-radius:14px; height:auto; width:100%; box-sizing:border-box;" onchange="document.getElementById('search-filter-form').submit()">
+            <option value="All">All Companies</option>
+            @foreach($allCompanies as $comp)
+              <option value="{{ $comp }}" {{ $company === $comp ? 'selected' : '' }}>{{ $comp }}</option>
+            @endforeach
+          </select>
+        </div>
       </div>
-    </div>
+    </form>
 
     <!-- Category Pills Filter -->
     @php
       $cats = ['All', 'Fever', 'Antibiotic', 'Allergy', 'Acidity', 'Pain', 'Diabetes', 'Heart', 'Supplement', 'Skin', 'Eye', 'Dental'];
-      $activeCat = request('category', 'All');
     @endphp
     <div style="display:flex; gap:8px; margin-bottom:14px; overflow-x:auto; padding-bottom:4px;">
       @foreach($cats as $c)
-        <a href="{{ url('/shop/quicksetup?category='.$c) }}" style="flex-shrink:0; padding:7px 16px; border-radius:20px; background:{{ $activeCat === $c ? '#1A3C8F' : '#F3F4F6' }}; color:{{ $activeCat === $c ? '#fff' : '#555' }}; font-weight:700; font-size:12px; text-decoration:none;">
+        <a href="{{ url('/shop/quicksetup?category='.$c.'&q='.urlencode($search).'&company='.urlencode($company)) }}" style="flex-shrink:0; padding:7px 16px; border-radius:20px; background:{{ $category === $c ? '#1A3C8F' : '#F3F4F6' }}; color:{{ $category === $c ? '#fff' : '#555' }}; font-weight:700; font-size:12px; text-decoration:none;">
           {{ $c }}
         </a>
       @endforeach
@@ -130,6 +133,25 @@
 
           </div>
         @endforeach
+      </div>
+
+      <!-- Custom Clean Pagination Controls -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding:10px 0;">
+        @if($masterMedicines->onFirstPage())
+          <span style="padding:10px 18px; background:#F3F4F6; color:#9CA3AF; border-radius:10px; font-weight:700; font-size:12px;">Previous</span>
+        @else
+          <a href="{{ $masterMedicines->previousPageUrl() }}" class="btn-outline" style="padding:10px 18px; font-size:12px; text-decoration:none; display:inline-block; border-radius:10px;">Previous</a>
+        @endif
+
+        <span style="font-weight:800; font-size:12.5px; color:#555;">
+          Page {{ $masterMedicines->currentPage() }} / {{ $masterMedicines->lastPage() }}
+        </span>
+
+        @if($masterMedicines->hasMorePages())
+          <a href="{{ $masterMedicines->nextPageUrl() }}" class="btn-blue" style="padding:10px 18px; font-size:12px; text-decoration:none; display:inline-block; border-radius:10px; color:#fff;">Next</a>
+        @else
+          <span style="padding:10px 18px; background:#F3F4F6; color:#9CA3AF; border-radius:10px; font-weight:700; font-size:12px;">Next</span>
+        @endif
       </div>
 
       <div style="height:20px;"></div>
