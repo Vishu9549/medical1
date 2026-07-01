@@ -70,6 +70,10 @@
             <input type="text" name="shop_name" class="form-input" placeholder="e.g. Sharma Medical Store" value="{{ old('shop_name') }}" required>
           </div>
 
+          <button type="button" onclick="detectGPSCoordinates(true)" class="btn-outline" style="width:100%; border:1px solid #1A3C8F; color:#1A3C8F; background:#fff; padding:10px; border-radius:10px; font-weight:800; font-size:12px; cursor:pointer; margin-bottom:12px;">
+            📍 Auto-Detect GPS & Geocode Location
+          </button>
+
           <div style="margin-bottom:12px;">
             <label class="form-label">City / Region Area Coverage</label>
             <select name="area" id="area-select" class="form-input" required>
@@ -117,10 +121,6 @@
               <input type="number" step="any" name="longitude" id="lng-input" class="form-input" placeholder="85.3647" value="{{ old('longitude', '85.3647') }}" required>
             </div>
           </div>
-          
-          <button type="button" onclick="detectGPSCoordinates(true)" class="btn-outline" style="width:100%; border:1px solid #1A3C8F; color:#1A3C8F; background:#fff; padding:10px; border-radius:10px; font-weight:800; font-size:12px; cursor:pointer; margin-bottom:12px;">
-            📍 Auto-Detect GPS & Geocode Location
-          </button>
         </div>
       </div>
 
