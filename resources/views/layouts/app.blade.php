@@ -348,12 +348,15 @@ body{background:#F0F4FF;display:flex;flex-direction:column;min-height:100vh;font
     <h3 style="font-weight:900; font-size:18px; margin-bottom:12px; color:#1A202C;">Select City</h3>
     <p style="font-size:12px; color:#718096; margin-bottom:20px;">Apni city select karein pharmacies aur items dekhne ke liye:</p>
     <div style="display:flex; flex-direction:column; gap:10px;">
+      <button onclick="autoDetectCity()" class="btn-blue" id="btn-auto-detect-city" style="width:100%; border:none; padding:12px; font-weight:800; font-size:13.5px; border-radius:10px; cursor:pointer; background:#00B29A; color:#fff; display:flex; align-items:center; justify-content:center; gap:8px;">
+        ⚡ Auto Detect Location
+      </button>
       <a href="{{ url('/set-location?city=Muzaffarpur') }}" class="btn-outline" style="text-decoration:none; padding:12px; display:block;">Muzaffarpur</a>
       <a href="{{ url('/set-location?city=Patna') }}" class="btn-outline" style="text-decoration:none; padding:12px; display:block;">Patna</a>
       <a href="{{ url('/set-location?city=Jaipur') }}" class="btn-outline" style="text-decoration:none; padding:12px; display:block;">Jaipur</a>
       <a href="{{ url('/set-location?city=Darbhanga') }}" class="btn-outline" style="text-decoration:none; padding:12px; display:block;">Darbhanga</a>
     </div>
-    <button onclick="closeGlobalLocationModal()" class="btn-danger" style="margin-top:20px; width:100%; border:none; padding:12px; font-size:13px; cursor:pointer;">Cancel</button>
+    <button onclick="closeGlobalLocationModal()" class="btn-danger" style="margin-top:20px; width:100%; border:none; padding:12px; font-size:13px; cursor:pointer; border-radius:10px;">Cancel</button>
   </div>
 </div>
 
@@ -363,6 +366,51 @@ function openGlobalLocationModal() {
 }
 function closeGlobalLocationModal() {
   document.getElementById('global-location-modal').style.display = 'none';
+}
+function autoDetectCity() {
+  const btn = document.getElementById('btn-auto-detect-city');
+  const originalHTML = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '🕒 Detecting Location...';
+
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported by your browser.");
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1`, {
+        headers: {
+          'Accept-Language': 'en'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        let city = data.address.city || data.address.town || data.address.village || data.address.suburb || data.address.county || 'Muzaffarpur';
+        city = city.replace(/\s+(District|Division|City)/i, '').trim();
+
+        window.location.href = `/set-location?city=${encodeURIComponent(city)}`;
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Location match failed. Setting city to Muzaffarpur.");
+        window.location.href = `/set-location?city=Muzaffarpur`;
+      });
+    },
+    function(error) {
+      console.error(error);
+      alert("Location access denied or timed out. Please select a city manually.");
+      btn.disabled = false;
+      btn.innerHTML = originalHTML;
+    },
+    { enableHighAccuracy: true, timeout: 8000 }
+  );
 }
 </script>
 
