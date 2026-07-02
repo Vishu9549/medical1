@@ -127,10 +127,11 @@ class HomeController extends Controller
     public function orders()
     {
         $orders = \App\Models\Order::where('user_id', \Illuminate\Support\Facades\Auth::id())->latest()->get();
+        $prescriptions = \App\Models\Prescription::where('user_id', \Illuminate\Support\Facades\Auth::id())->latest()->get();
         $cart = session('cart', []);
         $cartCount = array_sum($cart);
 
-        return view('customer.profile_orders', compact('orders', 'cartCount'));
+        return view('customer.profile_orders', compact('orders', 'prescriptions', 'cartCount'));
     }
 
     public function addresses()
