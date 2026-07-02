@@ -404,12 +404,24 @@ function autoDetectCity() {
       });
     },
     function(error) {
-      console.error(error);
-      alert("Location access denied or timed out. Please select a city manually.");
-      btn.disabled = false;
-      btn.innerHTML = originalHTML;
+      console.warn("GPS failed, trying IP fallback...", error);
+      btn.innerHTML = '🕒 Trying IP Lookup...';
+      
+      fetch('https://ipapi.co/json/')
+      .then(res => res.json())
+      .then(data => {
+        let city = data.city || 'Muzaffarpur';
+        city = city.replace(/\s+(District|Division|City)/i, '').trim();
+        window.location.href = `/set-location?city=${encodeURIComponent(city)}`;
+      })
+      .catch(err => {
+        console.error("IP Geolocation failed:", err);
+        alert("Location access denied or matched city not found. Please select a city manually.");
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+      });
     },
-    { enableHighAccuracy: true, timeout: 8000 }
+    { enableHighAccuracy: true, timeout: 5000 }
   );
 }
 </script>
