@@ -21,8 +21,20 @@ class PrescriptionController extends Controller
             ->distinct()
             ->pluck('delivery_address');
 
-        // Get all approved shops
-        $shops = Shop::where('status', 'approved')->orderBy('name', 'asc')->get();
+        // Get only nearby approved shops matching the user's city location
+        $city = session('user_location', 'Muzaffarpur');
+        $shops = Shop::where('status', 'approved')
+            ->where(function($q) use ($city) {
+                $q->where('address', 'like', "%{$city}%")
+                  ->orWhere('area', 'like', "%{$city}%");
+            })
+            ->orderBy('name', 'asc')
+            ->get();
+
+        // Fallback to all approved shops if no pharmacy is found in their city
+        if ($shops->isEmpty()) {
+            $shops = Shop::where('status', 'approved')->orderBy('name', 'asc')->get();
+        }
 
         return view('customer.prescription.upload', compact('pastAddresses', 'shops'));
     }
