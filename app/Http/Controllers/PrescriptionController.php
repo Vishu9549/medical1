@@ -24,6 +24,7 @@ class PrescriptionController extends Controller
         // Get only nearby approved shops matching the user's city location
         $city = session('user_location', 'Muzaffarpur');
         $shops = Shop::where('status', 'approved')
+            ->where('is_online', true)
             ->where(function($q) use ($city) {
                 $q->where('address', 'like', "%{$city}%")
                   ->orWhere('area', 'like', "%{$city}%");
@@ -31,9 +32,9 @@ class PrescriptionController extends Controller
             ->orderBy('name', 'asc')
             ->get();
 
-        // Fallback to all approved shops if no pharmacy is found in their city
+        // Fallback to all approved online shops if no pharmacy is found in their city
         if ($shops->isEmpty()) {
-            $shops = Shop::where('status', 'approved')->orderBy('name', 'asc')->get();
+            $shops = Shop::where('status', 'approved')->where('is_online', true)->orderBy('name', 'asc')->get();
         }
 
         return view('customer.prescription.upload', compact('pastAddresses', 'shops'));

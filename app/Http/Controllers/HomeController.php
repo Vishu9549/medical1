@@ -22,7 +22,7 @@ class HomeController extends Controller
         ];
 
         $city = session('user_location', 'Muzaffarpur');
-        $allShops = Shop::where('status', 'approved')->get();
+        $allShops = Shop::where('status', 'approved')->where('is_online', true)->get();
         
         $shops = $allShops->sortBy(function($shop) use ($city) {
             return stripos($shop->address, $city) !== false ? 0 : 1;
