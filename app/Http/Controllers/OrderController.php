@@ -29,10 +29,18 @@ class OrderController extends Controller
 
         $shop = Shop::findOrFail($request->shop_id);
 
+        if (!$shop->is_online) {
+            return redirect()->back()->with('error', "Store Offline! Orders band hain is store ke.");
+        }
+
         if (!$shop->isOpen()) {
             $opens = date('h:i A', strtotime($shop->opens_at ?? '09:00'));
             $closes = date('h:i A', strtotime($shop->closes_at ?? '21:00'));
             return redirect()->back()->with('error', "Store Closed! Order nahi kiya ja sakta. Store timings: $opens se $closes.");
+        }
+
+        if ($request->mode === 'delivery' && !$shop->delivery_enabled) {
+            return redirect()->back()->with('error', "Home Delivery is currently disabled for this shop. Please select Self Pickup.");
         }
 
         $cartItems = \App\Models\Medicine::whereIn('id', array_keys($cart))->get();

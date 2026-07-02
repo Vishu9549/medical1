@@ -145,24 +145,40 @@
                   <span style="font-size:11px; color:#aaa;">({{ $shop->reviews }})</span>
                   <span style="font-size:11px; color:#888; font-weight:800;" class="shop-distance-text">{{ $shop->distance_km }} km</span>
                 </div>
-                <div style="font-size:11px; margin-top:4px;">
+                <div style="font-size:11px; margin-top:4px; display:flex; flex-direction:column; gap:2px;">
                   @php
+                    $isOnline = (bool) $shop->is_online;
                     $isOpen = $shop->isOpen();
                     $opens = date('h:i A', strtotime($shop->opens_at ?? '09:00'));
                     $closes = date('h:i A', strtotime($shop->closes_at ?? '21:00'));
+                    $deliveryEnabled = (bool) $shop->delivery_enabled;
                   @endphp
-                  @if($isOpen)
-                    <span style="color:#16A34A; font-weight:800;">🟢 Open</span> 
-                    <span style="color:#666;">(Closes {{ $closes }})</span>
-                  @else
-                    <span style="color:#DC2626; font-weight:800;">🔴 Closed</span> 
-                    <span style="color:#666;">(Opens {{ $opens }})</span>
-                  @endif
+                  <div>
+                    @if(!$isOnline)
+                      <span style="color:#DC2626; font-weight:800;">🔴 Offline</span>
+                      <span style="color:#888;">(Orders band)</span>
+                    @elseif($isOpen)
+                      <span style="color:#16A34A; font-weight:800;">🟢 Open</span> 
+                      <span style="color:#666;">(Closes {{ $closes }})</span>
+                    @else
+                      <span style="color:#DC2626; font-weight:800;">🔴 Closed</span> 
+                      <span style="color:#666;">(Opens {{ $opens }})</span>
+                    @endif
+                  </div>
+                  <div style="font-size:10px; color:#666; font-weight:700; margin-top:1px;">
+                    @if($deliveryEnabled)
+                      🛵 Delivery & Pickup
+                    @else
+                      🚶 Pickup Only
+                    @endif
+                  </div>
                 </div>
               </div>
               <div>
-                @if($isOpen)
+                @if($isOnline && $isOpen)
                   <a href="{{ url('/search?shop_id='.$shop->id) }}" class="btn-blue" style="font-size:12px; padding:8px 12px; text-decoration:none;">Order</a>
+                @elseif(!$isOnline)
+                  <span style="font-size:12px; padding:8px 12px; background:#FEE2E2; color:#DC2626; border-radius:10px; font-weight:800; display:inline-block; text-align:center;">Offline</span>
                 @else
                   <span style="font-size:12px; padding:8px 12px; background:#F3F4F6; color:#9CA3AF; border-radius:10px; font-weight:800; display:inline-block; text-align:center;">Closed</span>
                 @endif
