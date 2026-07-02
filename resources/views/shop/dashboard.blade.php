@@ -190,6 +190,61 @@
         </p>
       </div>
 
+      <!-- Prescription Orders Card -->
+      <div style="background:#fff; border-radius:20px; padding:18px; box-shadow:0 4px 20px rgba(0,0,0,0.06); margin:0; grid-column: 1 / -1; border:1px solid #F3F4F6;">
+        <h4 style="font-weight:900; font-size:15px; color:#1A3C8F; margin-top:0; margin-bottom:14px; display:flex; align-items:center; gap:6px;">📋 Prescription Orders</h4>
+        
+        @if($prescriptions->count() === 0)
+          <div style="text-align:center; padding:20px; color:#888; font-size:13px;">
+            Koi prescription orders nahi mile abhi tak.
+          </div>
+        @else
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            @foreach($prescriptions as $rx)
+              <div style="background:#F8FAFC; border-radius:14px; padding:14px; border:1px solid #E2E8F0;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+                  <div>
+                    <span style="font-size:12px; font-weight:800; color:#1A3C8F;">#RX-{{ str_pad($rx->id, 5, '0', STR_PAD_LEFT) }}</span>
+                    <div style="font-size:11px; color:#666; margin-top:2px;">{{ $rx->created_at->format('d M Y, h:i A') }}</div>
+                  </div>
+                  
+                  <!-- Dropdown Status Form -->
+                  <form action="{{ url('/shop/prescription/status') }}" method="POST" style="margin:0;">
+                    @csrf
+                    <input type="hidden" name="prescription_id" value="{{ $rx->id }}">
+                    <select name="status" onchange="this.form.submit()" style="font-size:11.5px; font-weight:700; padding:4px 8px; border-radius:8px; border:1px solid #CBD5E1; background:#fff; color:#1A1A1A; cursor:pointer;">
+                      <option value="Pending" {{ $rx->status === 'Pending' ? 'selected' : '' }}>Pending</option>
+                      <option value="Accepted" {{ $rx->status === 'Accepted' ? 'selected' : '' }}>Accepted</option>
+                      <option value="Out for Delivery" {{ $rx->status === 'Out for Delivery' ? 'selected' : '' }}>Out for Delivery</option>
+                      <option value="Delivered" {{ $rx->status === 'Delivered' ? 'selected' : '' }}>Delivered</option>
+                      <option value="Cancelled" {{ $rx->status === 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
+                    </select>
+                  </form>
+                </div>
+
+                <div style="display:flex; gap:12px; align-items:flex-start;">
+                  <!-- Thumbnail Link -->
+                  <a href="{{ $rx->image_path }}" target="_blank" style="flex-shrink:0;">
+                    <img src="{{ $rx->image_path }}" style="width:70px; height:70px; border-radius:8px; object-fit:cover; border:1px solid #CBD5E1;" alt="RX">
+                  </a>
+                  
+                  <div style="flex:1; font-size:12px; color:#475569;">
+                    <div style="margin-bottom:2px;"><strong style="color:#1A1A1A;">Patient:</strong> {{ $rx->patient_name }} ({{ $rx->patient_age ?? 'N/A' }} Yrs)</div>
+                    <div style="margin-bottom:2px;"><strong style="color:#1A1A1A;">Phone:</strong> {{ $rx->patient_phone }}</div>
+                    <div style="margin-bottom:4px; line-height:1.3;"><strong style="color:#1A1A1A;">Address:</strong> {{ $rx->delivery_address }}</div>
+                    @if($rx->notes)
+                      <div style="background:#FFFBEB; border:1px solid #FDE68A; border-radius:8px; padding:6px 8px; font-size:11px; color:#B45309; margin-top:4px;">
+                        <strong>Notes:</strong> {{ $rx->notes }}
+                      </div>
+                    @endif
+                  </div>
+                </div>
+              </div>
+            @endforeach
+          </div>
+        @endif
+      </div>
+
     </div>
   </div>
 </div>

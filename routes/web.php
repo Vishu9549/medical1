@@ -7,6 +7,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PrescriptionController;
 
 // Customer Front-End Routes (Public)
 Route::get('/', [HomeController::class, 'index']);
@@ -39,6 +40,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/smartcart/results', [CartController::class, 'results']);
     Route::post('/order', [OrderController::class, 'store']);
     Route::get('/order/{id}/success', [OrderController::class, 'success']);
+    Route::get('/prescription/upload', [PrescriptionController::class, 'uploadForm']);
+    Route::post('/prescription/upload', [PrescriptionController::class, 'store']);
+    Route::get('/prescription/{id}/success', [PrescriptionController::class, 'success']);
 });
 
 // Protected Shop Dashboard Routes (Requires Auth & Shop Owner Role)
@@ -55,6 +59,7 @@ Route::middleware(['auth', 'role.shop_owner'])->group(function () {
     Route::get('/shop/orders', [ShopController::class, 'ordersIndex']);
     Route::post('/shop/order/status', [ShopController::class, 'ordersUpdate']);
     Route::post('/shop/update-timings', [ShopController::class, 'updateTimings']);
+    Route::post('/shop/prescription/status', [PrescriptionController::class, 'updateStatus']);
 });
 
 // Shop Registration is open to Auth users

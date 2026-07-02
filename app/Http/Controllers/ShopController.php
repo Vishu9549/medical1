@@ -89,7 +89,11 @@ class ShopController extends Controller
 
         $wallet = Wallet::where('shop_id', $shop->id)->first();
 
-        return view('shop.dashboard', compact('shop', 'ordersCount', 'revenue', 'inventoryCount', 'wallet'));
+        $prescriptions = \App\Models\Prescription::where('shop_id', $shop->id)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return view('shop.dashboard', compact('shop', 'ordersCount', 'revenue', 'inventoryCount', 'wallet', 'prescriptions'));
     }
 
     public function toggleOnline(Request $request)

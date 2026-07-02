@@ -81,7 +81,7 @@
     </div>
 
     <!-- Smart Cart Banner -->
-    <div style="padding:0 0 20px;">
+    <div style="padding:0 0 16px;">
       <a href="{{ url('/smartcart') }}" style="text-decoration:none;">
         <div style="background:linear-gradient(135deg,#7C3AED,#A855F7); border-radius:20px; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 20px rgba(124,58,237,0.3);">
           <div>
@@ -89,6 +89,19 @@
             <div style="color:rgba(255,255,255,0.8); font-size:12px;">Multiple medicines — best pharmacy auto-match</div>
           </div>
           <div style="color:#fff; font-size:24px;">→</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Prescription Upload Banner -->
+    <div style="padding:0 0 20px;">
+      <a href="{{ url('/prescription/upload') }}" style="text-decoration:none;">
+        <div style="background:linear-gradient(135deg,#1E40AF,#3B82F6); border-radius:20px; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 20px rgba(37,99,235,0.25);">
+          <div>
+            <div style="color:#fff; font-weight:800; font-size:15px; margin-bottom:4px;">📋 Prescription hai?</div>
+            <div style="color:rgba(255,255,255,0.85); font-size:12px;">Upload karo, shop dhundh denge</div>
+          </div>
+          <div style="background:#fff; color:#1E40AF; font-size:12.5px; font-weight:800; padding:8px 16px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); white-space:nowrap;">Upload ↑</div>
         </div>
       </a>
     </div>
