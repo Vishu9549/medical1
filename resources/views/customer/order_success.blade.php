@@ -22,9 +22,27 @@
         </div>
       @endforeach
       
-      <div style="border-top:1px dashed #E5E7EB; padding-top:10px; margin-top:6px; display:flex; justify-content:space-between;">
-        <span style="font-size:15px; font-weight:800;">Total</span>
-        <span style="font-size:15px; font-weight:900; color:#1A3C8F;">₹{{ $order->total_price + $order->delivery_charge }}</span>
+      <div style="border-top:1px dashed #E5E7EB; padding-top:10px; margin-top:6px; display:flex; flex-direction:column; gap:4px;">
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:#555;">
+          <span>Items Subtotal:</span>
+          <span>₹{{ $order->total_price + $order->discount_amount }}</span>
+        </div>
+        @if(($order->discount_amount ?? 0) > 0)
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:#16A34A; font-weight:700;">
+            <span>Bill Discount:</span>
+            <span>-₹{{ $order->discount_amount }}</span>
+          </div>
+        @endif
+        @if(($order->delivery_charge ?? 0) > 0)
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:#555;">
+            <span>Delivery Charges:</span>
+            <span>+₹{{ $order->delivery_charge }}</span>
+          </div>
+        @endif
+        <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:800; border-top:1px solid #E5E7EB; padding-top:4px; margin-top:2px;">
+          <span>Grand Total:</span>
+          <span style="font-weight:900; color:#1A3C8F;">₹{{ $order->total_price + $order->delivery_charge }}</span>
+        </div>
       </div>
     </div>
 

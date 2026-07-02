@@ -142,6 +142,64 @@
         </form>
       </div>
 
+      <!-- Delivery & Offer Settings Card -->
+      <div style="background:#fff; border-radius:20px; padding:18px; box-shadow:0 4px 20px rgba(0,0,0,0.06); border:1px solid #F3F4F6; margin:0; grid-column: 1 / -1;">
+        <h4 style="font-weight:900; font-size:14px; color:#1A3C8F; margin-top:0; margin-bottom:12px; display:flex; align-items:center; gap:6px;">⚙️ Delivery & Offer Settings</h4>
+        <form action="{{ url('/shop/update-delivery-settings') }}" method="POST">
+          @csrf
+          
+          <!-- Delivery Settings row -->
+          <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:16px; border-bottom:1px solid #F3F4F6; padding-bottom:16px;">
+            <div style="font-weight:800; font-size:12.5px; color:#374151;">🛵 Delivery Configuration</div>
+            
+            <div style="display:flex; gap:10px;">
+              <div style="flex:1;">
+                <label class="form-label" style="font-size:11px; margin-bottom:4px; display:block; font-weight:700; color:#555;">Delivery Radius (KM)</label>
+                <input type="number" step="0.1" name="delivery_radius_km" class="form-input" style="padding:10px; font-size:13px;" value="{{ $shop->delivery_radius_km ?? '10' }}" required>
+              </div>
+              <div style="flex:1;">
+                <label class="form-label" style="font-size:11px; margin-bottom:4px; display:block; font-weight:700; color:#555;">Delivery Charge Type</label>
+                <select name="delivery_charge_type" id="delivery_charge_type" class="form-input" style="padding:10px; font-size:13px; height:40px;" onchange="toggleDeliveryChargeInputs()" required>
+                  <option value="fixed" {{ ($shop->delivery_charge_type ?? '') === 'fixed' ? 'selected' : '' }}>Fixed Flat Rate</option>
+                  <option value="dynamic" {{ ($shop->delivery_charge_type ?? 'dynamic') === 'dynamic' ? 'selected' : '' }}>Dynamic (Per KM)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:10px;">
+              <div style="flex:1;" id="fixed-charge-wrapper">
+                <label class="form-label" style="font-size:11px; margin-bottom:4px; display:block; font-weight:700; color:#555;">Fixed Delivery Charge (₹)</label>
+                <input type="number" step="0.5" name="delivery_charge_fixed" class="form-input" style="padding:10px; font-size:13px;" value="{{ $shop->delivery_charge_fixed ?? '20' }}">
+              </div>
+              <div style="flex:1;" id="per-km-charge-wrapper">
+                <label class="form-label" style="font-size:11px; margin-bottom:4px; display:block; font-weight:700; color:#555;">Charge per KM (₹)</label>
+                <input type="number" step="0.5" name="delivery_charge_per_km" class="form-input" style="padding:10px; font-size:13px;" value="{{ $shop->delivery_charge_per_km ?? '8' }}">
+              </div>
+            </div>
+          </div>
+
+          <!-- Billing Offers row -->
+          <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:16px;">
+            <div style="font-weight:800; font-size:12.5px; color:#374151;">🎁 Discount Offers (Customer Savings)</div>
+            
+            <div style="display:flex; gap:10px;">
+              <div style="flex:1;">
+                <label class="form-label" style="font-size:11px; margin-bottom:4px; display:block; font-weight:700; color:#555;">Min Bill Amount (₹)</label>
+                <input type="number" step="1" name="offer_min_bill" class="form-input" style="padding:10px; font-size:13px;" value="{{ $shop->offer_min_bill ?? '0' }}" required>
+              </div>
+              <div style="flex:1;">
+                <label class="form-label" style="font-size:11px; margin-bottom:4px; display:block; font-weight:700; color:#555;">Discount Percentage (%)</label>
+                <input type="number" step="0.5" name="offer_discount_pct" class="form-input" style="padding:10px; font-size:13px;" min="0" max="100" value="{{ $shop->offer_discount_pct ?? '0' }}" required>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-blue" style="width:100%; border:none; padding:12px; border-radius:10px; font-weight:800; font-size:12.5px; color:#fff; cursor:pointer;">
+            Save Settings
+          </button>
+        </form>
+      </div>
+
       <!-- Quick Action Grid -->
       <div style="display:flex; gap:16px; margin:0; width:100%; grid-column: 1 / -1;">
         <a href="{{ url('/shop/inventory') }}" style="flex:1; text-decoration:none;">
@@ -248,4 +306,24 @@
     </div>
   </div>
 </div>
+
+<script>
+  function toggleDeliveryChargeInputs() {
+    const type = document.getElementById('delivery_charge_type').value;
+    const fixedWrap = document.getElementById('fixed-charge-wrapper');
+    const dynamicWrap = document.getElementById('per-km-charge-wrapper');
+
+    if (type === 'fixed') {
+      fixedWrap.style.display = 'block';
+      dynamicWrap.style.display = 'none';
+    } else {
+      fixedWrap.style.display = 'none';
+      dynamicWrap.style.display = 'block';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    toggleDeliveryChargeInputs();
+  });
+</script>
 @endsection

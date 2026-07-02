@@ -16,6 +16,7 @@ class Order extends Model
         'delivery_address',
         'items',
         'user_id',
+        'discount_amount',
     ];
 
     public function user(): BelongsTo
@@ -26,6 +27,7 @@ class Order extends Model
     protected $casts = [
         'total_price' => 'float',
         'delivery_charge' => 'float',
+        'discount_amount' => 'float',
         'items' => 'array',
     ];
 

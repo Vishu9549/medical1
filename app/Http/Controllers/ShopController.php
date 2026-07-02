@@ -310,4 +310,29 @@ class ShopController extends Controller
 
         return redirect()->back()->with('success', 'Store timings updated successfully!');
     }
+
+    public function updateDeliverySettings(Request $request)
+    {
+        $shop = $this->getActiveShop();
+        if (!$shop) return redirect('/profile');
+
+        $request->validate([
+            'delivery_radius_km' => 'required|numeric|min:0.1',
+            'delivery_charge_type' => 'required|string|in:fixed,dynamic',
+            'delivery_charge_fixed' => 'nullable|numeric|min:0',
+            'delivery_charge_per_km' => 'nullable|numeric|min:0',
+            'offer_min_bill' => 'required|numeric|min:0',
+            'offer_discount_pct' => 'required|numeric|min:0|max:100',
+        ]);
+
+        $shop->delivery_radius_km = $request->delivery_radius_km;
+        $shop->delivery_charge_type = $request->delivery_charge_type;
+        $shop->delivery_charge_fixed = $request->delivery_charge_fixed ?? 0.00;
+        $shop->delivery_charge_per_km = $request->delivery_charge_per_km ?? 0.00;
+        $shop->offer_min_bill = $request->offer_min_bill;
+        $shop->offer_discount_pct = $request->offer_discount_pct;
+        $shop->save();
+
+        return redirect()->back()->with('success', 'Delivery and Offer settings updated successfully!');
+    }
 }

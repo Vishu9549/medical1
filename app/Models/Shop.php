@@ -24,6 +24,12 @@ class Shop extends Model
         'user_id',
         'opens_at',
         'closes_at',
+        'delivery_radius_km',
+        'delivery_charge_type',
+        'delivery_charge_fixed',
+        'delivery_charge_per_km',
+        'offer_min_bill',
+        'offer_discount_pct',
     ];
 
     public function isOpen()

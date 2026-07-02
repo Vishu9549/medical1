@@ -121,7 +121,22 @@ class CartController extends Controller
                 }
             }
 
-            $deliveryCharge = $shop->distance_km > 10 ? 0 : round($shop->distance_km * 8);
+            // Calculate delivery charges according to shop settings
+            $deliveryCharge = 0;
+            if ($shop->delivery_charge_type === 'fixed') {
+                $deliveryCharge = (float)($shop->delivery_charge_fixed ?? 20);
+            } else {
+                $deliveryCharge = round($shop->distance_km * ($shop->delivery_charge_per_km ?? 8));
+            }
+
+            // Calculate active offers and bill payment discount
+            $discount = 0;
+            if ($shop->offer_min_bill > 0 && $totalPrice >= $shop->offer_min_bill && $shop->offer_discount_pct > 0) {
+                $discount = round(($totalPrice * $shop->offer_discount_pct) / 100, 2);
+            }
+
+            // Check delivery radius constraint
+            $isOutOfRadius = $shop->distance_km > ($shop->delivery_radius_km ?? 10.0);
 
             $matches[] = [
                 'shop' => $shop,
@@ -130,7 +145,9 @@ class CartController extends Controller
                 'matchCount' => count($available),
                 'totalPrice' => $totalPrice,
                 'deliveryCharge' => $deliveryCharge,
-                'totalWithDelivery' => $totalPrice + ($shop->delivery_enabled ? $deliveryCharge : 0)
+                'discount' => $discount,
+                'isOutOfRadius' => $isOutOfRadius,
+                'totalWithDelivery' => $totalPrice - $discount + ($shop->delivery_enabled && !$isOutOfRadius ? $deliveryCharge : 0)
             ];
         }
 

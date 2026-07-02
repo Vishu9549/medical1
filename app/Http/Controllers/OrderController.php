@@ -39,8 +39,13 @@ class OrderController extends Controller
             return redirect()->back()->with('error', "Store Closed! Order nahi kiya ja sakta. Store timings: $opens se $closes.");
         }
 
-        if ($request->mode === 'delivery' && !$shop->delivery_enabled) {
-            return redirect()->back()->with('error', "Home Delivery is currently disabled for this shop. Please select Self Pickup.");
+        if ($request->mode === 'delivery') {
+            if (!$shop->delivery_enabled) {
+                return redirect()->back()->with('error', "Home Delivery is currently disabled for this shop. Please select Self Pickup.");
+            }
+            if ($shop->distance_km > ($shop->delivery_radius_km ?? 10.0)) {
+                return redirect()->back()->with('error', "Your address is out of delivery radius (Max {$shop->delivery_radius_km} KM). Please select Self Pickup.");
+            }
         }
 
         $cartItems = \App\Models\Medicine::whereIn('id', array_keys($cart))->get();
@@ -71,7 +76,11 @@ class OrderController extends Controller
         $deliveryCharge = 0;
         $deliveryAddress = null;
         if ($request->mode === 'delivery') {
-            $deliveryCharge = $shop->distance_km > 10 ? 0 : round($shop->distance_km * 8);
+            if ($shop->delivery_charge_type === 'fixed') {
+                $deliveryCharge = (float)($shop->delivery_charge_fixed ?? 20);
+            } else {
+                $deliveryCharge = round($shop->distance_km * ($shop->delivery_charge_per_km ?? 8));
+            }
             $deliveryAddress = $request->address_name . ', ' 
                              . $request->address_line1 . ', ' 
                              . $request->address_line2 . ', ' 
@@ -79,15 +88,22 @@ class OrderController extends Controller
                              . $request->address_pincode;
         }
 
+        // Calculate offer discount
+        $discountAmount = 0;
+        if ($shop->offer_min_bill > 0 && $totalPrice >= $shop->offer_min_bill && $shop->offer_discount_pct > 0) {
+            $discountAmount = round(($totalPrice * $shop->offer_discount_pct) / 100, 2);
+        }
+
         $order = Order::create([
             'shop_id' => $shop->id,
             'status' => 'Pending',
             'mode' => $request->mode,
-            'total_price' => $totalPrice,
+            'total_price' => $totalPrice - $discountAmount,
             'delivery_charge' => $deliveryCharge,
+            'discount_amount' => $discountAmount,
             'delivery_address' => $deliveryAddress,
             'items' => $items,
-            'user_id' => Auth::id() // Securely bind order to customer
+            'user_id' => Auth::id()
         ]);
 
         // Update Wallet total sales & commission if commission is enabled

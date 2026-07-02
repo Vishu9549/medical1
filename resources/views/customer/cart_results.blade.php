@@ -52,12 +52,19 @@
 
               <!-- Delivery Option -->
               @if($bestMatch['shop']->delivery_enabled)
-                <label style="flex: 1; border: 1.5px solid #E5E7EB; border-radius: 12px; padding: 14px 10px; text-align: center; cursor: pointer; background: #fff; position: relative; display: block; transition: all 0.2s;" class="mode-label" id="label-delivery">
-                  <input type="radio" name="mode" value="delivery" style="position: absolute; top: 10px; right: 10px; accent-color: #1A3C8F;">
-                  <div style="font-size: 24px; margin-bottom: 4px;">🛵</div>
-                  <div style="font-weight: 800; font-size: 13px; color: #1A1A1A;">Home Delivery</div>
-                  <div style="margin-top: 6px; background: #FEF3C7; color: #D97706; font-weight: 800; font-size: 11px; padding: 2px 8px; border-radius: 6px; display: inline-block;">+₹{{ $bestMatch['deliveryCharge'] }}</div>
-                </label>
+                @if($bestMatch['isOutOfRadius'])
+                  <div style="flex: 1; border: 1.5px dashed #FCA5A5; border-radius: 12px; padding: 12px; background: #FEF2F2; color: #DC2626; font-size: 11px; font-weight: 700; line-height: 1.4; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                    <div>🛵 Range Exceeded</div>
+                    <div style="font-size:10px; color:#ef4444; font-weight:600; margin-top:2px;">Distance ({{ number_format($bestMatch['shop']->distance_km, 1) }}km) exceeds pharmacy delivery range ({{ number_format($bestMatch['shop']->delivery_radius_km ?? 10.0, 1) }}km).</div>
+                  </div>
+                @else
+                  <label style="flex: 1; border: 1.5px solid #E5E7EB; border-radius: 12px; padding: 14px 10px; text-align: center; cursor: pointer; background: #fff; position: relative; display: block; transition: all 0.2s;" class="mode-label" id="label-delivery">
+                    <input type="radio" name="mode" value="delivery" style="position: absolute; top: 10px; right: 10px; accent-color: #1A3C8F;">
+                    <div style="font-size: 24px; margin-bottom: 4px;">🛵</div>
+                    <div style="font-weight: 800; font-size: 13px; color: #1A1A1A;">Home Delivery</div>
+                    <div style="margin-top: 6px; background: #FEF3C7; color: #D97706; font-weight: 800; font-size: 11px; padding: 2px 8px; border-radius: 6px; display: inline-block;">+₹{{ $bestMatch['deliveryCharge'] }}</div>
+                  </label>
+                @endif
               @endif
             </div>
           </div>
@@ -142,10 +149,17 @@
               <span>Delivery Charges:</span>
               <span style="font-weight: 700; color: #16A34A;" id="summary-delivery-text">FREE</span>
             </div>
+
+            @if(($bestMatch['discount'] ?? 0) > 0)
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; color: #16A34A; font-weight: 800;" id="summary-discount-row">
+                <span>Bill Discount ({{ $bestMatch['shop']->offer_discount_pct }}%):</span>
+                <span>-₹{{ $bestMatch['discount'] }}</span>
+              </div>
+            @endif
             
             <div style="border-top: 1px solid #CBD5E0; padding-top: 12px; display: flex; justify-content: space-between; margin-bottom: 20px;">
               <span style="font-size: 16px; font-weight: 900; color: #1A202C;">Order Total:</span>
-              <span style="font-size: 18px; font-weight: 900; color: #B7791F;" id="summary-total-text">₹{{ $bestMatch['totalPrice'] }}</span>
+              <span style="font-size: 18px; font-weight: 900; color: #B7791F;" id="summary-total-text">₹{{ $bestMatch['totalPrice'] - ($bestMatch['discount'] ?? 0) }}</span>
             </div>
 
             <!-- Amazon Style Yellow Button -->
@@ -166,6 +180,7 @@
 <script>
   const priceMedicines = {{ $bestMatch['totalPrice'] }};
   const priceDelivery = {{ $bestMatch['deliveryCharge'] }};
+  const discount = {{ $bestMatch['discount'] ?? 0 }};
   
   const labelPickup = document.getElementById('label-pickup');
   const labelDelivery = document.getElementById('label-delivery');
@@ -199,7 +214,7 @@
 
       summaryDeliveryText.innerText = '₹' + priceDelivery;
       summaryDeliveryText.style.color = '#B7791F';
-      summaryTotalText.innerText = '₹' + (priceMedicines + priceDelivery);
+      summaryTotalText.innerText = '₹' + (priceMedicines - discount + priceDelivery);
     } else {
       if (labelPickup) {
         labelPickup.style.borderColor = '#1A3C8F';
@@ -219,7 +234,7 @@
 
       summaryDeliveryText.innerText = 'FREE';
       summaryDeliveryText.style.color = '#16A34A';
-      summaryTotalText.innerText = '₹' + priceMedicines;
+      summaryTotalText.innerText = '₹' + (priceMedicines - discount);
     }
   }
 
