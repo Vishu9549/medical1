@@ -21,7 +21,10 @@ class PrescriptionController extends Controller
             ->distinct()
             ->pluck('delivery_address');
 
-        return view('customer.prescription.upload', compact('pastAddresses'));
+        // Get all approved shops
+        $shops = Shop::where('status', 'approved')->orderBy('name', 'asc')->get();
+
+        return view('customer.prescription.upload', compact('pastAddresses', 'shops'));
     }
 
     public function store(Request $request)
@@ -32,6 +35,7 @@ class PrescriptionController extends Controller
 
         $request->validate([
             'prescription_image' => 'required|image|mimes:jpeg,png,jpg|max:5120', // Max 5MB
+            'shop_id' => 'required|integer|exists:shops,id',
             'patient_name' => 'required|string|max:100',
             'patient_age' => 'nullable|integer|min:1|max:120',
             'patient_phone' => 'required|string|max:15',
@@ -48,20 +52,9 @@ class PrescriptionController extends Controller
             $imagePath = '/uploads/prescriptions/' . $filename;
         }
 
-        // Auto-detect nearest approved shop in customer's current session location
-        $city = session('user_location', 'Muzaffarpur');
-        $assignedShop = Shop::where('status', 'approved')
-            ->where('address', 'like', "%{$city}%")
-            ->first();
-
-        // Fallback to any approved shop if none found in active city
-        if (!$assignedShop) {
-            $assignedShop = Shop::where('status', 'approved')->first();
-        }
-
         $prescription = Prescription::create([
             'user_id' => Auth::id(),
-            'shop_id' => $assignedShop ? $assignedShop->id : null,
+            'shop_id' => $request->shop_id,
             'image_path' => $imagePath,
             'patient_name' => $request->patient_name,
             'patient_age' => $request->patient_age,

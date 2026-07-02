@@ -96,6 +96,22 @@
         </div>
       </div>
 
+      <!-- Select Pharmacy Card -->
+      <div style="background:#fff; border-radius:20px; padding:18px; box-shadow:0 2px 14px rgba(0,0,0,0.04); border:1px solid #E5E7EB; margin-bottom:20px; display:flex; flex-direction:column; gap:12px;">
+        <h4 style="font-weight:900; font-size:13.5px; color:#1A1A1A; margin:0;">Select Pharmacy Store</h4>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          @foreach($shops as $index => $sh)
+            <label style="display:flex; align-items:center; gap:10px; background:{{ $index === 0 ? '#ECFDF5' : '#F8FAFC' }}; border:1.5px solid {{ $index === 0 ? '#00B29A' : '#E2E8F0' }}; border-radius:12px; padding:12px; cursor:pointer; transition:all 0.2s;" class="shop-option" id="shop-card-{{ $sh->id }}">
+              <input type="radio" name="shop_id" value="{{ $sh->id }}" style="margin-top:2px;" onclick="handleShopSelect({{ $sh->id }})" {{ $index === 0 ? 'checked' : '' }} required>
+              <div style="flex:1; font-size:12px; color:{{ $index === 0 ? '#065F46' : '#334155' }}; line-height:1.3;">
+                <strong style="color:#1A1A1A;">{{ $sh->name }}</strong>
+                <div style="font-size:10.5px; color:#666; margin-top:2px;">📍 {{ $sh->area }} • {{ date('h:i A', strtotime($sh->opens_at ?? '09:00')) }} - {{ date('h:i A', strtotime($sh->closes_at ?? '21:00')) }}</div>
+              </div>
+            </label>
+          @endforeach
+        </div>
+      </div>
+
       <!-- Details Card -->
       <div style="background:#fff; border-radius:20px; padding:18px; box-shadow:0 2px 14px rgba(0,0,0,0.04); border:1px solid #E5E7EB; margin-bottom:20px; display:flex; flex-direction:column; gap:14px;">
         <h4 style="font-weight:900; font-size:13.5px; color:#1A1A1A; margin:0;">Patient & Delivery Details</h4>
@@ -226,6 +242,23 @@
       textarea.value = radio.value;
       textareaWrapper.style.display = 'none';
       textarea.required = false;
+    }
+  }
+
+  function handleShopSelect(shopId) {
+    document.querySelectorAll('.shop-option').forEach(card => {
+      card.style.borderColor = '#E2E8F0';
+      card.style.background = '#F8FAFC';
+      const textDiv = card.querySelector('div');
+      if (textDiv) textDiv.style.color = '#334155';
+    });
+
+    const card = document.getElementById('shop-card-' + shopId);
+    if (card) {
+      card.style.borderColor = '#00B29A';
+      card.style.background = '#ECFDF5';
+      const textDiv = card.querySelector('div');
+      if (textDiv) textDiv.style.color = '#065F46';
     }
   }
 </script>
