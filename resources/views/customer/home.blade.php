@@ -32,21 +32,21 @@
   <div class="scroll" style="flex:1; padding-bottom:8px;">
     
     <!-- Stats Row -->
-    <div style="display:flex; gap:10px; margin-bottom:20px;">
-      <div class="stat-card">
-        <div style="font-size:18px; margin-bottom:2px;">🏪</div>
-        <div style="font-size:22px; font-weight:900; color:#1A3C8F;">{{ $shopsCount }}</div>
-        <div style="font-size:11px; color:#888; font-weight:600; margin-top:2px;">Medical Shops</div>
+    <div style="display:flex; gap:8px; margin-bottom:16px; padding:0 2px;">
+      <div style="flex:1; background:#fff; border-radius:12px; padding:8px 4px; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.04); border:1px solid #F0F4FF;">
+        <div style="font-size:14px; margin-bottom:1px;">🏪</div>
+        <div style="font-size:17px; font-weight:900; color:#1A3C8F; line-height:1.2;">{{ $shopsCount }}</div>
+        <div style="font-size:9.5px; color:#666; font-weight:700; margin-top:1px; white-space:nowrap;">Medical Shops</div>
       </div>
-      <div class="stat-card">
-        <div style="font-size:18px; margin-bottom:2px;">🟢</div>
-        <div style="font-size:22px; font-weight:900; color:#059669;">{{ $onlineShopsCount }}</div>
-        <div style="font-size:11px; color:#888; font-weight:600; margin-top:2px;">Online Now</div>
+      <div style="flex:1; background:#fff; border-radius:12px; padding:8px 4px; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.04); border:1px solid #F0F4FF;">
+        <div style="font-size:14px; margin-bottom:1px;">🟢</div>
+        <div style="font-size:17px; font-weight:900; color:#059669; line-height:1.2;">{{ $onlineShopsCount }}</div>
+        <div style="font-size:9.5px; color:#666; font-weight:700; margin-top:1px; white-space:nowrap;">Online Now</div>
       </div>
-      <div class="stat-card">
-        <div style="font-size:18px; margin-bottom:2px;">📍</div>
-        <div style="font-size:22px; font-weight:900; color:#D97706;">5km</div>
-        <div style="font-size:11px; color:#888; font-weight:600; margin-top:2px;">Coverage</div>
+      <div style="flex:1; background:#fff; border-radius:12px; padding:8px 4px; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.04); border:1px solid #F0F4FF;">
+        <div style="font-size:14px; margin-bottom:1px;">📍</div>
+        <div style="font-size:17px; font-weight:900; color:#D97706; line-height:1.2;">5km</div>
+        <div style="font-size:9.5px; color:#666; font-weight:700; margin-top:1px; white-space:nowrap;">Coverage</div>
       </div>
     </div>
 
