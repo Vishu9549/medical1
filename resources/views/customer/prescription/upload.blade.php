@@ -120,21 +120,32 @@
 
         <!-- Delivery Address -->
         <div>
-          <label class="form-label" style="font-size:11.5px; margin-bottom:4px; font-weight:700; display:block; color:#555;">Delivery Address</label>
-          <textarea name="delivery_address" class="form-input" style="padding:11px; height:60px; font-family:inherit; resize:none;" placeholder="Complete delivery address likhein" required>{{ Auth::user()->address ?? '' }}</textarea>
-
+          <label class="form-label" style="font-size:11.5px; margin-bottom:6px; font-weight:700; display:block; color:#555;">Delivery Address</label>
+          
           @if($pastAddresses->count() > 0)
-            <div style="margin-top:8px;">
-              <span style="font-size:10px; color:#888; font-weight:700;">Suggested Past Addresses:</span>
-              <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
-                @foreach($pastAddresses as $addr)
-                  <button type="button" onclick="selectAddress('{{ addslashes($addr) }}')" style="font-size:10px; background:#F3F4F6; border:1px solid #E5E7EB; border-radius:8px; padding:4px 8px; color:#555; cursor:pointer;">
-                    {{ Str::limit($addr, 25) }}
-                  </button>
-                @endforeach
-              </div>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
+              @foreach($pastAddresses as $index => $addr)
+                <label style="display:flex; align-items:flex-start; gap:10px; background:#F8FAFC; border:1.5px solid #E2E8F0; border-radius:12px; padding:12px; cursor:pointer; transition:all 0.2s;" class="address-option" id="addr-card-{{ $index }}">
+                  <input type="radio" name="selected_address_option" value="{{ $addr }}" style="margin-top:2px;" onclick="handleAddressSelect(this, '{{ $index }}')">
+                  <div style="flex:1; font-size:11.5px; color:#334155; line-height:1.4;">
+                    <strong>Delivery Address {{ $index + 1 }}:</strong>
+                    <div>{{ $addr }}</div>
+                  </div>
+                </label>
+              @endforeach
+
+              <label style="display:flex; align-items:center; gap:10px; background:#ECFDF5; border:1.5px solid #00B29A; border-radius:12px; padding:12px; cursor:pointer; transition:all 0.2s;" class="address-option" id="addr-card-new">
+                <input type="radio" name="selected_address_option" value="new" style="margin-top:2px;" onclick="handleAddressSelect(this, 'new')" checked>
+                <div style="flex:1; font-size:12.5px; color:#065F46; font-weight:800;">
+                  ➕ Enter New Address
+                </div>
+              </label>
             </div>
           @endif
+
+          <div id="new-address-wrapper">
+            <textarea name="delivery_address" id="delivery-address-textarea" class="form-input" style="padding:11px; height:60px; font-family:inherit; resize:none;" placeholder="Complete delivery address likhein" required>{{ Auth::user()->address ?? '' }}</textarea>
+          </div>
         </div>
 
         <!-- Doctor Instructions / Notes -->
@@ -177,8 +188,45 @@
     }
   }
 
-  function selectAddress(address) {
-    document.getElementsByName('delivery_address')[0].value = address;
+  function handleAddressSelect(radio, key) {
+    // Reset all options UI borders
+    document.querySelectorAll('.address-option').forEach(card => {
+      card.style.borderColor = '#E2E8F0';
+      card.style.background = '#F8FAFC';
+      // If child text exists, reset color
+      const textDiv = card.querySelector('div');
+      if (textDiv) textDiv.style.color = '#334155';
+    });
+
+    // Highlight selected card
+    const card = document.getElementById('addr-card-' + key);
+    if (card) {
+      if (key === 'new') {
+        card.style.borderColor = '#00B29A';
+        card.style.background = '#ECFDF5';
+        const textDiv = card.querySelector('div');
+        if (textDiv) textDiv.style.color = '#065F46';
+      } else {
+        card.style.borderColor = '#1E40AF';
+        card.style.background = '#EFF6FF';
+        const textDiv = card.querySelector('div');
+        if (textDiv) textDiv.style.color = '#1E40AF';
+      }
+    }
+
+    const textarea = document.getElementById('delivery-address-textarea');
+    const textareaWrapper = document.getElementById('new-address-wrapper');
+
+    if (radio.value === 'new') {
+      textarea.value = "{{ Auth::user()->address ?? '' }}";
+      textarea.placeholder = 'Complete delivery address likhein';
+      textareaWrapper.style.display = 'block';
+      textarea.required = true;
+    } else {
+      textarea.value = radio.value;
+      textareaWrapper.style.display = 'none';
+      textarea.required = false;
+    }
   }
 </script>
 @endsection
