@@ -13,14 +13,50 @@ class Medicine extends Model
         'emoji',
         'mrp',
         'price',
-        'images',
+        'product_id',
+        'marketer',
+        'composition',
+        'medicine_type',
+        'introduction',
+        'benefits',
+        'how_to_use',
+        'safety_advise',
+        'if_miss',
+        'packaging_detail',
+        'package',
+        'qty',
+        'product_form',
+        'prescription_required',
+        'fact_box',
+        'primary_use',
+        'storage',
+        'side_effect',
+        'alcohol_interaction',
+        'pregnancy_interaction',
+        'lactation_interaction',
+        'driving_interaction',
+        'kidney_interaction',
+        'liver_interaction',
+        'country_of_origin',
+        'q_a',
+        'how_it_works',
+        'drug_drug_interaction',
+        'marketer_details',
+        'image_urls',
     ];
 
     protected $casts = [
         'mrp' => 'float',
         'price' => 'float',
-        'images' => 'array',
     ];
+
+    public function getImagesAttribute()
+    {
+        if (!empty($this->image_urls)) {
+            return array_filter(array_map('trim', explode(',', $this->image_urls)));
+        }
+        return [];
+    }
 
     public function getGenericNameAttribute()
     {

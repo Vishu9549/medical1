@@ -4,17 +4,30 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\Medicine;
 
 class MedicineSeeder extends Seeder
 {
     public function run(): void
     {
-        $prefixes = ['Al', 'Ben', 'Cal', 'Dol', 'Ery', 'Flu', 'Glip', 'Hep', 'Ibu', 'Juv', 'Kof', 'Lip', 'Met', 'Neo', 'Ome', 'Pan', 'Qin', 'Ros', 'Sita', 'Tel', 'Uni', 'Val', 'Zol'];
-        $middles = ['a', 'o', 'i', 'e', 'u', 'as', 'in', 'ex', 'or', 'ap', 'ip', 'op', 'at'];
-        $suffixes = ['stat', 'nac', 'zole', 'cillin', 'pril', 'sartan', 'olol', 'press', 'phage', 'formin', 'tidine', 'fen', 'cef', 'mox', 'dopa', 'zine'];
-        $dosages = ['5mg', '10mg', '25mg', '50mg', '100mg', '250mg', '500mg', '650mg', '1g'];
-        
-        $categoriesData = [
+        // Disable foreign keys check to cleanly truncate and re-seed
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('medicines')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+        $csvPath = database_path('seeders/medicines.csv');
+        if (!file_exists($csvPath)) {
+            $this->command->error("CSV file not found at: $csvPath");
+            return;
+        }
+
+        $file = fopen($csvPath, 'r');
+        $headers = fgetcsv($file); // Read headers
+
+        // Map header indices to keys
+        $headerMap = array_flip($headers);
+
+        $categoriesEmojis = [
             'Fever' => '🌡️',
             'Antibiotic' => '💊',
             'Allergy' => '🤧',
@@ -25,65 +38,122 @@ class MedicineSeeder extends Seeder
             'Supplement' => '🍊',
             'Skin' => '🧴',
             'Eye' => '👁️',
-            'Dental' => '🦷'
+            'Dental' => '🦷',
+            'General' => '📦'
         ];
 
         $medsToInsert = [];
         $uniqueNames = [];
-        $counter = 1;
+        $idCounter = 1;
 
-        $coreMeds = [
-            ['id' => 1, 'name' => 'Paracetamol 500mg', 'category' => 'Fever', 'emoji' => '🌡️', 'mrp' => 32, 'price' => 25],
-            ['id' => 2, 'name' => 'Azithromycin 500mg', 'category' => 'Antibiotic', 'emoji' => '💊', 'mrp' => 120, 'price' => 95],
-            ['id' => 3, 'name' => 'Cetirizine 10mg', 'category' => 'Allergy', 'emoji' => '🤧', 'mrp' => 28, 'price' => 22],
-            ['id' => 4, 'name' => 'Omeprazole 20mg', 'category' => 'Acidity', 'emoji' => '🔵', 'mrp' => 45, 'price' => 36],
-            ['id' => 5, 'name' => 'Ibuprofen 400mg', 'category' => 'Pain', 'emoji' => '🩹', 'mrp' => 38, 'price' => 30],
-            ['id' => 6, 'name' => 'Dolo 650mg', 'category' => 'Fever', 'emoji' => '🌡️', 'mrp' => 30, 'price' => 24],
-            ['id' => 7, 'name' => 'Metformin 500mg', 'category' => 'Diabetes', 'emoji' => '💉', 'mrp' => 55, 'price' => 42],
-            ['id' => 8, 'name' => 'Amoxicillin 250mg', 'category' => 'Antibiotic', 'emoji' => '💊', 'mrp' => 85, 'price' => 68],
-            ['id' => 9, 'name' => 'Pantoprazole 40mg', 'category' => 'Acidity', 'emoji' => '🔵', 'mrp' => 60, 'price' => 48],
-            ['id' => 10, 'name' => 'Vitamin C 500mg', 'category' => 'Supplement', 'emoji' => '🍊', 'mrp' => 40, 'price' => 32],
-            ['id' => 11, 'name' => 'Atorvastatin 10mg', 'category' => 'Heart', 'emoji' => '❤️', 'mrp' => 95, 'price' => 76],
-            ['id' => 12, 'name' => 'Metronidazole 400mg', 'category' => 'Antibiotic', 'emoji' => '💊', 'mrp' => 42, 'price' => 34],
-        ];
+        while (($row = fgetcsv($file)) !== false) {
+            // Helper to get column safely
+            $getCol = function($name) use ($row, $headerMap) {
+                $idx = $headerMap[$name] ?? null;
+                return ($idx !== null && isset($row[$idx])) ? trim($row[$idx]) : '';
+            };
 
-        foreach ($coreMeds as $m) {
-            $uniqueNames[strtolower($m['name'])] = true;
-            $medsToInsert[] = array_merge($m, ['created_at' => now(), 'updated_at' => now()]);
-            $counter++;
-        }
-
-        while ($counter <= 5000) {
-            $cat = array_rand($categoriesData);
-            $emoji = $categoriesData[$cat];
-            
-            $name = $prefixes[array_rand($prefixes)] 
-                  . $middles[array_rand($middles)] 
-                  . $suffixes[array_rand($suffixes)] 
-                  . ' ' 
-                  . $dosages[array_rand($dosages)];
-
-            if (!isset($uniqueNames[strtolower($name)])) {
-                $uniqueNames[strtolower($name)] = true;
-                $mrp = rand(15, 500);
-                $price = round($mrp * (rand(70, 95) / 100));
-                
-                $medsToInsert[] = [
-                    'id' => $counter,
-                    'name' => $name,
-                    'category' => $cat,
-                    'emoji' => $emoji,
-                    'mrp' => $mrp,
-                    'price' => $price,
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ];
-                $counter++;
+            $name = $getCol('Product Name');
+            if (empty($name)) {
+                continue;
             }
+
+            // Skip duplicate names to prevent catalog pollution
+            $nameLower = strtolower($name);
+            if (isset($uniqueNames[$nameLower])) {
+                continue;
+            }
+            $uniqueNames[$nameLower] = true;
+
+            $composition = $getCol('Composition');
+            $primaryUse = $getCol('primary_use');
+            $prodForm = strtolower($getCol('Product Form'));
+            $mrp = (float) $getCol('MRP');
+            if ($mrp <= 0) {
+                $mrp = 99.00;
+            }
+            // Selling price is 20% off MRP by default
+            $price = round($mrp * 0.8, 2);
+
+            // Determine category
+            $category = 'General';
+            $compLower = strtolower($composition);
+            $useLower = strtolower($primaryUse);
+
+            if (strpos($compLower, 'paracetamol') !== false || strpos($compLower, 'acetaminophen') !== false) {
+                $category = 'Fever';
+            } elseif (strpos($compLower, 'aceclofenac') !== false || strpos($compLower, 'ibuprofen') !== false || strpos($compLower, 'diclofenac') !== false || strpos($compLower, 'tramadol') !== false || strpos($compLower, 'nimesulide') !== false || strpos($useLower, 'pain') !== false) {
+                $category = 'Pain';
+            } elseif (strpos($compLower, 'amoxicillin') !== false || strpos($compLower, 'azithromycin') !== false || strpos($compLower, 'cefi') !== false || strpos($compLower, 'cloxacillin') !== false || strpos($compLower, 'floxacin') !== false || strpos($compLower, 'clavulanate') !== false) {
+                $category = 'Antibiotic';
+            } elseif (strpos($compLower, 'cetirizine') !== false || strpos($compLower, 'levocetirizine') !== false || strpos($compLower, 'loratadine') !== false || strpos($compLower, 'montelukast') !== false || strpos($compLower, 'fexofenadine') !== false) {
+                $category = 'Allergy';
+            } elseif (strpos($compLower, 'pantoprazole') !== false || strpos($compLower, 'omeprazole') !== false || strpos($compLower, 'rabeprazole') !== false || strpos($compLower, 'ranitidine') !== false || strpos($compLower, 'domperidone') !== false) {
+                $category = 'Acidity';
+            } elseif (strpos($compLower, 'metformin') !== false || strpos($compLower, 'glimepiride') !== false || strpos($compLower, 'gliclazide') !== false || strpos($compLower, 'pioglitazone') !== false || strpos($compLower, 'insulin') !== false) {
+                $category = 'Diabetes';
+            } elseif (strpos($compLower, 'atorvastatin') !== false || strpos($compLower, 'telmisartan') !== false || strpos($compLower, 'amlodipine') !== false || strpos($compLower, 'losartan') !== false || strpos($compLower, 'metoprolol') !== false || strpos($compLower, 'rosuvastatin') !== false) {
+                $category = 'Heart';
+            } elseif (strpos($compLower, 'vitamin') !== false || strpos($compLower, 'calcium') !== false || strpos($compLower, 'zinc') !== false || strpos($compLower, 'multivitamin') !== false || strpos($compLower, 'iron') !== false) {
+                $category = 'Supplement';
+            } elseif (strpos($prodForm, 'cream') !== false || strpos($prodForm, 'gel') !== false || strpos($prodForm, 'ointment') !== false) {
+                $category = 'Skin';
+            } elseif (strpos($prodForm, 'eye drop') !== false || strpos($prodForm, 'eye/ear') !== false) {
+                $category = 'Eye';
+            }
+
+            $emoji = $categoriesEmojis[$category] ?? '📦';
+
+            $medsToInsert[] = [
+                'id' => $idCounter,
+                'name' => $name,
+                'category' => $category,
+                'emoji' => $emoji,
+                'mrp' => $mrp,
+                'price' => $price,
+                'product_id' => $getCol('Product ID'),
+                'marketer' => $getCol('Marketer'),
+                'composition' => $composition,
+                'medicine_type' => $getCol('medicine_type'),
+                'introduction' => $getCol('Introduction'),
+                'benefits' => $getCol('Benefits'),
+                'how_to_use' => $getCol('how_to_use'),
+                'safety_advise' => $getCol('safety_advise'),
+                'if_miss' => $getCol('if_miss'),
+                'packaging_detail' => $getCol('Packaging Detail'),
+                'package' => $getCol('Package'),
+                'qty' => $getCol('Qty'),
+                'product_form' => $getCol('Product Form'),
+                'prescription_required' => $getCol('prescription_required'),
+                'fact_box' => $getCol('Fact_Box'),
+                'primary_use' => $primaryUse,
+                'storage' => $getCol('storage'),
+                'side_effect' => $getCol('side_effect'),
+                'alcohol_interaction' => $getCol('alcoholInteraction'),
+                'pregnancy_interaction' => $getCol('pregnancyInteraction'),
+                'lactation_interaction' => $getCol('lactationInteraction'),
+                'driving_interaction' => $getCol('drivingInteraction'),
+                'kidney_interaction' => $getCol('kidneyInteraction'),
+                'liver_interaction' => $getCol('liverInteraction'),
+                'country_of_origin' => $getCol('country_of_origin'),
+                'q_a' => $getCol('Q_A'),
+                'how_it_works' => $getCol('How it works'),
+                'drug_drug_interaction' => $getCol('drug-drug Interaction'),
+                'marketer_details' => $getCol('Marketer details'),
+                'image_urls' => $getCol('Image_Urls'),
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+
+            $idCounter++;
+        }
+        fclose($file);
+
+        // Bulk insert in chunks of 200 items to prevent memory limits
+        foreach (array_chunk($medsToInsert, 200) as $chunk) {
+            DB::table('medicines')->insert($chunk);
         }
 
-        foreach (array_chunk($medsToInsert, 500) as $chunk) {
-            DB::table('medicines')->insertOrIgnore($chunk);
-        }
+        $this->command->info("Successfully seeded " . count($medsToInsert) . " detailed medicines from CSV!");
     }
 }
