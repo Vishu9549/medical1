@@ -33,20 +33,31 @@
         @php
           $qty = $cart[$med->id] ?? 0;
           $disc = $med->mrp > 0 ? round((($med->mrp - $med->price) / $med->mrp) * 100) : 0;
+          $detailUrl = url('/medicine/'.$med->id.(!empty(request('shop_id')) ? '?shop_id='.request('shop_id') : ''));
         @endphp
         <div class="cart-item-card" style="border: {{ $qty > 0 ? '2px solid #BFDBFE' : '2px solid transparent' }};">
-          <div style="width:52px; height:52px; border-radius:14px; background:{{ $qty > 0 ? '#EEF2FF' : '#F8FAFF' }}; display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0;">
-            {{ $med->emoji }}
-          </div>
-          <div style="flex:1;">
-            <div style="font-weight:800; font-size:13px; color:#1A1A1A; margin-bottom:2px;">{{ $med->name }}</div>
-            <div style="font-size:11px; color:#888; margin-bottom:4px;">{{ $med->category }}</div>
-            <div style="display:flex; gap:5px; align-items:center;">
-              <div style="font-size:14px; font-weight:900; color:#1A3C8F;">₹{{ $med->price }}</div>
-              <div style="font-size:11px; color:#aaa; text-decoration:line-through;">₹{{ $med->mrp }}</div>
-              <div style="background:#DCFCE7; color:#16A34A; font-size:9px; font-weight:800; padding:2px 6px; border-radius:5px;">{{ $disc }}% OFF</div>
+          <a href="{{ $detailUrl }}" style="display:flex; align-items:center; gap:12px; flex:1; text-decoration:none; text-align:left; color:inherit; overflow:hidden;">
+            <div style="width:52px; height:52px; border-radius:14px; background:{{ $qty > 0 ? '#EEF2FF' : '#F8FAFF' }}; display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0; overflow:hidden;">
+              @if(!empty($med->images))
+                @php
+                  $isMedAbsolute = strpos($med->images[0], 'http://') === 0 || strpos($med->images[0], 'https://') === 0;
+                  $medImgUrl = $isMedAbsolute ? $med->images[0] : asset($med->images[0]);
+                @endphp
+                <img src="{{ $medImgUrl }}" style="width:100%; height:100%; object-fit:contain;">
+              @else
+                {{ $med->emoji }}
+              @endif
             </div>
-          </div>
+            <div style="flex:1; overflow:hidden;">
+              <div style="font-weight:800; font-size:13px; color:#1A1A1A; margin-bottom:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ $med->name }}</div>
+              <div style="font-size:11px; color:#888; margin-bottom:4px;">{{ $med->category }}</div>
+              <div style="display:flex; gap:5px; align-items:center;">
+                <div style="font-size:14px; font-weight:900; color:#1A3C8F;">₹{{ $med->price }}</div>
+                <div style="font-size:11px; color:#aaa; text-decoration:line-through;">₹{{ $med->mrp }}</div>
+                <div style="background:#DCFCE7; color:#16A34A; font-size:9px; font-weight:800; padding:2px 6px; border-radius:5px;">{{ $disc }}% OFF</div>
+              </div>
+            </div>
+          </a>
           <div class="cart-controls" data-med-id="{{ $med->id }}">
             <!-- Add Button Form (visible when qty == 0) -->
             <form action="{{ url('/cart/add') }}" method="POST" class="cart-form add-form-el" style="{{ $qty == 0 ? 'display:block;' : 'display:none;' }}">

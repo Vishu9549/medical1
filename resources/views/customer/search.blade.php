@@ -62,7 +62,11 @@
           <div class="med-row" style="background:{{ $qty > 0 ? '#FAFBFF' : '#fff' }}; border: 1px solid #E5E7EB; border-radius: 14px; margin-bottom: 0;">
             <a href="{{ $detailUrl }}" class="med-img" style="overflow:hidden; position:relative; display:flex;">
               @if(!empty($med->images))
-                <img src="{{ asset($med->images[0]) }}" style="width:100%; height:100%; object-fit:cover;">
+                @php
+                  $isRelAbsolute = strpos($med->images[0], 'http://') === 0 || strpos($med->images[0], 'https://') === 0;
+                  $relImgUrl = $isRelAbsolute ? $med->images[0] : asset($med->images[0]);
+                @endphp
+                <img src="{{ $relImgUrl }}" style="width:100%; height:100%; object-fit:cover;">
               @else
                 <div>{{ $med->emoji }}</div>
               @endif
