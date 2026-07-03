@@ -15,21 +15,34 @@
   <div class="scroll" style="flex:1; padding:16px;">
     
     <!-- Image Gallery Carousel / Product Showcase -->
-    <div style="background:#fff; border-radius:24px; padding:16px; box-shadow:0 10px 30px rgba(0,0,0,0.05); margin-bottom:20px; display:flex; flex-direction:column; align-items:center; border:1px solid #E5E7EB; position:relative; overflow:hidden;">
+    <div style="background:#fff; border-radius:24px; padding:16px; box-shadow:0 10px 30px rgba(0,0,0,0.05); margin-bottom:20px; display:flex; flex-direction:column; align-items:center; border:1px solid #E5E7EB; position:relative; overflow:hidden; width:100%;">
       @if(!empty($medicine->images))
-        <div style="width:100%; height:220px; display:flex; overflow-x:auto; scroll-snap-type:x mandatory; gap:10px; border-radius:16px;" id="detail-carousel" class="hide-scrollbar">
-          @foreach($medicine->images as $img)
-            @php
-              $isAbsolute = strpos($img, 'http://') === 0 || strpos($img, 'https://') === 0;
-              $imgUrl = $isAbsolute ? $img : asset($img);
-            @endphp
-            <img src="{{ $imgUrl }}" style="width:100%; height:100%; object-fit:contain; flex-shrink:0; scroll-snap-align:start; border-radius:16px;" alt="{{ $medicine->name }}">
-          @endforeach
+        <div style="position:relative; width:100%; display:flex; align-items:center;">
+          <!-- Left Arrow -->
+          @if(count($medicine->images) > 1)
+            <button type="button" onclick="scrollCarousel(-1)" style="position:absolute; left:4px; z-index:10; background:rgba(255,255,255,0.85); border:1px solid #CBD5E1; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; box-shadow:0 2px 6px rgba(0,0,0,0.1); color:#1A3C8F; font-size:16px;">⟨</button>
+          @endif
+
+          <div style="width:100%; height:220px; display:flex; overflow-x:auto; scroll-snap-type:x mandatory; gap:10px; border-radius:16px; scroll-behavior:smooth;" id="detail-carousel" class="hide-scrollbar">
+            @foreach($medicine->images as $img)
+              @php
+                $isAbsolute = strpos($img, 'http://') === 0 || strpos($img, 'https://') === 0;
+                $imgUrl = $isAbsolute ? $img : asset($img);
+              @endphp
+              <img src="{{ $imgUrl }}" style="width:100%; height:100%; object-fit:contain; flex-shrink:0; scroll-snap-align:start; border-radius:16px;" alt="{{ $medicine->name }}">
+            @endforeach
+          </div>
+
+          <!-- Right Arrow -->
+          @if(count($medicine->images) > 1)
+            <button type="button" onclick="scrollCarousel(1)" style="position:absolute; right:4px; z-index:10; background:rgba(255,255,255,0.85); border:1px solid #CBD5E1; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; box-shadow:0 2px 6px rgba(0,0,0,0.1); color:#1A3C8F; font-size:16px;">⟩</button>
+          @endif
         </div>
+
         @if(count($medicine->images) > 1)
-          <div style="display:flex; gap:6px; margin-top:10px;">
+          <div style="display:flex; gap:6px; margin-top:10px;" id="carousel-dots">
             @foreach($medicine->images as $k => $img)
-              <span style="width:8px; height:8px; border-radius:50%; background:#1A3C8F; opacity:{{ $k == 0 ? '1' : '0.3' }};"></span>
+              <span style="width:8px; height:8px; border-radius:50%; background:#1A3C8F; opacity:{{ $k == 0 ? '1' : '0.3' }}; transition:opacity 0.2s;"></span>
             @endforeach
           </div>
         @endif
@@ -270,6 +283,28 @@
 </div>
 
 <script>
+  // Carousel swipe and indicator updates
+  const carousel = document.getElementById('detail-carousel');
+  const dotsContainer = document.getElementById('carousel-dots');
+  
+  if (carousel && dotsContainer) {
+    const dots = dotsContainer.querySelectorAll('span');
+    carousel.addEventListener('scroll', () => {
+      const index = Math.round(carousel.scrollLeft / carousel.offsetWidth);
+      dots.forEach((dot, idx) => {
+        dot.style.opacity = idx === index ? '1' : '0.3';
+      });
+    });
+  }
+
+  function scrollCarousel(direction) {
+    const carousel = document.getElementById('detail-carousel');
+    if (carousel) {
+      const offset = carousel.offsetWidth;
+      carousel.scrollLeft += direction * offset;
+    }
+  }
+
   // AJAX enhancement for premium experience
   document.querySelectorAll('.cart-form').forEach(form => {
     form.addEventListener('submit', function(e) {
