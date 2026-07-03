@@ -160,10 +160,30 @@
       @endif
 
       <!-- Safety Warnings -->
-      @if($medicine->safety_advise)
+      @if(!empty($medicine->parsed_safety_advise))
+        <div style="background:#FFFDF5; border-radius:16px; border:1px solid #FEF3C7; padding:16px; box-shadow:0 4px 12px rgba(0,0,0,0.02); display:flex; flex-direction:column; gap:12px;">
+          <h4 style="font-weight:900; font-size:14px; color:#B45309; margin:0;">🛡️ Safety Advice</h4>
+          @foreach($medicine->parsed_safety_advise as $advise)
+            <div style="background:#fff; border:1px solid #FDE68A; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:4px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+                <div style="font-weight:800; font-size:13px; color:#1A1A1A; display:flex; align-items:center; gap:6px;">
+                  <span>{{ $advise['icon'] }}</span>
+                  <span>{{ $advise['title'] }}</span>
+                </div>
+                <span style="font-size:10px; font-weight:800; padding:2px 8px; border-radius:6px; background:{{ strtolower($advise['status']) === 'safe' ? '#DCFCE7' : '#FEE2E2' }}; color:{{ strtolower($advise['status']) === 'safe' ? '#16A34A' : '#DC2626' }};">
+                  {{ $advise['status'] }}
+                </span>
+              </div>
+              @if($advise['description'])
+                <p style="font-size:12px; color:#555; line-height:1.4; margin:2px 0 0 0;">{{ $advise['description'] }}</p>
+              @endif
+            </div>
+          @endforeach
+        </div>
+      @elseif($medicine->safety_advise)
         <div style="background:#FFFDF5; border-radius:16px; border:1px solid #FEF3C7; padding:16px; box-shadow:0 4px 12px rgba(0,0,0,0.02);">
           <h4 style="font-weight:900; font-size:14px; color:#B45309; margin:0 0 8px 0;">🛡️ Safety Advice</h4>
-          <p style="font-size:13px; color:#92400E; line-height:1.6; margin:0; white-space:pre-line;">{{ $medicine->safety_advise }}</p>
+          <p style="font-size:13px; color:#92400E; line-height:1.6; margin:0; white-space:pre-line;">{{ strip_tags($medicine->safety_advise) }}</p>
         </div>
       @endif
 
@@ -171,61 +191,31 @@
       @if($medicine->fact_box)
         <div style="background:#F9FAFB; border-radius:16px; border:1px solid #E5E7EB; padding:16px; box-shadow:0 4px 12px rgba(0,0,0,0.02);">
           <h4 style="font-weight:900; font-size:14px; color:#4B5563; margin:0 0 8px 0;">📊 Quick Info Fact Box</h4>
-          <p style="font-size:12px; color:#374151; line-height:1.5; margin:0; white-space:pre-line; background:#fff; padding:12px; border-radius:10px; border:1px solid #E5E7EB;">{{ $medicine->fact_box }}</p>
-        </div>
-      @endif
-
-      <!-- Interaction Details -->
-      @if($medicine->alcohol_interaction || $medicine->pregnancy_interaction || $medicine->lactation_interaction || $medicine->driving_interaction || $medicine->kidney_interaction || $medicine->liver_interaction)
-        <div style="background:#fff; border-radius:16px; border:1px solid #E5E7EB; padding:16px; box-shadow:0 4px 12px rgba(0,0,0,0.02);">
-          <h4 style="font-weight:900; font-size:14px; color:#1A3C8F; margin:0 0 12px 0;">🤝 General Interaction Warnings</h4>
-          
-          <div style="display:flex; flex-direction:column; gap:10px; font-size:12.5px; color:#4B5563;">
-            @if($medicine->alcohol_interaction)
-              <div style="border-bottom: 1px solid #F3F4F6; padding-bottom: 8px;">
-                <strong style="color:#1A1A1A;">🍺 Alcohol Interaction:</strong>
-                <p style="margin:2px 0 0 0; font-size:12px; color:#6B7280;">{{ $medicine->alcohol_interaction }}</p>
-              </div>
-            @endif
-            @if($medicine->pregnancy_interaction)
-              <div style="border-bottom: 1px solid #F3F4F6; padding-bottom: 8px;">
-                <strong style="color:#1A1A1A;">🤰 Pregnancy Interaction:</strong>
-                <p style="margin:2px 0 0 0; font-size:12px; color:#6B7280;">{{ $medicine->pregnancy_interaction }}</p>
-              </div>
-            @endif
-            @if($medicine->lactation_interaction)
-              <div style="border-bottom: 1px solid #F3F4F6; padding-bottom: 8px;">
-                <strong style="color:#1A1A1A;">🤱 Lactation/Breastfeeding:</strong>
-                <p style="margin:2px 0 0 0; font-size:12px; color:#6B7280;">{{ $medicine->lactation_interaction }}</p>
-              </div>
-            @endif
-            @if($medicine->driving_interaction)
-              <div style="border-bottom: 1px solid #F3F4F6; padding-bottom: 8px;">
-                <strong style="color:#1A1A1A;">🚗 Driving Interaction:</strong>
-                <p style="margin:2px 0 0 0; font-size:12px; color:#6B7280;">{{ $medicine->driving_interaction }}</p>
-              </div>
-            @endif
-            @if($medicine->kidney_interaction)
-              <div style="border-bottom: 1px solid #F3F4F6; padding-bottom: 8px;">
-                <strong style="color:#1A1A1A;">🔬 Kidney Interaction:</strong>
-                <p style="margin:2px 0 0 0; font-size:12px; color:#6B7280;">{{ $medicine->kidney_interaction }}</p>
-              </div>
-            @endif
-            @if($medicine->liver_interaction)
-              <div>
-                <strong style="color:#1A1A1A;">🧪 Liver Interaction:</strong>
-                <p style="margin:2px 0 0 0; font-size:12px; color:#6B7280;">{{ $medicine->liver_interaction }}</p>
-              </div>
-            @endif
-          </div>
+          <p style="font-size:12px; color:#374151; line-height:1.5; margin:0; white-space:pre-line; background:#fff; padding:12px; border-radius:10px; border:1px solid #E5E7EB;">{{ strip_tags($medicine->fact_box) }}</p>
         </div>
       @endif
 
       <!-- Q&A Section -->
-      @if($medicine->q_a)
+      @if(!empty($medicine->parsed_qa))
+        <div style="background:#fff; border-radius:16px; border:1px solid #E5E7EB; padding:16px; box-shadow:0 4px 12px rgba(0,0,0,0.02); display:flex; flex-direction:column; gap:10px;">
+          <h4 style="font-weight:900; font-size:14px; color:#1A3C8F; margin:0 0 4px 0;">❓ Frequently Asked Questions (Q&A)</h4>
+          @foreach($medicine->parsed_qa as $k => $qa)
+            <div style="border-bottom:{{ $loop->last ? 'none' : '1px solid #F3F4F6' }}; padding:10px 0;">
+              <div style="font-weight:800; font-size:13px; color:#1A1A1A; margin-bottom:4px; display:flex; gap:6px; align-items:flex-start;">
+                <span style="color:#1A3C8F; font-weight:900;">Q.</span>
+                <span style="text-align:left;">{{ $qa['question'] }}</span>
+              </div>
+              <div style="font-size:12.5px; color:#4B5563; line-height:1.5; padding-left:16px; display:flex; gap:6px; align-items:flex-start;">
+                <span style="color:#10B981; font-weight:900;">A.</span>
+                <span style="text-align:left;">{{ $qa['answer'] }}</span>
+              </div>
+            </div>
+          @endforeach
+        </div>
+      @elseif($medicine->q_a)
         <div style="background:#fff; border-radius:16px; border:1px solid #E5E7EB; padding:16px; box-shadow:0 4px 12px rgba(0,0,0,0.02);">
           <h4 style="font-weight:900; font-size:14px; color:#1A3C8F; margin:0 0 10px 0;">❓ Frequently Asked Questions (Q&A)</h4>
-          <p style="font-size:12.5px; color:#4B5563; line-height:1.6; margin:0; white-space:pre-line;">{{ $medicine->q_a }}</p>
+          <p style="font-size:12.5px; color:#4B5563; line-height:1.6; margin:0; white-space:pre-line;">{{ strip_tags($medicine->q_a) }}</p>
         </div>
       @endif
 
