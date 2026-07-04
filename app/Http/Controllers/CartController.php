@@ -28,7 +28,8 @@ class CartController extends Controller
                 'emoji' => $med->emoji,
                 'price' => (float)$med->price,
                 'mrp' => (float)$med->mrp,
-                'disc' => $disc
+                'disc' => $disc,
+                'images' => $med->images
             ];
         });
 
