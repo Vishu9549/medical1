@@ -29,12 +29,24 @@ class ShopController extends Controller
             'area' => 'required|string',
             'address' => 'required|string',
             'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric'
+            'longitude' => 'required|numeric',
+            'opens_at' => 'required|string',
+            'closes_at' => 'required|string',
+            'delivery_enabled' => 'nullable',
+            'delivery_charge_type' => 'required|string|in:fixed,dynamic',
+            'delivery_charge_rate' => 'nullable|numeric|min:0'
         ]);
 
         if (!Auth::check()) {
             return redirect('/login')->with('error', 'Pehle account login karein.');
         }
+
+        $deliveryEnabled = $request->has('delivery_enabled');
+        $chargeType = $request->delivery_charge_type;
+        $rate = (float)($request->delivery_charge_rate ?? 0.00);
+
+        $fixedCharge = ($chargeType === 'fixed') ? $rate : 0.00;
+        $perKmCharge = ($chargeType === 'dynamic') ? $rate : 0.00;
 
         $shop = Shop::create([
             'name' => $request->name,
@@ -46,12 +58,17 @@ class ShopController extends Controller
             'reviews' => 0,
             'distance_km' => round(rand(5, 45) / 10, 1),
             'is_top' => false,
-            'delivery_enabled' => false,
+            'delivery_enabled' => $deliveryEnabled,
             'is_online' => true,
             'status' => 'approved', // Automatically approve for demo purposes
             'user_id' => Auth::id(),
             'latitude' => $request->latitude,
-            'longitude' => $request->longitude
+            'longitude' => $request->longitude,
+            'opens_at' => $request->opens_at,
+            'closes_at' => $request->closes_at,
+            'delivery_charge_type' => $chargeType,
+            'delivery_charge_fixed' => $fixedCharge,
+            'delivery_charge_per_km' => $perKmCharge,
         ]);
 
         // Create wallet
