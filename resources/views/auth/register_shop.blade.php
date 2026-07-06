@@ -114,6 +114,17 @@
 
           <div style="display:flex; gap:10px; margin-bottom:12px;">
             <div style="flex:1;">
+              <label class="form-label">Opening Time</label>
+              <input type="time" name="opens_at" class="form-input" value="{{ old('opens_at', '09:00') }}" required>
+            </div>
+            <div style="flex:1;">
+              <label class="form-label">Closing Time</label>
+              <input type="time" name="closes_at" class="form-input" value="{{ old('closes_at', '21:00') }}" required>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-bottom:12px;">
+            <div style="flex:1;">
               <label class="form-label">Latitude</label>
               <input type="number" step="any" name="latitude" id="lat-input" class="form-input" placeholder="26.1209" value="{{ old('latitude', '26.1209') }}" required>
             </div>

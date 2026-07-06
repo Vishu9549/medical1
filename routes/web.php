@@ -62,6 +62,7 @@ Route::middleware(['auth', 'role.shop_owner'])->group(function () {
     Route::delete('/shop/inventory/delete/{id}', [ShopController::class, 'inventoryDelete']);
     Route::get('/shop/orders', [ShopController::class, 'ordersIndex']);
     Route::post('/shop/order/status', [ShopController::class, 'ordersUpdate']);
+    Route::get('/shop/settings', [ShopController::class, 'settingsIndex']);
     Route::post('/shop/update-timings', [ShopController::class, 'updateTimings']);
     Route::post('/shop/update-delivery-settings', [ShopController::class, 'updateDeliverySettings']);
     Route::post('/shop/prescription/status', [PrescriptionController::class, 'updateStatus']);

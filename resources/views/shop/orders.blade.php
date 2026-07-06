@@ -21,14 +21,14 @@
     <a href="{{ url('/shop/dashboard') }}" class="dash-tab" style="background:#F3F4F6; color:#888; flex:1;">
       <span style="font-size:16px;">📊</span>Overview
     </a>
-    <a href="{{ url('/shop/quicksetup') }}" class="dash-tab" style="background:#F3F4F6; color:#888; flex:1;">
-      <span style="font-size:16px;">⚡</span>Quick Setup
-    </a>
     <a href="{{ url('/shop/inventory') }}" class="dash-tab" style="background:#F3F4F6; color:#888; flex:1;">
       <span style="font-size:16px;">📦</span>Inventory
     </a>
     <a href="{{ url('/shop/orders') }}" class="dash-tab active" style="background:#1A3C8F; color:#fff; flex:1; box-shadow: 0 4px 12px rgba(37,99,235,0.3);">
       <span style="font-size:16px;">📋</span>Orders
+    </a>
+    <a href="{{ url('/shop/settings') }}" class="dash-tab" style="background:#F3F4F6; color:#888; flex:1;">
+      <span style="font-size:16px;">⚙️</span>Settings
     </a>
   </div>
 

@@ -335,4 +335,16 @@ class ShopController extends Controller
 
         return redirect()->back()->with('success', 'Delivery and Offer settings updated successfully!');
     }
+
+    public function settingsIndex()
+    {
+        $shop = $this->getActiveShop();
+        if (!$shop) {
+            return redirect('/profile')->with('error', 'Pehle store register karein!');
+        }
+
+        $wallet = Wallet::where('shop_id', $shop->id)->first();
+
+        return view('shop.settings', compact('shop', 'wallet'));
+    }
 }

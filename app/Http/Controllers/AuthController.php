@@ -95,6 +95,8 @@ class AuthController extends Controller
             'address' => 'required|string|max:1000',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
+            'opens_at' => 'required|string',
+            'closes_at' => 'required|string',
         ]);
 
         \Illuminate\Support\Facades\DB::transaction(function() use ($request) {
@@ -122,6 +124,8 @@ class AuthController extends Controller
                 'user_id' => $user->id,
                 'latitude' => $request->latitude,
                 'longitude' => $request->longitude,
+                'opens_at' => $request->opens_at,
+                'closes_at' => $request->closes_at,
             ]);
 
             \App\Models\Wallet::create([
