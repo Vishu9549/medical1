@@ -18,6 +18,8 @@ Route::get('/set-location', [HomeController::class, 'setLocation']);
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
+Route::post('/forgot-password', [AuthController::class, 'resetPassword'])->name('password.update');
 Route::get('/register', [AuthController::class, 'showRegister']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/register/shop', [AuthController::class, 'showShopRegister']);

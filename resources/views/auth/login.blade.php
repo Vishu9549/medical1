@@ -24,7 +24,10 @@
         <input type="email" name="email" class="form-input" placeholder="name@example.com" value="{{ old('email') }}" required>
       </div>
       <div style="margin-bottom:16px;">
-        <label class="form-label">Password</label>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <label class="form-label" style="margin-bottom:0;">Password</label>
+          <a href="{{ url('/forgot-password') }}" style="color:#2563EB; font-size:11.5px; font-weight:700; text-decoration:none;">Forgot Password?</a>
+        </div>
         <input type="password" name="password" class="form-input" placeholder="••••••" required>
       </div>
       <button type="submit" class="btn-blue" style="width:100%; border:none; padding:14px; border-radius:12px; font-weight:800; font-size:15px; color:#fff;">

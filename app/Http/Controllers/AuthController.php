@@ -136,6 +136,39 @@ class AuthController extends Controller
         return redirect('/shop/dashboard')->with('success', 'Pharmacy registered successfully!');
     }
 
+    public function showForgotPassword()
+    {
+        if (Auth::check()) {
+            return redirect('/');
+        }
+        return view('auth.forgot_password');
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'phone' => 'required|string',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $user = User::where('email', $request->email)
+                    ->where('phone', $request->phone)
+                    ->first();
+
+        if (!$user) {
+            return back()->withErrors([
+                'email' => 'The provided email and phone number combination does not match our records.',
+            ])->withInput($request->only('email', 'phone'));
+        }
+
+        $user->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        return redirect('/login')->with('success', 'Password reset successfully! Please login with your new password.');
+    }
+
     public function logout(Request $request)
     {
         Auth::logout();
