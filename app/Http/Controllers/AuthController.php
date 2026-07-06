@@ -6,6 +6,10 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use App\Mail\ResetPasswordMail;
 
 class AuthController extends Controller
 {
@@ -144,27 +148,70 @@ class AuthController extends Controller
         return view('auth.forgot_password');
     }
 
+    public function sendResetLink(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        $token = Str::random(60);
+
+        // Delete any existing tokens for this user
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        // Insert new token (save plain text token for simple verification)
+        DB::table('password_reset_tokens')->insert([
+            'email' => $request->email,
+            'token' => $token,
+            'created_at' => now(),
+        ]);
+
+        try {
+            Mail::to($request->email)->send(new ResetPasswordMail($token, $request->email));
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'email' => 'Could not send recovery email. Please check your SMTP mail server settings: ' . $e->getMessage(),
+            ]);
+        }
+
+        return back()->with('status', 'We have emailed your password reset link!');
+    }
+
+    public function showResetForm(Request $request, $token)
+    {
+        if (Auth::check()) {
+            return redirect('/');
+        }
+        return view('auth.reset_password', compact('token'));
+    }
+
     public function resetPassword(Request $request)
     {
         $request->validate([
             'email' => 'required|email|exists:users,email',
-            'phone' => 'required|string',
+            'token' => 'required|string',
             'password' => 'required|string|min:6|confirmed',
         ]);
 
-        $user = User::where('email', $request->email)
-                    ->where('phone', $request->phone)
+        $record = DB::table('password_reset_tokens')
+                    ->where('email', $request->email)
+                    ->where('token', $request->token)
                     ->first();
 
-        if (!$user) {
+        if (!$record) {
             return back()->withErrors([
-                'email' => 'The provided email and phone number combination does not match our records.',
-            ])->withInput($request->only('email', 'phone'));
+                'email' => 'This password reset link is invalid or has expired.',
+            ]);
         }
 
+        // Token is valid, update user's password
+        $user = User::where('email', $request->email)->first();
         $user->update([
             'password' => Hash::make($request->password)
         ]);
+
+        // Clean up token
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
         return redirect('/login')->with('success', 'Password reset successfully! Please login with your new password.');
     }

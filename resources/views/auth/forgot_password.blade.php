@@ -6,7 +6,7 @@
     <div style="text-align:center; margin-bottom:20px;">
       <div style="font-size:32px; margin-bottom:10px;">🔒</div>
       <h2 style="font-weight:900; font-size:18px; color:#1A1A1A;">Reset Password</h2>
-      <p style="font-size:12px; color:#888; margin-top:4px;">Enter registered email and phone number to reset password instantly.</p>
+      <p style="font-size:12px; color:#888; margin-top:4px;">Put your registered email address and we'll send you a password reset link.</p>
     </div>
 
     @if($errors->any())
@@ -17,26 +17,20 @@
       </div>
     @endif
 
+    @if(session('status'))
+      <div style="background:#ECFDF5; border:1px solid #A7F3D0; border-radius:10px; padding:10px 12px; font-size:12px; color:#059669; margin-bottom:12px;">
+        ✅ {{ session('status') }}
+      </div>
+    @endif
+
     <form action="{{ url('/forgot-password') }}" method="POST">
       @csrf
-      <div style="margin-bottom:12px;">
-        <label class="form-label">Registered Email</label>
+      <div style="margin-bottom:16px;">
+        <label class="form-label">Email Address</label>
         <input type="email" name="email" class="form-input" placeholder="name@example.com" value="{{ old('email') }}" required>
       </div>
-      <div style="margin-bottom:12px;">
-        <label class="form-label">Registered Phone Number</label>
-        <input type="text" name="phone" class="form-input" placeholder="e.g. 9876543210" value="{{ old('phone') }}" required>
-      </div>
-      <div style="margin-bottom:12px;">
-        <label class="form-label">New Password</label>
-        <input type="password" name="password" class="form-input" placeholder="Min 6 characters" required>
-      </div>
-      <div style="margin-bottom:16px;">
-        <label class="form-label">Confirm New Password</label>
-        <input type="password" name="password_confirmation" class="form-input" placeholder="Confirm new password" required>
-      </div>
       <button type="submit" class="btn-blue" style="width:100%; border:none; padding:14px; border-radius:12px; font-weight:800; font-size:15px; color:#fff;">
-        Reset Password
+        Send Reset Link
       </button>
     </form>
 
