@@ -210,11 +210,9 @@
         function toggleProfileDeliverySection(checked) {
           const container = document.getElementById('profile-delivery-charges-container');
           if (checked) {
-            container.style.opacity = '1';
-            container.style.pointerEvents = 'auto';
+            container.style.display = 'block';
           } else {
-            container.style.opacity = '0.5';
-            container.style.pointerEvents = 'none';
+            container.style.display = 'none';
           }
         }
 
