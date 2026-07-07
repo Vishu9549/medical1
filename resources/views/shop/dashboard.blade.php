@@ -86,6 +86,9 @@
     <a href="{{ url('/shop/dashboard') }}" class="dash-tab {{ Request::is('shop/dashboard') ? 'active' : '' }}" style="background:#1A3C8F; color:#fff; flex:1; box-shadow: 0 4px 12px rgba(37,99,235,0.3);">
       <span style="font-size:16px;">📊</span>Overview
     </a>
+    <a href="{{ url('/shop/quicksetup') }}" class="dash-tab" style="background:#F3F4F6; color:#888; flex:1;">
+      <span style="font-size:16px;">⚡</span>Quick Setup
+    </a>
     <a href="{{ url('/shop/inventory') }}" class="dash-tab" style="background:#F3F4F6; color:#888; flex:1;">
       <span style="font-size:16px;">📦</span>Inventory
     </a>
@@ -100,6 +103,18 @@
   <!-- Content scroll pane -->
   <div class="scroll" style="flex:1;">
     <div class="responsive-grid">
+
+      @if($inventoryCount === 0)
+        <a href="{{ url('/shop/quicksetup') }}" style="text-decoration:none; margin:0; grid-column: 1 / -1;">
+          <div style="background:linear-gradient(135deg,#7C3AED,#A855F7); border-radius:18px; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 16px rgba(124,58,237,0.3);">
+            <div>
+              <div style="color:#fff; font-weight:900; font-size:14px; margin-bottom:3px;">⚡ Quick Setup se shuru karein</div>
+              <div style="color:rgba(255,255,255,0.85); font-size:12px;">Bas tick karo — 2 min mein ready</div>
+            </div>
+            <div style="color:#fff; font-size:22px;">→</div>
+          </div>
+        </a>
+      @endif
 
       <!-- Welcome Banner -->
       <div style="background:linear-gradient(135deg,#EEF2FF,#F8FAFF); border-radius:20px; padding:18px; box-shadow:0 4px 20px rgba(37,99,235,0.08); border:1px solid #E0E7FF; margin:0; grid-column: 1 / -1;">
