@@ -10,7 +10,7 @@ class InventorySeeder extends Seeder
     public function run(): void
     {
         $allShops = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        $medicines = DB::table('medicines')->select('id', 'price')->get();
+        $medicines = DB::table('medicines')->select('id', 'price')->limit(15)->get();
 
         $invToInsert = [];
         foreach ($allShops as $shopId) {
