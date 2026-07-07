@@ -105,8 +105,16 @@
             </div>
 
             <!-- Medicine Icon & Details -->
-            <div style="width:48px; height:48px; border-radius:12px; flex-shrink:0; background:#F8FAFF; display:flex; align-items:center; justify-content:center; font-size:24px;">
-              {{ $med->emoji }}
+            <div style="width:48px; height:48px; border-radius:12px; flex-shrink:0; background:#F8FAFF; display:flex; align-items:center; justify-content:center; font-size:24px; overflow:hidden;">
+              @if(!empty($med->images))
+                @php
+                  $img = $med->images[0];
+                  $src = (str_starts_with($img, 'http://') || str_starts_with($img, 'https://')) ? $img : asset($img);
+                @endphp
+                <img src="{{ $src }}" style="width:100%; height:100%; object-fit:cover;">
+              @else
+                {{ $med->emoji }}
+              @endif
             </div>
             
             <div style="flex:1; min-width:0;">
