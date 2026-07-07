@@ -123,6 +123,48 @@
             </div>
           </div>
 
+          <!-- Home Delivery Toggle -->
+          <div style="background:#F8FAFF; border:1px solid #E0E7FF; border-radius:14px; padding:14px; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <div style="font-weight:800; font-size:13px; color:#1A1A1A; display:flex; align-items:center; gap:6px;">
+                🛵 Home Delivery
+              </div>
+              <div style="font-size:11px; color:#666; margin-top:2px;">Pickup + Delivery dono available</div>
+            </div>
+            <label class="switch-container" style="position:relative; display:inline-block; width:44px; height:24px;">
+              <input type="checkbox" name="delivery_enabled" value="1" checked style="opacity:0; width:0; height:0;" onchange="toggleRegDeliverySection(this.checked)">
+              <span class="switch-slider" style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#10B981; transition:.4s; border-radius:24px;"></span>
+            </label>
+          </div>
+
+          <!-- Delivery Charge Options Container -->
+          <div id="reg-delivery-charges-container" style="background:#F9FAFB; border:1px solid #E5E7EB; border-radius:14px; padding:14px; margin-bottom:14px;">
+            <div style="font-weight:800; font-size:13px; color:#1A1A1A; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+              💰 Delivery Charge
+            </div>
+            <div style="font-size:11px; color:#666; margin-bottom:12px;">Aap decide karein customer se kitna delivery charge lena hai</div>
+
+            <!-- Buttons Selector -->
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+              <button type="button" id="reg-btn-del-free" onclick="setRegDeliveryType('free')" style="flex:1; padding:8px; border:1.5px solid #CBD5E1; background:#fff; border-radius:10px; font-weight:700; font-size:12px; color:#475569; cursor:pointer; outline:none;">🎁 Free</button>
+              <button type="button" id="reg-btn-del-perkm" onclick="setRegDeliveryType('perkm')" style="flex:1; padding:8px; border:2px solid #1A3C8F; background:#EFF6FF; border-radius:10px; font-weight:700; font-size:12px; color:#1A3C8F; cursor:pointer; outline:none;">🖊️ Per KM</button>
+              <button type="button" id="reg-btn-del-fixed" onclick="setRegDeliveryType('fixed')" style="flex:1; padding:8px; border:1.5px solid #CBD5E1; background:#fff; border-radius:10px; font-weight:700; font-size:12px; color:#475569; cursor:pointer; outline:none;">📦 Fixed</button>
+            </div>
+
+            <!-- Value Input -->
+            <input type="hidden" name="delivery_charge_type" id="reg-del-type" value="dynamic">
+            
+            <div id="reg-del-rate-wrapper">
+              <label class="form-label" id="reg-del-rate-label" style="font-size:11.5px; font-weight:700; color:#555; margin-bottom:4px; display:block;">Rate per KM (₹)</label>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-weight:800; color:#1A1A1A; font-size:14px;">₹</span>
+                <input type="number" step="0.5" name="delivery_charge_rate" id="reg-del-rate-input" class="form-input" style="flex:1; padding:8px 10px; font-size:13px;" value="8">
+                <span style="font-size:12px; color:#666;" id="reg-del-rate-suffix">/ km</span>
+              </div>
+              <div style="font-size:11px; color:#888; margin-top:6px;" id="reg-del-example">Example: 3 km &times; ₹8 = ₹24 delivery charge</div>
+            </div>
+          </div>
+
           <div style="display:flex; gap:10px; margin-bottom:12px;">
             <div style="flex:1;">
               <label class="form-label">Latitude</label>
@@ -285,5 +327,82 @@ document.addEventListener('click', function(e) {
     document.getElementById('search-results').style.display = 'none';
   }
 });
+
+function toggleRegDeliverySection(checked) {
+  const container = document.getElementById('reg-delivery-charges-container');
+  if (checked) {
+    container.style.display = 'block';
+  } else {
+    container.style.display = 'none';
+  }
+}
+
+function setRegDeliveryType(type) {
+  const btnFree = document.getElementById('reg-btn-del-free');
+  const btnPerKm = document.getElementById('reg-btn-del-perkm');
+  const btnFixed = document.getElementById('reg-btn-del-fixed');
+  const typeInput = document.getElementById('reg-del-type');
+  const rateWrapper = document.getElementById('reg-del-rate-wrapper');
+  const rateLabel = document.getElementById('reg-del-rate-label');
+  const rateInput = document.getElementById('reg-del-rate-input');
+  const rateSuffix = document.getElementById('reg-del-rate-suffix');
+  const rateExample = document.getElementById('reg-del-example');
+
+  // Reset styles
+  [btnFree, btnPerKm, btnFixed].forEach(btn => {
+    btn.style.border = '1.5px solid #CBD5E1';
+    btn.style.background = '#fff';
+    btn.style.color = '#475569';
+  });
+
+  if (type === 'free') {
+    btnFree.style.border = '2px solid #1A3C8F';
+    btnFree.style.background = '#EFF6FF';
+    btnFree.style.color = '#1A3C8F';
+    typeInput.value = 'fixed';
+    rateWrapper.style.display = 'none';
+    rateInput.value = '0';
+  } else if (type === 'perkm') {
+    btnPerKm.style.border = '2px solid #1A3C8F';
+    btnPerKm.style.background = '#EFF6FF';
+    btnPerKm.style.color = '#1A3C8F';
+    typeInput.value = 'dynamic';
+    rateWrapper.style.display = 'block';
+    rateLabel.innerText = 'Rate per KM (₹)';
+    rateInput.value = '8';
+    rateSuffix.innerText = '/ km';
+    rateExample.innerText = 'Example: 3 km × ₹8 = ₹24 delivery charge';
+  } else if (type === 'fixed') {
+    btnFixed.style.border = '2px solid #1A3C8F';
+    btnFixed.style.background = '#EFF6FF';
+    btnFixed.style.color = '#1A3C8F';
+    typeInput.value = 'fixed';
+    rateWrapper.style.display = 'block';
+    rateLabel.innerText = 'Fixed Delivery Charge (₹)';
+    rateInput.value = '20';
+    rateSuffix.innerText = 'flat';
+    rateExample.innerText = 'Flat rate applies regardless of distance.';
+  }
+}
 </script>
+
+<style>
+  .switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+  }
+  input:checked + .switch-slider {
+    background-color: #1A3C8F;
+  }
+  input:checked + .switch-slider:before {
+    transform: translateX(20px);
+  }
+</style>
 @endsection

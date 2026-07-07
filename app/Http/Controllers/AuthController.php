@@ -97,6 +97,9 @@ class AuthController extends Controller
             'longitude' => 'required|numeric',
             'opens_at' => 'required|string',
             'closes_at' => 'required|string',
+            'delivery_enabled' => 'nullable',
+            'delivery_charge_type' => 'required|string|in:fixed,dynamic',
+            'delivery_charge_rate' => 'nullable|numeric|min:0'
         ]);
 
         \Illuminate\Support\Facades\DB::transaction(function() use ($request) {
@@ -108,6 +111,13 @@ class AuthController extends Controller
                 'role' => 'shop_owner',
             ]);
 
+            $deliveryEnabled = $request->has('delivery_enabled');
+            $chargeType = $request->delivery_charge_type;
+            $rate = (float)($request->delivery_charge_rate ?? 0.00);
+
+            $fixedCharge = ($chargeType === 'fixed') ? $rate : 0.00;
+            $perKmCharge = ($chargeType === 'dynamic') ? $rate : 0.00;
+
             $shop = \App\Models\Shop::create([
                 'name' => $request->shop_name,
                 'owner_name' => $request->name,
@@ -118,7 +128,7 @@ class AuthController extends Controller
                 'reviews' => 0,
                 'distance_km' => round(rand(5, 45) / 10, 1),
                 'is_top' => false,
-                'delivery_enabled' => true,
+                'delivery_enabled' => $deliveryEnabled,
                 'is_online' => true,
                 'status' => 'approved',
                 'user_id' => $user->id,
@@ -126,6 +136,9 @@ class AuthController extends Controller
                 'longitude' => $request->longitude,
                 'opens_at' => $request->opens_at,
                 'closes_at' => $request->closes_at,
+                'delivery_charge_type' => $chargeType,
+                'delivery_charge_fixed' => $fixedCharge,
+                'delivery_charge_per_km' => $perKmCharge,
             ]);
 
             \App\Models\Wallet::create([
