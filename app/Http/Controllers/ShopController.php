@@ -146,11 +146,47 @@ class ShopController extends Controller
 
         $medQuery = Medicine::query();
         if ($category !== 'All') {
-            $medQuery->where('category', $category);
+            if ($category === 'Tablet') {
+                $medQuery->where(function($q) {
+                    $q->where('product_form', 'like', '%tablet%')
+                      ->orWhere('product_form', 'like', '%capsule%');
+                });
+            } elseif ($category === 'Liquid') {
+                $medQuery->where(function($q) {
+                    $q->where('product_form', 'like', '%liquid%')
+                      ->orWhere('product_form', 'like', '%suspension%')
+                      ->orWhere('product_form', 'like', '%syrup%')
+                      ->orWhere('product_form', 'like', '%solution%')
+                      ->orWhere('product_form', 'like', '%drop%');
+                });
+            } elseif ($category === 'Powder') {
+                $medQuery->where(function($q) {
+                    $q->where('product_form', 'like', '%powder%')
+                      ->orWhere('product_form', 'like', '%sachet%')
+                      ->orWhere('product_form', 'like', '%granule%');
+                });
+            } elseif ($category === 'Injection') {
+                $medQuery->where(function($q) {
+                    $q->where('product_form', 'like', '%injection%')
+                      ->orWhere('product_form', 'like', '%vial%')
+                      ->orWhere('product_form', 'like', '%ampoule%')
+                      ->orWhere('product_form', 'like', '%prefilled pen%');
+                });
+            } elseif ($category === 'Ointment/Cream') {
+                $medQuery->where(function($q) {
+                    $q->where('product_form', 'like', '%ointment%')
+                      ->orWhere('product_form', 'like', '%cream%')
+                      ->orWhere('product_form', 'like', '%gel%')
+                      ->orWhere('product_form', 'like', '%lotion%');
+                });
+            } else {
+                $medQuery->where('product_form', 'like', "%{$category}%");
+            }
         }
         if ($search) {
             $medQuery->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('product_form', 'like', "%{$search}%")
                   ->orWhere('category', 'like', "%{$search}%");
             });
         }

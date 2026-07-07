@@ -71,11 +71,11 @@
 
     <!-- Category Pills Filter -->
     @php
-      $cats = ['All', 'Fever', 'Antibiotic', 'Allergy', 'Acidity', 'Pain', 'Diabetes', 'Heart', 'Supplement', 'Skin', 'Eye', 'Dental'];
+      $cats = ['All', 'Tablet', 'Liquid', 'Powder', 'Injection', 'Ointment/Cream'];
     @endphp
     <div style="display:flex; gap:8px; margin-bottom:14px; overflow-x:auto; padding-bottom:4px;">
       @foreach($cats as $c)
-        <a href="{{ url('/shop/quicksetup?category='.$c.'&q='.urlencode($search).'&company='.urlencode($company)) }}" style="flex-shrink:0; padding:7px 16px; border-radius:20px; background:{{ $category === $c ? '#1A3C8F' : '#F3F4F6' }}; color:{{ $category === $c ? '#fff' : '#555' }}; font-weight:700; font-size:12px; text-decoration:none;">
+        <a href="{{ url('/shop/quicksetup?category='.urlencode($c).'&q='.urlencode($search).'&company='.urlencode($company)) }}" style="flex-shrink:0; padding:7px 16px; border-radius:20px; background:{{ $category === $c ? '#1A3C8F' : '#F3F4F6' }}; color:{{ $category === $c ? '#fff' : '#555' }}; font-weight:700; font-size:12px; text-decoration:none;">
           {{ $c }}
         </a>
       @endforeach
