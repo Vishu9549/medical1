@@ -3,11 +3,11 @@
 @section('content')
 <div class="screen">
   <!-- Header -->
-  <div class="hdr-gradient" style="padding-bottom: 24px; margin-bottom: 20px;">
+  <div class="hdr-gradient" id="cart-header-gradient" style="padding-bottom: 24px; margin-bottom: 20px; transition: all 0.3s ease-in-out;">
     <div class="hdr-circle"></div>
     <div class="hdr-circle2"></div>
 
-    <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px; position:relative; z-index:1;">
+    <div id="cart-header-title-block" style="display:flex; align-items:center; gap:12px; margin-bottom:14px; position:relative; z-index:1; transition: all 0.3s ease-in-out; max-height: 100px; opacity: 1; overflow: hidden;">
       <a href="{{ url('/') }}" class="nav-btn" style="background:rgba(255,255,255,0.15); border-radius:12px; width:40px; height:40px; color:#fff; font-size:18px; display:flex; align-items:center; justify-content:center; padding:0;">←</a>
       <div style="flex:1;">
         <h2 style="color:#fff; font-weight:900; font-size:20px; margin:0;">🛒 Smart Cart</h2>
@@ -20,9 +20,12 @@
     </div>
 
     <!-- Search in Smart Cart -->
-    <form action="{{ url('/smartcart') }}" method="GET" class="search-box" style="position:relative; z-index:1;">
-      <input name="q" class="search-input" placeholder="Medicine ya category likhein..." type="text" value="{{ $query }}">
+    <form action="{{ url('/smartcart') }}" method="GET" class="search-box" id="cart-search-form" style="position:relative; z-index:99; margin-bottom:0;" onsubmit="event.preventDefault(); triggerCartSearch();">
+      <input name="q" id="cart-search-input" class="search-input" placeholder="Medicine ya category likhein..." type="text" autocomplete="off" oninput="debouncedCartSearchSuggestions(this.value)">
       <button type="submit" class="search-btn">Filter</button>
+      
+      <!-- Autocomplete Dropdown suggestions list -->
+      <div id="cart-search-autocomplete" style="display:none; position:absolute; left:0; right:0; top:100%; background:#fff; border-radius:14px; margin-top:8px; box-shadow:0 10px 25px rgba(0,0,0,0.15); border:1px solid #E5E7EB; max-height:260px; overflow-y:auto; z-index:99999;"></div>
     </form>
   </div>
 
@@ -35,7 +38,7 @@
           $disc = $med->mrp > 0 ? round((($med->mrp - $med->price) / $med->mrp) * 100) : 0;
           $detailUrl = url('/medicine/'.$med->id.(!empty(request('shop_id')) ? '?shop_id='.request('shop_id') : ''));
         @endphp
-        <div class="cart-item-card" style="border: {{ $qty > 0 ? '2px solid #BFDBFE' : '2px solid transparent' }};">
+        <div class="cart-item-card catalog-item-row" data-name="{{ strtolower($med->name) }}" data-category="{{ strtolower($med->category) }}" style="border: {{ $qty > 0 ? '2px solid #BFDBFE' : '2px solid transparent' }};">
           <a href="{{ $detailUrl }}" style="display:flex; align-items:center; gap:12px; flex:1; text-decoration:none; text-align:left; color:inherit; overflow:hidden;">
             <div style="width:52px; height:52px; border-radius:14px; background:{{ $qty > 0 ? '#EEF2FF' : '#F8FAFF' }}; display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0; overflow:hidden;">
               @if(!empty($med->images))
@@ -180,6 +183,115 @@
 
   window.addEventListener('DOMContentLoaded', () => {
     attachCartSubmitHandlers(document);
+  });
+
+  // Autocomplete Suggestions
+  let autocompleteTimeout;
+  function debouncedCartSearchSuggestions(query) {
+    clearTimeout(autocompleteTimeout);
+    const dropdown = document.getElementById('cart-search-autocomplete');
+    const q = query.trim().toLowerCase();
+
+    if (q.length === 0) {
+      dropdown.style.display = 'none';
+      restoreCartHeader();
+      filterCatalogItems('');
+      return;
+    }
+
+    // Shrink header instantly on first character
+    shrinkCartHeader();
+    filterCatalogItems(q);
+
+    autocompleteTimeout = setTimeout(() => {
+      fetch(`{{ url('/medicines/search') }}?q=${encodeURIComponent(q)}`)
+        .then(res => res.json())
+        .then(data => {
+          dropdown.innerHTML = '';
+          if (data.length === 0) {
+            dropdown.style.display = 'none';
+            return;
+          }
+          dropdown.style.display = 'block';
+          data.forEach(item => {
+            const row = document.createElement('div');
+            row.style.padding = '12px 16px';
+            row.style.cursor = 'pointer';
+            row.style.borderBottom = '1px solid #F3F4F6';
+            row.style.fontSize = '13px';
+            row.style.fontWeight = '700';
+            row.style.color = '#1A1A1A';
+            row.style.display = 'flex';
+            row.style.alignItems = 'center';
+            row.style.gap = '8px';
+            row.innerHTML = `<span style="font-size:18px;">${item.emoji || '💊'}</span> <span>${item.name}</span> <span style="font-size:11px; color:#888; margin-left:auto; font-weight:normal;">in ${item.category}</span>`;
+            row.addEventListener('click', () => {
+              document.getElementById('cart-search-input').value = item.name;
+              dropdown.style.display = 'none';
+              triggerCartSearch();
+            });
+            dropdown.appendChild(row);
+          });
+        })
+        .catch(err => console.error(err));
+    }, 150);
+  }
+
+  function shrinkCartHeader() {
+    const titleBlock = document.getElementById('cart-header-title-block');
+    const headerGradient = document.getElementById('cart-header-gradient');
+
+    if (titleBlock) {
+      titleBlock.style.maxHeight = '0';
+      titleBlock.style.opacity = '0';
+      titleBlock.style.marginBottom = '0';
+    }
+    if (headerGradient) {
+      headerGradient.style.paddingBottom = '12px';
+      headerGradient.style.marginBottom = '12px';
+    }
+  }
+
+  function restoreCartHeader() {
+    const titleBlock = document.getElementById('cart-header-title-block');
+    const headerGradient = document.getElementById('cart-header-gradient');
+
+    if (titleBlock) {
+      titleBlock.style.maxHeight = '100px';
+      titleBlock.style.opacity = '1';
+      titleBlock.style.marginBottom = '14px';
+    }
+    if (headerGradient) {
+      headerGradient.style.paddingBottom = '24px';
+      headerGradient.style.marginBottom = '20px';
+    }
+  }
+
+  function filterCatalogItems(q) {
+    document.querySelectorAll('.catalog-item-row').forEach(row => {
+      const name = row.getAttribute('data-name');
+      const category = row.getAttribute('data-category');
+      if (!q || name.includes(q) || category.includes(q)) {
+        row.style.display = 'flex';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
+  // Submit trigger
+  function triggerCartSearch() {
+    const q = document.getElementById('cart-search-input').value.trim().toLowerCase();
+    shrinkCartHeader();
+    filterCatalogItems(q);
+  }
+
+  // Close suggestions list on click outside
+  document.addEventListener('click', function(e) {
+    if (e.target.id !== 'cart-search-input') {
+      const results = document.getElementById('cart-search-autocomplete');
+      if (results) results.style.display = 'none';
+    }
   });
 </script>
 @endsection
