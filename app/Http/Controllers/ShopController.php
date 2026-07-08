@@ -244,10 +244,12 @@ class ShopController extends Controller
                     ['price' => $price, 'quantity' => $qty]
                 );
                 $addedCount++;
+            } else {
+                Inventory::where('shop_id', $shop->id)->where('medicine_id', $medId)->delete();
             }
         }
 
-        return redirect('/shop/inventory')->with('success', $addedCount . ' Catalogue medicines added successfully!');
+        return redirect('/shop/inventory')->with('success', 'Catalogue medicines updated successfully!');
     }
 
     public function inventoryIndex()
