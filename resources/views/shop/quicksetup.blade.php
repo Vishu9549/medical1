@@ -50,7 +50,7 @@
       
       <div style="background:#fff; border-radius:18px; padding:20px; box-shadow:0 4px 20px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:16px;">
         <div style="display:flex; flex-direction:column; align-items:stretch; width:100%;">
-          <label class="form-label" style="margin-bottom:6px; font-size:13.5px; font-weight:800; color:#1A3C8F; display:block;">🔍 Search Medicine Name</label>
+          <label class="form-label" style="margin-bottom:6px; font-size:13.5px; font-weight:800; color:#1A3C8F; display:block;">🔍 search to add medicine inventory</label>
           <div style="display:flex; gap:10px; width:100%;">
             <input type="text" id="catalogue-search" class="form-input" style="padding:15px 16px; font-size:15px; border-radius:14px; flex:1; box-sizing:border-box;" placeholder="Type to search (e.g. Paracetamol)...">
             <button type="button" onclick="filterCatalogueList()" class="btn-blue" style="border-radius:14px; padding:15px 24px; font-weight:900; font-size:14px; border:none; cursor:pointer; color:#fff;">Search</button>
