@@ -80,6 +80,10 @@ class HomeController extends Controller
         // Get all unique categories for checkbox sidebar filter
         $allCategories = ['Fever', 'Antibiotic', 'Allergy', 'Acidity', 'Pain', 'Diabetes', 'Heart', 'Supplement', 'Skin', 'Eye', 'Dental'];
 
+        if ($request->ajax()) {
+            return view('customer.search_results_inner', compact('medicines', 'cart', 'cartCount', 'query', 'selectedShop', 'allCategories', 'selectedCategories'));
+        }
+
         return view('customer.search', compact('medicines', 'cart', 'cartCount', 'query', 'selectedShop', 'allCategories', 'selectedCategories'));
     }
 
@@ -189,5 +193,15 @@ class HomeController extends Controller
         $city = $request->input('city', 'Muzaffarpur');
         session(['user_location' => $city]);
         return redirect()->back()->with('success', 'Location updated to ' . $city);
+    }
+
+    public function medicineSearchSuggestions(\Illuminate\Http\Request $request)
+    {
+        $q = $request->input('q', '');
+        if (strlen($q) < 2) {
+            return response()->json([]);
+        }
+        $meds = \App\Models\Medicine::where('name', 'like', '%' . $q . '%')->limit(15)->get();
+        return response()->json($meds);
     }
 }

@@ -3,11 +3,11 @@
 @section('content')
 <div class="screen">
   <!-- === HEADER === -->
-  <div class="hdr-gradient">
+  <div class="hdr-gradient" id="home-header-gradient" style="transition: all 0.3s ease-in-out;">
     <div class="hdr-circle"></div>
     <div class="hdr-circle2"></div>
 
-    <div style="margin-bottom:18px; position:relative; z-index:1;">
+    <div id="home-header-title-block" style="margin-bottom:18px; position:relative; z-index:1; transition: all 0.3s ease-in-out; max-height: 200px; opacity: 1; overflow: hidden;">
       <h1 style="color:#fff; font-size:32px; font-weight:900; line-height:1.2; margin:0 0 8px;">
         Dawai dhundo,<br><span style="color:#93C5FD">5 km ke andar</span> 💊
       </h1>
@@ -15,15 +15,18 @@
     </div>
 
     <!-- Search Form -->
-    <form action="{{ url('/search') }}" method="GET" class="search-box" style="position:relative; z-index:1;">
-      <input name="q" class="search-input" placeholder="Medicine ka naam likhein..." type="text" value="{{ request('q') }}">
+    <form action="{{ url('/search') }}" method="GET" class="search-box" id="home-search-form" style="position:relative; z-index:99; margin-bottom:0;" onsubmit="event.preventDefault(); triggerHomeSearch();">
+      <input name="q" id="home-search-input" class="search-input" placeholder="Medicine ka naam likhein..." type="text" autocomplete="off" oninput="debouncedHomeSearchSuggestions(this.value)">
       <button type="submit" class="search-btn">🔍 Search</button>
+      
+      <!-- Autocomplete Dropdown suggestions list -->
+      <div id="home-search-autocomplete" style="display:none; position:absolute; left:0; right:0; top:100%; background:#fff; border-radius:14px; margin-top:8px; box-shadow:0 10px 25px rgba(0,0,0,0.15); border:1px solid #E5E7EB; max-height:260px; overflow-y:auto; z-index:99999;"></div>
     </form>
 
     <!-- Popular/Pills -->
-    <div style="display:flex; gap:8px; margin-top:12px; overflow-x:auto; padding-bottom:4px; position:relative; z-index:1;">
+    <div id="home-header-pills-block" style="display:flex; gap:8px; margin-top:12px; overflow-x:auto; padding-bottom:4px; position:relative; z-index:1; transition: all 0.3s ease-in-out; max-height: 100px; opacity: 1; overflow: hidden;">
       @foreach($pills as $pill)
-        <a href="{{ url('/search?q='.$pill) }}" class="pill">{{ $pill }}</a>
+        <a href="#" onclick="clickPillSearch('{{ $pill }}'); return false;" class="pill">{{ $pill }}</a>
       @endforeach
     </div>
   </div>
@@ -31,8 +34,12 @@
   <!-- === MAIN CONTENT AREA === -->
   <div class="scroll" style="flex:1; padding-bottom:8px;">
     
-    <!-- Stats Row -->
-    <div style="display:flex; gap:10px; margin-bottom:16px; padding:0 16px;">
+    <!-- Dynamic Search Results Container -->
+    <div id="home-search-results" style="display:none; padding:16px 0;"></div>
+
+    <div id="home-default-content">
+      <!-- Stats Row -->
+      <div style="display:flex; gap:10px; margin-bottom:16px; padding:0 16px;">
       <div style="flex:1; background:#fff; border-radius:12px; padding:10px 6px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.04); border:1px solid #F0F4FF; display:flex; flex-direction:column; align-items:center; justify-content:center;">
         <div style="font-size:18px; margin-bottom:4px;">🏪</div>
         <div style="font-size:18px; font-weight:900; color:#1A3C8F; line-height:1.2;">{{ $shopsCount }}</div>
@@ -188,8 +195,6 @@
         @endforeach
       </div>
     </div>
-
-
 
   </div>
 
@@ -412,6 +417,183 @@
   window.addEventListener('DOMContentLoaded', () => {
     requestGeolocation();
     filterShops('city');
+  });
+
+  // Autocomplete Suggestions
+  let autocompleteTimeout;
+  function debouncedHomeSearchSuggestions(query) {
+    clearTimeout(autocompleteTimeout);
+    const dropdown = document.getElementById('home-search-autocomplete');
+    if (!query || query.trim().length < 2) {
+      dropdown.style.display = 'none';
+      return;
+    }
+    autocompleteTimeout = setTimeout(() => {
+      fetch(`{{ url('/medicines/search') }}?q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          dropdown.innerHTML = '';
+          if (data.length === 0) {
+            dropdown.style.display = 'none';
+            return;
+          }
+          dropdown.style.display = 'block';
+          data.forEach(item => {
+            const row = document.createElement('div');
+            row.style.padding = '12px 16px';
+            row.style.cursor = 'pointer';
+            row.style.borderBottom = '1px solid #F3F4F6';
+            row.style.fontSize = '13.5px';
+            row.style.fontWeight = '700';
+            row.style.color = '#1A1A1A';
+            row.style.display = 'flex';
+            row.style.alignItems = 'center';
+            row.style.gap = '8px';
+            row.innerHTML = `<span style="font-size:18px;">${item.emoji || '💊'}</span> <span>${item.name}</span> <span style="font-size:11px; color:#888; margin-left:auto; font-weight:normal;">in ${item.category}</span>`;
+            row.addEventListener('click', () => {
+              document.getElementById('home-search-input').value = item.name;
+              dropdown.style.display = 'none';
+              triggerHomeSearch();
+            });
+            dropdown.appendChild(row);
+          });
+        })
+        .catch(err => console.error(err));
+    }, 200);
+  }
+
+  // Dynamic search activation
+  function triggerHomeSearch() {
+    const q = document.getElementById('home-search-input').value.trim();
+    if (!q) return;
+
+    // Shrink header: hide title, subtitles, pills
+    const titleBlock = document.getElementById('home-header-title-block');
+    const pillsBlock = document.getElementById('home-header-pills-block');
+    const headerGradient = document.getElementById('home-header-gradient');
+
+    if (titleBlock) {
+      titleBlock.style.maxHeight = '0';
+      titleBlock.style.opacity = '0';
+      titleBlock.style.marginBottom = '0';
+    }
+    if (pillsBlock) {
+      pillsBlock.style.maxHeight = '0';
+      pillsBlock.style.opacity = '0';
+      pillsBlock.style.marginTop = '0';
+    }
+    if (headerGradient) {
+      headerGradient.style.paddingTop = '16px';
+      headerGradient.style.paddingBottom = '16px';
+    }
+
+    // Hide default blocks, show search result area
+    document.getElementById('home-default-content').style.display = 'none';
+    const resultsContainer = document.getElementById('home-search-results');
+    resultsContainer.style.display = 'block';
+    resultsContainer.innerHTML = `
+      <div style="text-align:center; padding:50px 20px; color:#666;">
+        <div style="font-size:32px; margin-bottom:12px;">⏳</div>
+        <div style="font-weight:700; font-size:14px;">Searching medicines...</div>
+      </div>
+    `;
+
+    // Fetch matching medicines via AJAX
+    fetch(`{{ url('/search') }}?q=${encodeURIComponent(q)}`, {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+      .then(res => res.text())
+      .then(html => {
+        resultsContainer.innerHTML = html;
+        bindResultsCartForms();
+      })
+      .catch(err => {
+        console.error(err);
+        resultsContainer.innerHTML = `<div style="padding:20px; text-align:center; color:red; font-weight:bold;">Error searching medicines. Please try again.</div>`;
+      });
+  }
+
+  // Restore state function
+  function clearSearchAndRestoreHome() {
+    document.getElementById('home-search-input').value = '';
+    document.getElementById('home-search-autocomplete').style.display = 'none';
+
+    // Restore header elements
+    const titleBlock = document.getElementById('home-header-title-block');
+    const pillsBlock = document.getElementById('home-header-pills-block');
+    const headerGradient = document.getElementById('home-header-gradient');
+
+    if (titleBlock) {
+      titleBlock.style.maxHeight = '200px';
+      titleBlock.style.opacity = '1';
+      titleBlock.style.marginBottom = '18px';
+    }
+    if (pillsBlock) {
+      pillsBlock.style.maxHeight = '100px';
+      pillsBlock.style.opacity = '1';
+      pillsBlock.style.marginTop = '12px';
+    }
+    if (headerGradient) {
+      headerGradient.style.paddingTop = '30px';
+      headerGradient.style.paddingBottom = '70px';
+    }
+
+    // Toggle content views back
+    document.getElementById('home-search-results').style.display = 'none';
+    document.getElementById('home-search-results').innerHTML = '';
+    document.getElementById('home-default-content').style.display = 'block';
+  }
+
+  function clickPillSearch(term) {
+    document.getElementById('home-search-input').value = term;
+    triggerHomeSearch();
+  }
+
+  // Bind AJAX cart submit events dynamically for the newly loaded results HTML
+  function bindResultsCartForms() {
+    document.querySelectorAll('#home-search-results .cart-form').forEach(form => {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const url = this.getAttribute('action');
+        const formData = new FormData(this);
+
+        fetch(url, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Re-run search query to update state/badges smoothly
+            triggerHomeSearch();
+            
+            // Optionally update navbar/footer cart count dynamically if applicable
+            if (data.cartCount !== undefined) {
+              document.querySelectorAll('.cart-badge-count').forEach(badge => {
+                badge.textContent = data.cartCount;
+              });
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          this.submit();
+        });
+      });
+    });
+  }
+
+  // Close suggestions list on click outside
+  document.addEventListener('click', function(e) {
+    if (e.target.id !== 'home-search-input') {
+      const results = document.getElementById('home-search-autocomplete');
+      if (results) results.style.display = 'none';
+    }
   });
 </script>
 @endsection
