@@ -147,6 +147,7 @@
                 <span style="font-size:12px; color:#666;" id="profile-del-rate-suffix">/ km</span>
               </div>
               <div style="font-size:11px; color:#888; margin-top:6px;" id="profile-del-example">Example: 3 km &times; ₹8 = ₹24 delivery charge</div>
+            </div>
           </div>
 
           <!-- Discount Offers (Customer Savings) -->
