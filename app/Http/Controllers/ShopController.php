@@ -34,7 +34,9 @@ class ShopController extends Controller
             'closes_at' => 'required|string',
             'delivery_enabled' => 'nullable',
             'delivery_charge_type' => 'required|string|in:fixed,dynamic',
-            'delivery_charge_rate' => 'nullable|numeric|min:0'
+            'delivery_charge_rate' => 'nullable|numeric|min:0',
+            'offer_min_bill' => 'nullable|numeric|min:0',
+            'offer_discount_pct' => 'nullable|numeric|min:0|max:100'
         ]);
 
         if (!Auth::check()) {
@@ -69,6 +71,8 @@ class ShopController extends Controller
             'delivery_charge_type' => $chargeType,
             'delivery_charge_fixed' => $fixedCharge,
             'delivery_charge_per_km' => $perKmCharge,
+            'offer_min_bill' => (float)($request->offer_min_bill ?? 0.00),
+            'offer_discount_pct' => (float)($request->offer_discount_pct ?? 0.00),
         ]);
 
         // Create wallet

@@ -162,6 +162,22 @@
                 <span style="font-size:12px; color:#666;" id="reg-del-rate-suffix">/ km</span>
               </div>
               <div style="font-size:11px; color:#888; margin-top:6px;" id="reg-del-example">Example: 3 km &times; ₹8 = ₹24 delivery charge</div>
+          </div>
+
+          <!-- Discount Offers (Customer Savings) -->
+          <div style="background:#FFFDF5; border:1px solid #FEF3C7; border-radius:14px; padding:14px; margin-bottom:14px;">
+            <div style="font-weight:800; font-size:13px; color:#B45309; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+              🎁 Discount Offers (Customer Savings)
+            </div>
+            <div style="display:flex; gap:10px;">
+              <div style="flex:1;">
+                <label class="form-label" style="font-size:11.5px; font-weight:700; color:#92400E; margin-bottom:4px; display:block;">Min Bill Amount (₹)</label>
+                <input type="number" step="any" name="offer_min_bill" class="form-input" style="padding:8px 10px; font-size:13px;" value="{{ old('offer_min_bill', '0.00') }}">
+              </div>
+              <div style="flex:1;">
+                <label class="form-label" style="font-size:11.5px; font-weight:700; color:#92400E; margin-bottom:4px; display:block;">Discount Percentage (%)</label>
+                <input type="number" step="any" name="offer_discount_pct" class="form-input" style="padding:8px 10px; font-size:13px;" value="{{ old('offer_discount_pct', '0.00') }}">
+              </div>
             </div>
           </div>
 
