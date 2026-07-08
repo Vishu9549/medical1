@@ -257,7 +257,10 @@ class ShopController extends Controller
         $shop = $this->getActiveShop();
         if (!$shop) return redirect('/profile');
 
-        $inventory = Inventory::where('shop_id', $shop->id)->with('medicine')->get();
+        $inventory = Inventory::where('shop_id', $shop->id)
+            ->with('medicine')
+            ->orderBy('id', 'desc')
+            ->get();
 
         return view('shop.inventory', compact('shop', 'inventory'));
     }
