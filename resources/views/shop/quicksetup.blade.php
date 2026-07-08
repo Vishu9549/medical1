@@ -165,16 +165,32 @@
         @endif
       </div>
 
-      <div style="height:20px;"></div>
-      <button type="submit" class="btn-blue" style="width:100%; padding:16px; font-weight:900; font-size:15px; border-radius:14px; box-shadow:0 4px 16px rgba(37,99,235,0.3); border:none; color:#fff; cursor:pointer;">
-        💾 Add Selected Medicines
-      </button>
+      <!-- Extra spacer so bottom content isn't covered by the sticky bar -->
+      <div style="height:100px;"></div>
+
+      <!-- Floating Sticky Save Bar -->
+      <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 500px; z-index: 9999; margin: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 12px 16px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); border: 1px solid #E5E7EB; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box;">
+        <div style="font-size: 13px; color: #4B5563; font-weight: 800;">
+          Selected: <span style="color: #1A3C8F; font-size: 16px; font-weight: 900;" id="selected-qty-badge">0</span> items
+        </div>
+        <button type="submit" class="btn-blue" style="border-radius: 12px; padding: 12px 24px; font-weight: 900; font-size: 13.5px; border: none; cursor: pointer; color: #fff; box-shadow: 0 4px 12px rgba(37,99,235,0.2); margin:0;">
+          💾 Save Selected
+        </button>
+      </div>
     </form>
   </div>
 </div>
 
 <script>
-  // Highlight selection dynamically
+  // Highlight selection dynamically & update selected count
+  function updateSelectedCount() {
+    const checkedCount = document.querySelectorAll('.qs-toggle:checked').length;
+    const badge = document.getElementById('selected-qty-badge');
+    if (badge) {
+      badge.textContent = checkedCount;
+    }
+  }
+
   document.querySelectorAll('.qs-toggle').forEach(checkbox => {
     checkbox.addEventListener('change', function() {
       const card = this.closest('.qs-card');
@@ -183,8 +199,12 @@
       } else {
         card.style.borderColor = 'transparent';
       }
+      updateSelectedCount();
     });
   });
+
+  // Run on initial load
+  window.addEventListener('DOMContentLoaded', updateSelectedCount);
 
   // Client-side instant filter catalogue list
   function filterCatalogueList() {
