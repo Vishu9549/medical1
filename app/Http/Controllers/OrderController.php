@@ -64,6 +64,11 @@ class OrderController extends Controller
             $price = $inv ? (float)$inv->price : (float)$med->price;
             $qty = $cart[$med->id] ?? 1;
 
+            if ($inv) {
+                $newQty = max(0, $inv->quantity - $qty);
+                $inv->update(['quantity' => $newQty]);
+            }
+
             $items[] = [
                 'name' => $med->name,
                 'price' => $price,
