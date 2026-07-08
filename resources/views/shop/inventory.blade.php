@@ -124,11 +124,11 @@
                data-company="{{ strtolower($item->medicine ? $item->medicine->company : '') }}"
                data-form="{{ strtolower($item->medicine ? $item->medicine->product_form : '') }}"
                style="background:#fff; border-radius:16px; padding:12px; display:flex; gap:12px; align-items:center; box-shadow:0 2px 12px rgba(0,0,0,0.05); margin:0;">
-            <div style="width:50px; height:50px; border-radius:12px; background:#F8FAFF; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; overflow:hidden; position:relative;">
+            <div style="width:80px; height:80px; border-radius:12px; background:#F8FAFF; display:flex; align-items:center; justify-content:center; font-size:32px; flex-shrink:0; overflow:hidden; position:relative; border:1px solid #E5E7EB;">
               @if(!empty($item->images))
-                <img src="{{ asset($item->images[0]) }}" style="width:100%; height:100%; object-fit:cover;">
+                <img src="{{ asset($item->images[0]) }}" style="width:100%; height:100%; object-fit:contain;">
               @elseif($item->medicine && !empty($item->medicine->images))
-                <img src="{{ asset($item->medicine->images[0]) }}" style="width:100%; height:100%; object-fit:cover;">
+                <img src="{{ asset($item->medicine->images[0]) }}" style="width:100%; height:100%; object-fit:contain;">
               @else
                 {{ $item->medicine ? $item->medicine->emoji : '💊' }}
               @endif
