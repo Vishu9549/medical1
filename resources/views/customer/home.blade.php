@@ -421,15 +421,26 @@
 
   // Autocomplete Suggestions
   let autocompleteTimeout;
+  let searchTimeout;
+
   function debouncedHomeSearchSuggestions(query) {
     clearTimeout(autocompleteTimeout);
+    clearTimeout(searchTimeout);
+
     const dropdown = document.getElementById('home-search-autocomplete');
-    if (!query || query.trim().length < 2) {
+    const q = query.trim();
+
+    if (q.length === 0) {
       dropdown.style.display = 'none';
+      clearSearchAndRestoreHome();
       return;
     }
+
+    // Shrink header instantly on first character
+    shrinkHeader();
+
     autocompleteTimeout = setTimeout(() => {
-      fetch(`{{ url('/medicines/search') }}?q=${encodeURIComponent(query)}`)
+      fetch(`{{ url('/medicines/search') }}?q=${encodeURIComponent(q)}`)
         .then(res => res.json())
         .then(data => {
           dropdown.innerHTML = '';
@@ -459,15 +470,15 @@
           });
         })
         .catch(err => console.error(err));
-    }, 200);
+    }, 150);
+
+    // Also trigger instant results search dynamically as they type
+    searchTimeout = setTimeout(() => {
+      fetchResults(q);
+    }, 350);
   }
 
-  // Dynamic search activation
-  function triggerHomeSearch() {
-    const q = document.getElementById('home-search-input').value.trim();
-    if (!q) return;
-
-    // Shrink header: hide title, subtitles, pills
+  function shrinkHeader() {
     const titleBlock = document.getElementById('home-header-title-block');
     const pillsBlock = document.getElementById('home-header-pills-block');
     const headerGradient = document.getElementById('home-header-gradient');
@@ -486,19 +497,23 @@
       headerGradient.style.paddingTop = '16px';
       headerGradient.style.paddingBottom = '16px';
     }
+  }
 
-    // Hide default blocks, show search result area
+  function fetchResults(q) {
     document.getElementById('home-default-content').style.display = 'none';
     const resultsContainer = document.getElementById('home-search-results');
     resultsContainer.style.display = 'block';
-    resultsContainer.innerHTML = `
-      <div style="text-align:center; padding:50px 20px; color:#666;">
-        <div style="font-size:32px; margin-bottom:12px;">⏳</div>
-        <div style="font-weight:700; font-size:14px;">Searching medicines...</div>
-      </div>
-    `;
+    
+    // Only show loader spinner if the container is currently empty
+    if (!resultsContainer.innerHTML.trim() || resultsContainer.innerHTML.includes('Searching medicines...')) {
+      resultsContainer.innerHTML = `
+        <div style="text-align:center; padding:50px 20px; color:#666;">
+          <div style="font-size:32px; margin-bottom:12px;">⏳</div>
+          <div style="font-weight:700; font-size:14px;">Searching medicines...</div>
+        </div>
+      `;
+    }
 
-    // Fetch matching medicines via AJAX
     fetch(`{{ url('/search') }}?q=${encodeURIComponent(q)}`, {
       headers: {
         'X-Requested-With': 'XMLHttpRequest'
@@ -509,10 +524,15 @@
         resultsContainer.innerHTML = html;
         bindResultsCartForms();
       })
-      .catch(err => {
-        console.error(err);
-        resultsContainer.innerHTML = `<div style="padding:20px; text-align:center; color:red; font-weight:bold;">Error searching medicines. Please try again.</div>`;
-      });
+      .catch(err => console.error(err));
+  }
+
+  // Dynamic search activation (called when pressing enter/search button)
+  function triggerHomeSearch() {
+    const q = document.getElementById('home-search-input').value.trim();
+    if (!q) return;
+    shrinkHeader();
+    fetchResults(q);
   }
 
   // Restore state function
