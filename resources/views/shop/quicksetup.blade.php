@@ -45,24 +45,24 @@
     </div>
 
     <!-- Search & Brand Filter Layout (GET Form for Server-side filtering) -->
-    <form method="GET" action="{{ url('/shop/quicksetup') }}" id="search-filter-form" style="margin-bottom:16px;">
+    <form method="GET" action="{{ url('/shop/quicksetup') }}" id="search-filter-form" style="margin-bottom:16px;" onsubmit="event.preventDefault();">
       <input type="hidden" name="category" value="{{ $category }}">
       
       <div style="background:#fff; border-radius:18px; padding:20px; box-shadow:0 4px 20px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:16px;">
         <div style="display:flex; flex-direction:column; align-items:stretch; width:100%;">
           <label class="form-label" style="margin-bottom:6px; font-size:13.5px; font-weight:800; color:#1A3C8F; display:block;">🔍 Search Medicine Name</label>
           <div style="display:flex; gap:10px; width:100%;">
-            <input type="text" name="q" id="catalogue-search" value="{{ $search }}" class="form-input" style="padding:15px 16px; font-size:15px; border-radius:14px; flex:1; box-sizing:border-box;" placeholder="Type to search (e.g. Paracetamol)...">
-            <button type="submit" class="btn-blue" style="border-radius:14px; padding:15px 24px; font-weight:900; font-size:14px; border:none; cursor:pointer; color:#fff;">Search</button>
+            <input type="text" id="catalogue-search" class="form-input" style="padding:15px 16px; font-size:15px; border-radius:14px; flex:1; box-sizing:border-box;" placeholder="Type to search (e.g. Paracetamol)...">
+            <button type="button" onclick="filterCatalogueList()" class="btn-blue" style="border-radius:14px; padding:15px 24px; font-weight:900; font-size:14px; border:none; cursor:pointer; color:#fff;">Search</button>
           </div>
         </div>
         
         <div style="display:flex; flex-direction:column; align-items:stretch; width:100%;">
           <label class="form-label" style="margin-bottom:6px; font-size:13.5px; font-weight:800; color:#1A3C8F; display:block;">🏭 Filter by Company / Brand</label>
-          <select name="company" id="company-filter" class="form-input" style="padding:15px 16px; font-size:15px; border-radius:14px; height:auto; width:100%; box-sizing:border-box;" onchange="document.getElementById('search-filter-form').submit()">
+          <select id="company-filter" class="form-input" style="padding:15px 16px; font-size:15px; border-radius:14px; height:auto; width:100%; box-sizing:border-box;" onchange="filterCatalogueList()">
             <option value="All">All Companies</option>
             @foreach($allCompanies as $comp)
-              <option value="{{ $comp }}" {{ $company === $comp ? 'selected' : '' }}>{{ $comp }}</option>
+              <option value="{{ $comp }}">{{ $comp }}</option>
             @endforeach
           </select>
         </div>

@@ -207,7 +207,7 @@ class ShopController extends Controller
         $allCompanies = ['Cipla Ltd', 'Abbott India', 'Sun Pharma', 'Alkem Laboratories', 'Mankind Pharma', 'Lupin Ltd'];
         
         // Paginate the collection manually
-        $perPage = 30;
+        $perPage = 500;
         $page = (int) $request->input('page', 1);
         $sliced = $masterMedicinesCollection->slice(($page - 1) * $perPage, $perPage)->values();
         
