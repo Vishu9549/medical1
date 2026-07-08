@@ -73,6 +73,41 @@
       </div>
     @endif
 
+    <!-- Search & Brand Filter Layout -->
+    <div style="background:#fff; border-radius:18px; padding:20px; box-shadow:0 4px 20px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:16px; margin-bottom:16px;">
+      <div style="display:flex; flex-direction:column; align-items:stretch; width:100%;">
+        <label class="form-label" style="margin-bottom:6px; font-size:13.5px; font-weight:800; color:#1A3C8F; display:block;">🔍 Search Medicine Name</label>
+        <div style="display:flex; gap:10px; width:100%;">
+          <input type="text" id="inventory-search" class="form-input" style="padding:15px 16px; font-size:15px; border-radius:14px; flex:1; box-sizing:border-box;" placeholder="Type to search (e.g. Paracetamol)...">
+        </div>
+      </div>
+      
+      <div style="display:flex; flex-direction:column; align-items:stretch; width:100%;">
+        <label class="form-label" style="margin-bottom:6px; font-size:13.5px; font-weight:800; color:#1A3C8F; display:block;">🏭 Filter by Company / Brand</label>
+        <select id="inventory-company-filter" class="form-input" style="padding:15px 16px; font-size:15px; border-radius:14px; height:auto; width:100%; box-sizing:border-box;">
+          <option value="All">All Companies</option>
+          <option value="Cipla Ltd">Cipla Ltd</option>
+          <option value="Abbott India">Abbott India</option>
+          <option value="Sun Pharma">Sun Pharma</option>
+          <option value="Alkem Laboratories">Alkem Laboratories</option>
+          <option value="Mankind Pharma">Mankind Pharma</option>
+          <option value="Lupin Ltd">Lupin Ltd</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Category Pills Filter -->
+    @php
+      $cats = ['All', 'Tablet', 'Liquid', 'Powder', 'Injection', 'Ointment/Cream'];
+    @endphp
+    <div style="display:flex; gap:8px; margin-bottom:14px; overflow-x:auto; padding-bottom:4px;">
+      @foreach($cats as $c)
+        <button type="button" onclick="selectInventoryForm('{{ $c }}')" id="pill-{{ Str::slug($c) }}" class="inventory-form-pill" style="flex-shrink:0; border:none; padding:7px 16px; border-radius:20px; background:#F3F4F6; color:#555; font-weight:700; font-size:12px; cursor:pointer; outline:none;">
+          {{ $c }}
+        </button>
+      @endforeach
+    </div>
+
     <!-- Inventory Stock Table/Grid -->
     @if($inventory->isEmpty())
       <div style="text-align:center; padding:40px 20px; color:#888;">
@@ -83,7 +118,12 @@
     @else
       <div class="responsive-grid">
         @foreach($inventory as $item)
-          <div style="background:#fff; border-radius:16px; padding:12px; display:flex; gap:12px; align-items:center; box-shadow:0 2px 12px rgba(0,0,0,0.05); margin:0;">
+          <div class="inventory-item" 
+               data-name="{{ strtolower($item->medicine ? $item->medicine->name : $item->name) }}" 
+               data-generic="{{ strtolower($item->medicine ? $item->medicine->generic_name : '') }}" 
+               data-company="{{ strtolower($item->medicine ? $item->medicine->company : '') }}"
+               data-form="{{ strtolower($item->medicine ? $item->medicine->product_form : '') }}"
+               style="background:#fff; border-radius:16px; padding:12px; display:flex; gap:12px; align-items:center; box-shadow:0 2px 12px rgba(0,0,0,0.05); margin:0;">
             <div style="width:50px; height:50px; border-radius:12px; background:#F8FAFF; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; overflow:hidden; position:relative;">
               @if(!empty($item->images))
                 <img src="{{ asset($item->images[0]) }}" style="width:100%; height:100%; object-fit:cover;">
@@ -188,5 +228,84 @@ document.addEventListener('click', function(e) {
     if (results) results.style.display = 'none';
   }
 });
+
+// Client-side instant filter inventory list
+let activeForm = 'All';
+
+function selectInventoryForm(formVal) {
+  activeForm = formVal;
+  
+  // Toggle active styles on pills
+  document.querySelectorAll('.inventory-form-pill').forEach(pill => {
+    pill.style.background = '#F3F4F6';
+    pill.style.color = '#555';
+  });
+  const selectedPill = document.getElementById('pill-' + formVal.toLowerCase().replace('/', '-'));
+  if (selectedPill) {
+    selectedPill.style.background = '#1A3C8F';
+    selectedPill.style.color = '#fff';
+  }
+
+  filterInventoryList();
+}
+
+function filterInventoryList() {
+  const searchVal = document.getElementById('inventory-search').value.toLowerCase().trim();
+  const companyVal = document.getElementById('inventory-company-filter').value.toLowerCase().trim();
+
+  document.querySelectorAll('.inventory-item').forEach(row => {
+    const name = row.getAttribute('data-name');
+    const generic = row.getAttribute('data-generic');
+    const company = row.getAttribute('data-company');
+    const pForm = row.getAttribute('data-form');
+
+    // 1. Matches Search query
+    const matchesSearch = !searchVal || 
+                          name.includes(searchVal) || 
+                          generic.includes(searchVal) || 
+                          company.includes(searchVal);
+
+    // 2. Matches Company filter
+    const matchesCompany = companyVal === 'all' || company === companyVal;
+
+    // 3. Matches Form pill filter
+    let matchesForm = true;
+    if (activeForm !== 'All') {
+      const formLower = pForm.toLowerCase();
+      if (activeForm === 'Tablet') {
+        matchesForm = formLower.includes('tablet') || formLower.includes('capsule');
+      } else if (activeForm === 'Liquid') {
+        matchesForm = formLower.includes('liquid') || formLower.includes('suspension') || formLower.includes('syrup') || formLower.includes('solution') || formLower.includes('drop');
+      } else if (activeForm === 'Powder') {
+        matchesForm = formLower.includes('powder') || formLower.includes('sachet') || formLower.includes('granule');
+      } else if (activeForm === 'Injection') {
+        matchesForm = formLower.includes('injection') || formLower.includes('vial') || formLower.includes('ampoule') || formLower.includes('prefilled pen');
+      } else if (activeForm === 'Ointment/Cream') {
+        matchesForm = formLower.includes('ointment') || formLower.includes('cream') || formLower.includes('gel') || formLower.includes('lotion');
+      } else {
+        matchesForm = formLower.includes(activeForm.toLowerCase());
+      }
+    }
+
+    if (matchesSearch && matchesCompany && matchesForm) {
+      row.style.display = 'flex';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+}
+
+// Bind keypress and input events
+const searchInput = document.getElementById('inventory-search');
+if (searchInput) {
+  searchInput.addEventListener('input', filterInventoryList);
+}
+const companySelect = document.getElementById('inventory-company-filter');
+if (companySelect) {
+  companySelect.addEventListener('change', filterInventoryList);
+}
+
+// Run once to initialize active pill style
+selectInventoryForm('All');
 </script>
 @endsection
