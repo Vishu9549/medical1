@@ -19,7 +19,7 @@ class CartController extends Controller
             $catalogQuery->where('name', 'like', "%{$query}%")
                          ->orWhere('category', 'like', "%{$query}%");
         }
-        $catalog = $catalogQuery->get()->map(function ($med) {
+        $catalog = $catalogQuery->limit(100)->get()->map(function ($med) {
             $disc = $med->mrp > 0 ? round((($med->mrp - $med->price) / $med->mrp) * 100) : 0;
             return (object) [
                 'id' => $med->id,

@@ -22,3 +22,10 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+/Prescribed_medicine_DB_with_imageLinks
+/Prescribed_medicine_DB_with_imageLinks.zip
+/database/seeders/medicines_merged.csv
+/database/seeders/medicines_merged.zip
+/database/seeders/import_merged.php
+
