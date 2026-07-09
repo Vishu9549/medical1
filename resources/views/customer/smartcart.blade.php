@@ -190,17 +190,20 @@
   const scrollContainer = document.getElementById('cart-scroll-container');
   const itemsGrid = scrollContainer.querySelector('.responsive-grid');
 
-  scrollContainer.addEventListener('scroll', () => {
+  function handleScroll() {
     if (isPageLoading || !hasMorePages) return;
     
-    // Check if scrolled near bottom
-    const threshold = 150;
-    const position = scrollContainer.scrollHeight - scrollContainer.scrollTop - scrollContainer.clientHeight;
+    const threshold = 250;
+    const windowScrollPosition = document.documentElement.offsetHeight - window.innerHeight - window.scrollY;
+    const containerScrollPosition = scrollContainer.scrollHeight - scrollContainer.scrollTop - scrollContainer.clientHeight;
     
-    if (position < threshold) {
+    if (windowScrollPosition < threshold || containerScrollPosition < threshold) {
       loadNextBundle();
     }
-  });
+  }
+
+  window.addEventListener('scroll', handleScroll);
+  scrollContainer.addEventListener('scroll', handleScroll);
 
   function loadNextBundle() {
     isPageLoading = true;
