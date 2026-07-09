@@ -29,7 +29,7 @@
                 $isAbsolute = strpos($img, 'http://') === 0 || strpos($img, 'https://') === 0;
                 $imgUrl = $isAbsolute ? $img : asset($img);
               @endphp
-              <img src="{{ $imgUrl }}" style="width:100%; height:100%; object-fit:contain; flex-shrink:0; scroll-snap-align:start; border-radius:16px;" alt="{{ $medicine->name }}">
+              <img src="{{ $imgUrl }}" referrerpolicy="no-referrer" style="width:100%; height:100%; object-fit:contain; flex-shrink:0; scroll-snap-align:start; border-radius:16px;" alt="{{ $medicine->name }}">
             @endforeach
           </div>
 

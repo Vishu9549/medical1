@@ -12,7 +12,7 @@
             $isMedAbsolute = strpos($med->images[0], 'http://') === 0 || strpos($med->images[0], 'https://') === 0;
             $medImgUrl = $isMedAbsolute ? $med->images[0] : asset($med->images[0]);
           @endphp
-          <img src="{{ $medImgUrl }}" style="width:100%; height:100%; object-fit:contain;">
+          <img src="{{ $medImgUrl }}" referrerpolicy="no-referrer" style="width:100%; height:100%; object-fit:contain;">
         @else
           {{ $med->emoji }}
         @endif

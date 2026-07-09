@@ -24,7 +24,7 @@
               $isRelAbsolute = strpos($med->images[0], 'http://') === 0 || strpos($med->images[0], 'https://') === 0;
               $relImgUrl = $isRelAbsolute ? $med->images[0] : asset($med->images[0]);
             @endphp
-            <img src="{{ $relImgUrl }}" style="width:100%; height:100%; object-fit:contain;">
+            <img src="{{ $relImgUrl }}" referrerpolicy="no-referrer" style="width:100%; height:100%; object-fit:contain;">
           @else
             <div style="font-size:32px;">{{ $med->emoji }}</div>
           @endif
